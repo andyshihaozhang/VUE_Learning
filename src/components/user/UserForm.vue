@@ -24,7 +24,8 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { UserStatus, NewUser } from '@/types/user'
+import { UserStatus } from '@/types/user'
+import type { NewUser } from '@/types/user'
 
 const props = defineProps<{
   initialData?: NewUser

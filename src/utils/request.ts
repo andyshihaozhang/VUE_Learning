@@ -1,46 +1,47 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import axios from 'axios'
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { ElMessage, ElLoading } from 'element-plus'
 
-// ¶¨Òå½Ó¿Ú·µ»Ø¸ñÊ½
+// æ¥å£è¿”å›æ ¼å¼
 interface ApiResponse<T = any> {
   code: number
   data: T
   message: string
 }
 
-// ¶¨ÒåÇëÇóÅäÖÃ½Ó¿Ú
+// è¯·æ±‚é…ç½®æ¥å£
 interface RequestConfig extends AxiosRequestConfig {
-  loading?: boolean // ÊÇ·ñÏÔÊ¾loading
-  showError?: boolean // ÊÇ·ñÏÔÊ¾´íÎóĞÅÏ¢
+  loading?: boolean // æ˜¯å¦æ˜¾ç¤ºloading
+  showError?: boolean // æ˜¯å¦æ˜¾ç¤ºé”™è¯¯ä¿¡æ¯
 }
 
-// ´´½¨axiosÊµÀı
+// åˆ›å»ºaxioså®ä¾‹
 const service: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api', // ´Ó»·¾³±äÁ¿»ñÈ¡baseURL
-  timeout: 15000, // ÇëÇó³¬Ê±Ê±¼ä
+  baseURL: import.meta.env.VITE_API_BASE_URL || '', // ç§»é™¤é»˜è®¤çš„ /api å‰ç¼€
+  timeout: 15000, // è¯·æ±‚è¶…æ—¶æ—¶é—´
   headers: {
     'Content-Type': 'application/json;charset=utf-8'
   }
 })
 
-// ÇëÇó¶ÓÁĞ
+// è¯·æ±‚é˜Ÿåˆ—
 let requestQueue: string[] = []
-// loadingÊµÀı
+// loadingå®ä¾‹
 let loadingInstance: any = null
 
-// ÏÔÊ¾loading
+// æ˜¾ç¤ºloading
 const showLoading = () => {
   if (requestQueue.length === 0) {
     loadingInstance = ElLoading.service({
       lock: true,
-      text: '¼ÓÔØÖĞ...',
+      text: 'åŠ è½½ä¸­...',
       background: 'rgba(0, 0, 0, 0.7)'
     })
   }
   requestQueue.push('request')
 }
 
-// Òş²Øloading
+// éšè—loading
 const hideLoading = () => {
   requestQueue.pop()
   if (requestQueue.length === 0) {
@@ -48,16 +49,16 @@ const hideLoading = () => {
   }
 }
 
-// ÇëÇóÀ¹½ØÆ÷
+// è¯·æ±‚æ‹¦æˆªå™¨
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // »ñÈ¡token
+    // è·å–token
     const token = localStorage.getItem('token')
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`
     }
 
-    // ´¦Àíloading
+    // æ˜¾ç¤ºloading
     const requestConfig = config as RequestConfig
     if (requestConfig.loading !== false) {
       showLoading()
@@ -65,15 +66,15 @@ service.interceptors.request.use(
 
     return config
   },
-  (error) => {
+  (error: any) => {
     return Promise.reject(error)
   }
 )
 
-// ÏìÓ¦À¹½ØÆ÷
+// å“åº”æ‹¦æˆªå™¨
 service.interceptors.response.use(
-  (response: AxiosResponse) => {
-    // ´¦Àíloading
+  (response: AxiosResponse): Promise<AxiosResponse> => {
+    // éšè—loading
     const requestConfig = response.config as RequestConfig
     if (requestConfig.loading !== false) {
       hideLoading()
@@ -81,81 +82,81 @@ service.interceptors.response.use(
 
     const res = response.data as ApiResponse
 
-    // ¸ù¾İ×Ô¶¨Òå´íÎóÂëÅĞ¶ÏÇëÇóÊÇ·ñ³É¹¦
+    // æ ¹æ®è‡ªå®šä¹‰é”™è¯¯ç åˆ¤æ–­è¯·æ±‚æ˜¯å¦æˆåŠŸ
     if (res.code !== 200) {
-      // ´¦ÀíÌØ¶¨´íÎóÂë
+      // å¤„ç†ç‰¹å®šé”™è¯¯ç 
       if (res.code === 401) {
-        // token¹ıÆÚ£¬Çå³ıtoken²¢Ìø×ªµ½µÇÂ¼Ò³
+        // tokenå¤±æ•ˆï¼Œæ¸…é™¤tokenå¹¶è·³è½¬ç™»å½•é¡µ
         localStorage.removeItem('token')
         window.location.href = '/login'
       }
 
-      // ÏÔÊ¾´íÎóĞÅÏ¢
+      // æ˜¾ç¤ºé”™è¯¯ä¿¡æ¯
       if (requestConfig.showError !== false) {
-        ElMessage.error(res.message || 'ÇëÇóÊ§°Ü')
+        ElMessage.error(res.message || 'è¯·æ±‚å¤±è´¥')
       }
 
-      return Promise.reject(new Error(res.message || 'ÇëÇóÊ§°Ü'))
+      return Promise.reject(new Error(res.message || 'è¯·æ±‚å¤±è´¥'))
     }
 
-    // ·µ»ØÊı¾İ
-    return res.data
+    // è¿”å›æ•°æ®
+    return Promise.resolve(response)
   },
-  (error) => {
-    // ´¦Àíloading
+  (error: any) => {
+    // éšè—loading
     const requestConfig = error.config as RequestConfig
     if (requestConfig?.loading !== false) {
       hideLoading()
     }
 
-    // ´¦Àí´íÎóĞÅÏ¢
-    let message = 'ÇëÇóÊ§°Ü'
+    // å¤„ç†é”™è¯¯ä¿¡æ¯
+    let message = 'è¯·æ±‚å¤±è´¥'
     if (error.response) {
       switch (error.response.status) {
         case 400:
-          message = 'ÇëÇó´íÎó'
+          message = 'è¯·æ±‚é”™è¯¯'
           break
         case 401:
-          message = 'Î´ÊÚÈ¨£¬ÇëÖØĞÂµÇÂ¼'
-          // Çå³ıtoken²¢Ìø×ªµ½µÇÂ¼Ò³
+          message = 'æœªæˆæƒï¼Œè¯·é‡æ–°ç™»å½•'
+          // æ¸…é™¤tokenå¹¶è·³è½¬ç™»å½•é¡µ
           localStorage.removeItem('token')
           window.location.href = '/login'
           break
         case 403:
-          message = '¾Ü¾ø·ÃÎÊ'
+          message = 'æ‹’ç»è®¿é—®'
           break
         case 404:
-          message = 'ÇëÇóµØÖ·³ö´í'
+          message = 'è¯·æ±‚åœ°å€å‡ºé”™'
           break
         case 408:
-          message = 'ÇëÇó³¬Ê±'
+          message = 'è¯·æ±‚è¶…æ—¶'
           break
         case 500:
-          message = '·şÎñÆ÷ÄÚ²¿´íÎó'
+          message = 'æœåŠ¡å™¨å†…éƒ¨é”™è¯¯'
           break
         case 501:
-          message = '·şÎñÎ´ÊµÏÖ'
+          message = 'æœåŠ¡æœªå®ç°'
           break
         case 502:
-          message = 'Íø¹Ø´íÎó'
+          message = 'ç½‘å…³é”™è¯¯'
           break
         case 503:
-          message = '·şÎñ²»¿ÉÓÃ'
+          message = 'æœåŠ¡ä¸å¯ç”¨'
           break
         case 504:
-          message = 'Íø¹Ø³¬Ê±'
+          message = 'ç½‘å…³è¶…æ—¶'
           break
         case 505:
-          message = 'HTTP°æ±¾²»ÊÜÖ§³Ö'
+          message = 'HTTPç‰ˆæœ¬ä¸å—æ”¯æŒ'
           break
         default:
-          message = `Á¬½Ó´íÎó${error.response.status}`
+          message = `è¿æ¥é”™è¯¯${error.response.status}`
       }
     } else if (error.request) {
-      message = '·şÎñÆ÷Î´ÏìÓ¦'
+      message = 'æœåŠ¡å™¨æœªå“åº”'
     }
 
-    // ÏÔÊ¾´íÎóĞÅÏ¢
+    // æ˜¾ç¤ºé”™è¯¯ä¿¡æ¯
     if (requestConfig?.showError !== false) {
       ElMessage.error(message)
     }
@@ -164,26 +165,26 @@ service.interceptors.response.use(
   }
 )
 
-// ·â×°ÇëÇó·½·¨
+// å°è£…è¯·æ±‚æ–¹æ³•
 const request = {
-  get<T = any>(url: string, params?: any, config?: RequestConfig): Promise<T> {
+  get<T = any>(url: string, params?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
     return service.get(url, { params, ...config })
   },
 
-  post<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T> {
+  post<T = any>(url: string, data?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
     return service.post(url, data, config)
   },
 
-  put<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T> {
+  put<T = any>(url: string, data?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
     return service.put(url, data, config)
   },
 
-  delete<T = any>(url: string, params?: any, config?: RequestConfig): Promise<T> {
+  delete<T = any>(url: string, params?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
     return service.delete(url, { params, ...config })
   },
 
-  // ÉÏ´«ÎÄ¼ş
-  upload<T = any>(url: string, file: File, config?: RequestConfig): Promise<T> {
+  // ä¸Šä¼ æ–‡ä»¶
+  upload<T = any>(url: string, file: File, config?: RequestConfig): Promise<ApiResponse<T>> {
     const formData = new FormData()
     formData.append('file', file)
     return service.post(url, formData, {
