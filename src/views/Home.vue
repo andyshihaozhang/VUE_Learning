@@ -2,7 +2,7 @@
   <div class="home">
     <div class="welcome-card">
       <h2>欢迎来到管理系统</h2>
-      <p>这是一个基于 Vue 3 + TypeScript 的现代化管理系统</p>
+      <p>这是一个基于 Vue 3 + TypeScript + Element-Plus 的现代化管理系统</p>
     </div>
     
     <div class="features">
@@ -16,7 +16,7 @@
       </div>
       <div class="feature-card">
         <h3>现代化UI</h3>
-        <p>简洁优雅的界面设计，提供出色的用户体验</p>
+        <p>基于 Element-Plus 的现代化 UI 设计，提供出色的用户体验</p>
       </div>
     </div>
   </div>

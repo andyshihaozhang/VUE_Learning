@@ -1,115 +1,125 @@
 <template>
   <div class="users">
-    <div class="header">
-      <h2>用户管理</h2>
-      <button class="add-btn" @click="showAddModal = true">
-        <span class="icon">+</span>
-        新增用户
-      </button>
-    </div>
-    <div class="user-list">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>用户名</th>
-            <th>电话</th>
-            <th>状态</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="user in users" :key="user.id">
-            <td>{{ user.id }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.phonenumber }}</td>
-            <td>
-              <UserStatusTag :status="user.status" />
-            </td>
-            <td>
-              <button class="btn-edit" @click="openEditModal(user)">编辑</button>
-              <button class="btn-delete" @click="handleDeleteUser(user.id)">删除</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <el-card class="box-card">
+      <template #header>
+        <div class="card-header">
+          <h2>员工管理</h2>
+          <el-button type="primary" @click="showAddModal = true">
+            <el-icon><Plus /></el-icon>
+            新增员工
+          </el-button>
+        </div>
+      </template>
+      <el-table :data="users.slice((currentPage - 1) * pageSize, currentPage * pageSize)" style="width: 100%">
+        <el-table-column prop="username" label="员工姓名" />
+        <el-table-column prop="phone" label="手机号" />
+        <el-table-column prop="status" label="状态">
+          <template #default="scope">
+            <UserStatusTag :status="scope.row.status" />
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="180">
+          <template #default="scope">
+            <el-button type="primary" size="small" @click="openEditModal(scope.row)">
+              <el-icon><Edit /></el-icon>
+              编辑
+            </el-button>
+            <el-button type="danger" size="small" @click="handleDeleteUser(scope.row.id)">
+              <el-icon><Delete /></el-icon>
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        class="pagination"
+        background
+        layout="prev, pager, next, jumper, ->, total"
+        :total="users.length"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-size="pageSize"
+        style="text-align: center; margin-top: 20px;"
+      />
+    </el-card>
 
     <!-- 新增用户模态框 -->
-    <div class="modal" v-if="showAddModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>新增用户</h3>
-          <button class="close-btn" @click="showAddModal = false">&times;</button>
-        </div>
-        <div class="modal-body">
-          <UserForm
-            @submit="handleAddUser"
-            @cancel="showAddModal = false"
-          />
-        </div>
-      </div>
-    </div>
+    <el-dialog v-model="showAddModal" title="新增用户" width="400px">
+      <UserForm
+        v-model="currentUserForm"
+        :is-edit="false"
+        @submit="handleAddUser"
+        @cancel="showAddModal = false"
+      />
+    </el-dialog>
 
     <!-- 编辑用户模态框 -->
-    <div class="modal" v-if="showEditModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>编辑用户</h3>
-          <button class="close-btn" @click="showEditModal = false">&times;</button>
-        </div>
-        <div class="modal-body">
-          <UserForm
-            :user="currentUser"
-            @submit="handleEditUser"
-            @cancel="showEditModal = false"
-          />
-        </div>
-      </div>
-    </div>
+    <el-dialog v-model="showEditModal" title="编辑用户" width="400px">
+      <UserForm
+        v-model="currentUserForm"
+        :is-edit="true"
+        @submit="handleEditUser"
+        @cancel="showEditModal = false"
+      />
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import type { User } from '@/types/user'
+import type { UserDetail } from '@/types/user'
 import { UserStatus } from '@/types/user'
 import UserStatusTag from '@/components/user/UserStatusTag.vue'
 import UserForm from '@/components/user/UserForm.vue'
-import { userApi } from '@/api/user'
+import { UserApi } from '@/api/user'
 import { ElMessage } from 'element-plus'
+import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 
 // 用户列表
-const users = ref<User[]>([])
+const users = ref<UserDetail[]>([])
 // 控制新增用户模态框显示
 const showAddModal = ref(false)
 // 控制编辑用户模态框显示
 const showEditModal = ref(false)
 // 当前编辑的用户
-const currentUser = ref<User | null>(null)
+const currentUser = ref<UserDetail | null>(null)
+// 当前编辑的用户表单
+const currentUserForm = ref<Partial<UserDetail>>({})
+
+const currentPage = ref(1)
+const pageSize = ref(16)
 
 // 获取用户列表
 const getUsers = async () => {
   try {
-    const response = await userApi.getUsers()
-    const res = response.data
-    if (res.code === 200 && Array.isArray(res.data)) {
-      users.value = res.data.map(user => ({
+    const response = await UserApi.getUsers({ page: 1, pageSize: 100 })
+    console.log('API Response:', response)
+    if (response?.data?.items) {
+      users.value = response.data.items.map((user: UserDetail) => ({
         ...user,
         status: user.status as UserStatus
       }))
     } else {
+      console.error('Invalid response format:', response)
       ElMessage.error('获取用户列表失败')
     }
   } catch (error) {
+    console.error('Error fetching users:', error)
     ElMessage.error('获取用户列表失败')
   }
 }
 
 // 处理新增用户
-const handleAddUser = async (userData: Omit<User, 'id'>) => {
+const handleAddUser = async (userData: Partial<UserDetail>) => {
   try {
-    const res = await userApi.addUser(userData)
+    if (!userData.username || !userData.phone) {
+      ElMessage.error('用户名和电话为必填项')
+      return
+    }
+    const res = await UserApi.createUser({
+      username: userData.username,
+      phone: userData.phone
+    })
     ElMessage.success(res.message || '添加用户成功')
     showAddModal.value = false
     getUsers()
@@ -119,9 +129,9 @@ const handleAddUser = async (userData: Omit<User, 'id'>) => {
 }
 
 // 处理删除用户
-const handleDeleteUser = async (id: number) => {
+const handleDeleteUser = async (id: string) => {
   try {
-    await userApi.deleteUser(id)
+    await UserApi.deleteUser(id)
     ElMessage.success('删除用户成功')
     getUsers()
   } catch (error) {
@@ -130,10 +140,10 @@ const handleDeleteUser = async (id: number) => {
 }
 
 // 处理编辑用户
-const handleEditUser = async (userData: Partial<User>) => {
+const handleEditUser = async (userData: Partial<UserDetail>) => {
   if (!currentUser.value) return
   try {
-    await userApi.updateUser(currentUser.value.id, userData)
+    await UserApi.updateUser(currentUser.value.id, userData)
     ElMessage.success('更新用户成功')
     showEditModal.value = false
     getUsers()
@@ -143,9 +153,14 @@ const handleEditUser = async (userData: Partial<User>) => {
 }
 
 // 打开编辑模态框
-const openEditModal = (user: User) => {
+const openEditModal = (user: UserDetail) => {
   currentUser.value = user
+  Object.assign(currentUserForm.value, user)
   showEditModal.value = true
+}
+
+const handleCurrentChange = (page: number) => {
+  currentPage.value = page
 }
 
 // 组件挂载时获取用户列表
@@ -155,119 +170,41 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.users {
-  padding: 20px;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.add-btn {
-  display: flex;
-  align-items: center;
-  padding: 8px 16px;
-  background-color: #1890ff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.add-btn:hover {
-  background-color: #40a9ff;
-}
-
-.icon {
-  margin-right: 8px;
-  font-size: 16px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-th, td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #e9ecef;
-}
-
-th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-}
-
-button {
-  padding: 4px 8px;
-  margin-right: 8px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-edit {
-  background-color: #1890ff;
-  color: white;
-}
-
-.btn-delete {
-  background-color: #ff4d4f;
-  color: white;
-}
-
-/* 模态框样式 */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 8px;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.modal-header {
-  padding: 16px 24px;
-  border-bottom: 1px solid #e9ecef;
+.card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.modal-header h3 {
-  margin: 0;
-  font-size: 18px;
-  color: #2c3e50;
-}
-
-.close-btn {
-  background: none;
+:deep(.el-card) {
   border: none;
-  font-size: 24px;
-  color: #666;
-  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.modal-body {
-  padding: 24px;
+:deep(.el-card__header) {
+  padding: 16px 20px;
+  border-bottom: 1px solid #edf2f7;
+  background-color: #fff;
+}
+
+:deep(.el-table) {
+  --el-table-border-color: #edf2f7;
+  --el-table-header-bg-color: #f8fafc;
+}
+
+:deep(.el-button--primary) {
+  --el-button-bg-color: #1a1f36;
+  --el-button-border-color: #1a1f36;
+  --el-button-hover-bg-color: #2d3748;
+  --el-button-hover-border-color: #2d3748;
+}
+
+:deep(.el-pagination.is-background .el-pager li:not(.is-disabled).is-active) {
+  background-color: #1a1f36;
+}
+
+:deep(.el-button .el-icon) {
+  margin-right: 4px;
+  vertical-align: middle;
 }
 </style> 

@@ -1,14 +1,24 @@
 <template>
-  <form @submit.prevent="handleSubmit">
-    <div class="form-group">
+  <form @submit.prevent="handleSubmit" class="user-form">
+    <div class="form-item">
       <label>用户名</label>
-      <input type="text" v-model="formData.username" required>
+      <input
+        v-model="formData.username"
+        type="text"
+        required
+        placeholder="请输入用户名"
+      />
     </div>
-    <div class="form-group">
+    <div class="form-item">
       <label>电话</label>
-      <input type="tel" v-model="formData.phonenumber" required pattern="[0-9]{11}">
+      <input
+        v-model="formData.phone"
+        type="tel"
+        required
+        placeholder="请输入电话号码"
+      />
     </div>
-    <div class="form-group">
+    <div class="form-item" v-if="isEdit">
       <label>状态</label>
       <select v-model="formData.status">
         <option :value="UserStatus.ACTIVE">在职</option>
@@ -16,100 +26,121 @@
       </select>
     </div>
     <div class="form-actions">
-      <button type="button" class="cancel-btn" @click="$emit('cancel')">取消</button>
-      <button type="submit" class="submit-btn">确定</button>
+      <button type="submit" class="btn-submit">{{ isEdit ? '保存' : '创建' }}</button>
+      <button type="button" class="btn-cancel" @click="$emit('cancel')">取消</button>
     </div>
   </form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import type { UserDetail } from '@/types/user'
 import { UserStatus } from '@/types/user'
-import type { NewUser } from '@/types/user'
 
 const props = defineProps<{
-  initialData?: NewUser
+  modelValue: Partial<UserDetail>
+  isEdit: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'submit', data: NewUser): void
+  (e: 'update:modelValue', value: Partial<UserDetail>): void
+  (e: 'submit', value: Partial<UserDetail>): void
   (e: 'cancel'): void
 }>()
 
-const formData = ref<NewUser>({
+const formData = ref<Partial<UserDetail>>({
   username: '',
-  phonenumber: '',
+  phone: '',
   status: UserStatus.ACTIVE
 })
 
-watch(() => props.initialData, (newVal) => {
-  if (newVal) {
-    formData.value = { ...newVal }
-  }
-}, { immediate: true })
+// 监听 modelValue 变化
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    formData.value = { ...newValue }
+  },
+  { immediate: true }
+)
 
+// 监听表单数据变化
+watch(
+  formData,
+  (newValue) => {
+    emit('update:modelValue', newValue)
+  },
+  { deep: true }
+)
+
+// 提交表单
 const handleSubmit = () => {
-  emit('submit', { ...formData.value })
+  emit('submit', formData.value)
 }
 </script>
 
 <style scoped>
-.form-group {
-  margin-bottom: 16px;
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #2c3e50;
+.form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.form-group input,
-.form-group select {
-  width: 100%;
+.form-item label {
+  font-weight: 500;
+  color: #333;
+}
+
+.form-item input,
+.form-item select {
   padding: 8px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #d9d9d9;
   border-radius: 4px;
   font-size: 14px;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.form-item input:focus,
+.form-item select:focus {
   outline: none;
   border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
 }
 
 .form-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
+  gap: 8px;
+  margin-top: 16px;
 }
 
-.cancel-btn,
-.submit-btn {
+.btn-submit,
+.btn-cancel {
   padding: 8px 16px;
+  border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 14px;
 }
 
-.cancel-btn {
-  background: none;
-  border: 1px solid #ddd;
-  color: #666;
-}
-
-.submit-btn {
+.btn-submit {
   background-color: #1890ff;
-  border: none;
   color: white;
 }
 
-.cancel-btn:hover {
-  background-color: #f8f9fa;
+.btn-submit:hover {
+  background-color: #40a9ff;
 }
 
-.submit-btn:hover {
-  background-color: #40a9ff;
+.btn-cancel {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.btn-cancel:hover {
+  background-color: #e8e8e8;
 }
 </style> 
