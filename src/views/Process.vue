@@ -3,7 +3,7 @@
     <!-- 顶部搜索区 -->
     <el-card class="search-card">
       <div class="search-header">
-        <h2 class="page-title">记录对象</h2>
+        <h2 class="page-title">录入对象</h2>
         <div class="search-content">
           <div class="search-item">
             <template v-if="divisionType === 'employee'">
@@ -88,7 +88,7 @@
         <el-card class="process-card">
           <template #header>
             <div class="card-header">
-              <h3>负责工序</h3>
+              <h3>工序记录</h3>
             </div>
           </template>
           <el-table :data="currentProcessList" style="width: 100%" v-if="currentProcessList.length > 0">
@@ -137,7 +137,7 @@
         <el-card class="process-card">
           <template #header>
             <div class="card-header">
-              <h3>负责工序</h3>
+              <h3>工序记录</h3>
             </div>
           </template>
           <el-table :data="currentProcessList" 
