@@ -1,28 +1,28 @@
 <template>
   <form @submit.prevent="handleSubmit" class="user-form">
     <div class="form-item">
-      <label>用户名</label>
+      <label>员工姓名</label>
       <input
-        v-model="formData.username"
+        v-model="formData.employeeName"
         type="text"
         required
-        placeholder="请输入用户名"
+        placeholder="请输入员工姓名"
       />
     </div>
     <div class="form-item">
-      <label>电话</label>
+      <label>手机号</label>
       <input
-        v-model="formData.phone"
+        v-model="formData.employeePhone"
         type="tel"
         required
-        placeholder="请输入电话号码"
+        placeholder="请输入手机号"
       />
     </div>
     <div class="form-item" v-if="isEdit">
       <label>状态</label>
-      <select v-model="formData.status">
-        <option :value="UserStatus.ACTIVE">在职</option>
-        <option :value="UserStatus.INACTIVE">离职</option>
+      <select v-model="formData.employeeStatus">
+        <option :value="EmployeeStatus.ACTIVE">在职</option>
+        <option :value="EmployeeStatus.INACTIVE">离职</option>
       </select>
     </div>
     <div class="form-actions">
@@ -34,24 +34,24 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { UserDetail } from '@/types/user'
-import { UserStatus } from '@/types/user'
+import type { EmployeeDetail } from '@/types/employee'
+import { EmployeeStatus } from '@/types/employee'
 
 const props = defineProps<{
-  modelValue: Partial<UserDetail>
+  modelValue: Partial<EmployeeDetail>
   isEdit: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: Partial<UserDetail>): void
-  (e: 'submit', value: Partial<UserDetail>): void
+  (e: 'update:modelValue', value: Partial<EmployeeDetail>): void
+  (e: 'submit', value: Partial<EmployeeDetail>): void
   (e: 'cancel'): void
 }>()
 
-const formData = ref<Partial<UserDetail>>({
-  username: '',
-  phone: '',
-  status: UserStatus.ACTIVE
+const formData = ref<Partial<EmployeeDetail>>({
+  employeeName: '',
+  employeePhone: 0,
+  employeeStatus: EmployeeStatus.ACTIVE
 })
 
 // 监听 modelValue 变化

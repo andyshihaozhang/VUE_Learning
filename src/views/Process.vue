@@ -166,25 +166,14 @@
 import { ref } from 'vue'
 import ProcessStatusTag from '@/components/Process/ProcessStatusTag.vue'
 import ProcessPriceInput from '@/components/Process/ProcessPriceInput.vue'
+import type { Product } from '@/types/product'
+import type { Process } from '@/types/process'
+import type { UserDetail } from '@/types/employee'
+
 // 分工方式
 const divisionType = ref('employee')
 const currentTopSelected = ref('')
 const currentLeftSelected = ref('')
-
-// 当前产品
-interface Product {
-  name: string
-  code: string
-  status: string
-  processes: Process[]
-}
-
-interface Process {
-  name: string
-  price: number
-  status: string
-  employee: string
-}
 
 interface Employee {
   name: string

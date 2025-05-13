@@ -10,12 +10,16 @@
           </el-button>
         </div>
       </template>
-      <el-table :data="users.slice((currentPage - 1) * pageSize, currentPage * pageSize)" style="width: 100%">
-        <el-table-column prop="username" label="员工姓名" />
-        <el-table-column prop="phone" label="手机号" />
-        <el-table-column prop="status" label="状态">
+      <el-table 
+        :data="employeeStore.employeeList" 
+        style="width: 100%"
+        v-loading="employeeStore.loading"
+      >
+        <el-table-column prop="employeeName" label="员工姓名" />
+        <el-table-column prop="employeePhone" label="手机号" />
+        <el-table-column prop="employeeStatus" label="状态">
           <template #default="scope">
-            <UserStatusTag :status="scope.row.status" />
+            <EmployeeStatusTag :status="scope.row.employeeStatus" />
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180">
@@ -24,7 +28,7 @@
               <el-icon><Edit /></el-icon>
               编辑
             </el-button>
-            <el-button type="danger" size="small" @click="handleDeleteUser(scope.row.id)">
+            <el-button type="danger" size="small" @click="handleDeleteEmployee(scope.row.employeeId)">
               <el-icon><Delete /></el-icon>
               删除
             </el-button>
@@ -35,30 +39,31 @@
         class="pagination"
         background
         layout="prev, pager, next, jumper, ->, total"
-        :total="users.length"
+        :total="employeeStore.total"
         @current-change="handleCurrentChange"
+        @size-change="handleSizeChange"
         :current-page="currentPage"
         :page-size="pageSize"
         style="text-align: center; margin-top: 20px;"
       />
     </el-card>
 
-    <!-- 新增用户模态框 -->
-    <el-dialog v-model="showAddModal" title="新增用户" width="400px">
-      <UserForm
-        v-model="currentUserForm"
+    <!-- 新增员工模态框 -->
+    <el-dialog v-model="showAddModal" title="新增员工" width="400px">
+      <EmployeeForm
+        v-model="currentEmployeeForm"
         :is-edit="false"
-        @submit="handleAddUser"
+        @submit="handleAddEmployee"
         @cancel="showAddModal = false"
       />
     </el-dialog>
 
-    <!-- 编辑用户模态框 -->
-    <el-dialog v-model="showEditModal" title="编辑用户" width="400px">
-      <UserForm
-        v-model="currentUserForm"
+    <!-- 编辑员工模态框 -->
+    <el-dialog v-model="showEditModal" title="编辑员工" width="400px">
+      <EmployeeForm
+        v-model="currentEmployeeForm"
         :is-edit="true"
-        @submit="handleEditUser"
+        @submit="handleEditEmployee"
         @cancel="showEditModal = false"
       />
     </el-dialog>
@@ -67,105 +72,108 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import type { UserDetail } from '@/types/user'
-import { UserStatus } from '@/types/user'
-import UserStatusTag from '@/components/user/UserStatusTag.vue'
-import UserForm from '@/components/user/UserForm.vue'
-import { UserApi } from '@/api/user'
 import { ElMessage } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 
-// 用户列表
-const users = ref<UserDetail[]>([])
-// 控制新增用户模态框显示
+import type { EmployeeDetail } from '@/types/employee'
+import { EmployeeStatus } from '@/types/employee'
+import EmployeeStatusTag from '@/components/user/EmployeeStatusTag.vue'
+import EmployeeForm from '@/components/user/EmployeeForm.vue'
+import { useEmployeeStore } from '@/stores/employeeStore'
+
+const employeeStore = useEmployeeStore()
+
+// 控制新增员工模态框显示
 const showAddModal = ref(false)
-// 控制编辑用户模态框显示
+// 控制编辑员工模态框显示
 const showEditModal = ref(false)
-// 当前编辑的用户
-const currentUser = ref<UserDetail | null>(null)
-// 当前编辑的用户表单
-const currentUserForm = ref<Partial<UserDetail>>({})
+// 当前编辑的员工表单
+const currentEmployeeForm = ref<Partial<EmployeeDetail>>({})
 
 const currentPage = ref(1)
 const pageSize = ref(16)
 
 // 获取用户列表
-const getUsers = async () => {
+const getEmployees = async () => {
   try {
-    const response = await UserApi.getUsers({ page: 1, pageSize: 100 })
-    console.log('API Response:', response)
-    if (response?.data?.items) {
-      users.value = response.data.items.map((user: UserDetail) => ({
-        ...user,
-        status: user.status as UserStatus
-      }))
-    } else {
-      console.error('Invalid response format:', response)
-      ElMessage.error('获取用户列表失败')
-    }
+    await employeeStore.fetchEmployees({
+      page: currentPage.value,
+      pageSize: pageSize.value
+    })
   } catch (error) {
-    console.error('Error fetching users:', error)
-    ElMessage.error('获取用户列表失败')
+    ElMessage.error('获取员工列表失败')
   }
 }
 
 // 处理新增用户
-const handleAddUser = async (userData: Partial<UserDetail>) => {
+const handleAddEmployee = async (employeeData: Partial<EmployeeDetail>) => {
   try {
-    if (!userData.username || !userData.phone) {
-      ElMessage.error('用户名和电话为必填项')
+    if (!employeeData.employeeName || !employeeData.employeePhone) {
+      ElMessage.error('员工姓名和手机号为必填项')
       return
     }
-    const res = await UserApi.createUser({
-      username: userData.username,
-      phone: userData.phone
+    await employeeStore.createEmployee({
+      employeeName: employeeData.employeeName,
+      employeePhone: employeeData.employeePhone,
+      employeeStatus: employeeData.employeeStatus as EmployeeStatus
     })
-    ElMessage.success(res.message || '添加用户成功')
+    ElMessage.success('添加员工成功')
     showAddModal.value = false
-    getUsers()
+    getEmployees()
   } catch (error) {
-    ElMessage.error('添加用户失败')
+    ElMessage.error('添加员工失败')
   }
 }
 
-// 处理删除用户
-const handleDeleteUser = async (id: string) => {
+// 处理删除员工
+const handleDeleteEmployee = async (id: number) => {
   try {
-    await UserApi.deleteUser(id)
-    ElMessage.success('删除用户成功')
-    getUsers()
+    await employeeStore.deleteEmployee(id)
+    ElMessage.success('删除员工成功')
+    getEmployees()
   } catch (error) {
-    ElMessage.error('删除用户失败')
+    ElMessage.error('删除员工失败')
   }
 }
 
-// 处理编辑用户
-const handleEditUser = async (userData: Partial<UserDetail>) => {
-  if (!currentUser.value) return
+// 处理编辑员工
+const handleEditEmployee = async (employeeData: Partial<EmployeeDetail>) => {
+  if (!currentEmployeeForm.value.employeeId) return
   try {
-    await UserApi.updateUser(currentUser.value.id, userData)
-    ElMessage.success('更新用户成功')
+    await employeeStore.updateEmployee(
+      currentEmployeeForm.value.employeeId,
+      employeeData
+    )
+    ElMessage.success('更新员工成功')
     showEditModal.value = false
-    getUsers()
+    getEmployees()
   } catch (error) {
-    ElMessage.error('更新用户失败')
+    ElMessage.error('更新员工失败')
   }
 }
 
 // 打开编辑模态框
-const openEditModal = (user: UserDetail) => {
-  currentUser.value = user
-  Object.assign(currentUserForm.value, user)
+const openEditModal = (employee: EmployeeDetail) => {
+  currentEmployeeForm.value = { ...employee }
   showEditModal.value = true
 }
 
+// 处理页码变化
 const handleCurrentChange = (page: number) => {
   currentPage.value = page
+  getEmployees()
+}
+
+// 处理每页条数变化
+const handleSizeChange = (size: number) => {
+  pageSize.value = size
+  currentPage.value = 1 // 重置到第一页
+  getEmployees()
 }
 
 // 组件挂载时获取用户列表
 onMounted(() => {
-  getUsers()
+  getEmployees()
 })
 </script>
 

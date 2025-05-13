@@ -1,15 +1,15 @@
 <template>
-  <span :class="['status-tag', status === UserStatus.ACTIVE ? 'active' : 'inactive']">
+  <span :class="['status-tag', status === EmployeeStatus.ACTIVE ? 'active' : 'inactive']">
     <span class="status-dot"></span>
-    {{ status === UserStatus.ACTIVE ? '在职' : '离职' }}
+    {{ status === EmployeeStatus.ACTIVE ? '在职' : '离职' }}
   </span>
 </template>
 
 <script setup lang="ts">
-import { UserStatus } from '@/types/user'
+import { EmployeeStatus } from '@/types/employee'
 
 defineProps<{
-  status: UserStatus
+  status: EmployeeStatus
 }>()
 </script>
 

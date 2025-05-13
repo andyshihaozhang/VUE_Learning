@@ -174,22 +174,8 @@ import { ref } from 'vue'
 import { Plus, Edit, Delete, List } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
-interface Process {
-  id: string
-  name: string
-  description: string
-  price: number
-  responser: string[]
-}
-
-interface Product {
-  id: string
-  name: string
-  code: string
-  customer: string
-  createTime: string
-  processes: Process[]
-}
+import type { Product } from '@/types/product'
+import type { Process } from '@/types/process'
 
 // 负责人列表数据
 const responsers = [

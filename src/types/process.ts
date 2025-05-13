@@ -4,3 +4,16 @@ export enum ProcessStatus {
     PENDING = '待开始',
     IN_PROGRESS = '进行中'
   }
+
+
+  // 流程接口
+  export interface Process {
+    indexId: number
+    processId: number
+    productId: number
+    processName: string
+    processDescription: string
+    processPrice: number
+    createTime: string
+  }
+  

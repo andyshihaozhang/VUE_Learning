@@ -10,5 +10,10 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["vite.config.ts", "src/mock/**/*", "src/types/**/*"]
+  "include": ["vite.config.ts", 
+              "src/mock/**/*", 
+              "src/types/**/*", 
+              "src/types/product.ts", 
+              "src/types/employee.ts", 
+              "src/types/process.ts"]
 }
