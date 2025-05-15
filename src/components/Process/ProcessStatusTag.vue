@@ -5,8 +5,7 @@
   </template>
 
 <script setup lang="ts">
-import { ProcessStatus } from '@/types/process'
-
+import { ProcessStatus } from '@/types/business/common'
 defineProps<{
     status: ProcessStatus
 }>()
@@ -14,11 +13,13 @@ defineProps<{
 function getStatusColor(status: ProcessStatus) {
     switch (status) {
         case ProcessStatus.COMPLETED:
-            return 'success'
+            return 'info'
         case ProcessStatus.PENDING:
             return 'warning'
         case ProcessStatus.IN_PROGRESS:
-            return 'info'
+            return 'success'
+        case ProcessStatus.CANCELLED:
+            return 'danger'
         default:
             return 'info'
     }

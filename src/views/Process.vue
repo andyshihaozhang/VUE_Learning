@@ -166,9 +166,8 @@
 import { ref } from 'vue'
 import ProcessStatusTag from '@/components/Process/ProcessStatusTag.vue'
 import ProcessPriceInput from '@/components/Process/ProcessPriceInput.vue'
-import type { Product } from '@/types/product'
-import type { Process } from '@/types/process'
-import type { UserDetail } from '@/types/employee'
+import type { Product } from '@/types/business/product'
+import type { Process } from '@/types/business/process'
 
 // 分工方式
 const divisionType = ref('employee')

@@ -21,8 +21,8 @@
     <div class="form-item" v-if="isEdit">
       <label>状态</label>
       <select v-model="formData.employeeStatus">
-        <option :value="EmployeeStatus.ACTIVE">在职</option>
-        <option :value="EmployeeStatus.INACTIVE">离职</option>
+        <option :value="ActiveStatus.ACTIVE">在职</option>
+        <option :value="ActiveStatus.INACTIVE">离职</option>
       </select>
     </div>
     <div class="form-actions">
@@ -34,8 +34,8 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { EmployeeDetail } from '@/types/employee'
-import { EmployeeStatus } from '@/types/employee'
+import type { EmployeeDetail } from '@/types/business/employee'
+import { ActiveStatus } from '@/types/business/common'
 
 const props = defineProps<{
   modelValue: Partial<EmployeeDetail>
@@ -51,7 +51,7 @@ const emit = defineEmits<{
 const formData = ref<Partial<EmployeeDetail>>({
   employeeName: '',
   employeePhone: 0,
-  employeeStatus: EmployeeStatus.ACTIVE
+  employeeStatus: ActiveStatus.ACTIVE
 })
 
 // 监听 modelValue 变化

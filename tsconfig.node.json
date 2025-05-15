@@ -5,15 +5,14 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    "strict": true
   },
-  "include": ["vite.config.ts", 
-              "src/mock/**/*", 
-              "src/types/**/*", 
-              "src/types/product.ts", 
-              "src/types/employee.ts", 
-              "src/types/process.ts"]
+  "include": [
+    "vite.config.ts",
+    "src/mock/**/*",
+    "src/types/**/*",
+    "src/types/business/**/*",
+    "src/types/api/**/*",
+    "src/types/global/**/*"
+  ]
 }

@@ -1,23 +1,23 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { EmployeeApi } from '@/api/employeeApi'
+import type { EmployeeDetail } from '@/types/business/employee'
+import { ActiveStatus } from '@/types/business/common'
 import type {
-  EmployeeDetail,
   EmployeeQueryParams,
   EmployeeCreateParams,
-  EmployeeUpdateParams,
-  EmployeeStatus
-} from '@/types/employee'
+  EmployeeUpdateParams
+} from '@/types/business/employee'
 
 export const useEmployeeStore = defineStore('employee', () => {
-  // ×´Ì¬¶¨Òå
+  // çŠ¶æ€å®šä¹‰
   const employeeList = ref<EmployeeDetail[]>([])
   const currentEmployee = ref<EmployeeDetail | null>(null)
   const total = ref(0)
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  // »ñÈ¡Ô±¹¤ÁĞ±í
+  // è·å–å‘˜å·¥åˆ—è¡¨
   const fetchEmployees = async (params: EmployeeQueryParams) => {
     try {
       loading.value = true
@@ -26,83 +26,83 @@ export const useEmployeeStore = defineStore('employee', () => {
         employeeList.value = response.data.data.items
         total.value = response.data.data.total
       } else {
-        error.value = '»ñÈ¡Ô±¹¤ÁĞ±íÊ§°Ü£ºÊı¾İ¸ñÊ½´íÎó'
+        error.value = 'è·å–å‘˜å·¥åˆ—è¡¨å¤±è´¥ï¼Œæ•°æ®æ ¼å¼é”™è¯¯'
       }
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '»ñÈ¡Ô±¹¤ÁĞ±íÊ§°Ü'
+      error.value = err instanceof Error ? err.message : 'è·å–å‘˜å·¥åˆ—è¡¨å¤±è´¥'
       throw err
     } finally {
       loading.value = false
     }
   }
 
-  // »ñÈ¡Ô±¹¤ÏêÇé
+  // è·å–å‘˜å·¥è¯¦æƒ…
   const fetchEmployeeById = async (id: number) => {
     try {
       loading.value = true
       const response = await EmployeeApi.getEmployeeById(id)
       currentEmployee.value = response.data.data
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '»ñÈ¡Ô±¹¤ÏêÇéÊ§°Ü'
+      error.value = err instanceof Error ? err.message : 'è·å–å‘˜å·¥è¯¦æƒ…å¤±è´¥'
     } finally {
       loading.value = false
     }
   }
 
-  // ´´½¨Ô±¹¤
+  // åˆ›å»ºå‘˜å·¥
   const createEmployee = async (data: EmployeeCreateParams) => {
     try {
       loading.value = true
       const response = await EmployeeApi.createEmployee(data)
       return response.data
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '´´½¨Ô±¹¤Ê§°Ü'
+      error.value = err instanceof Error ? err.message : 'åˆ›å»ºå‘˜å·¥å¤±è´¥'
       throw err
     } finally {
       loading.value = false
     }
   }
 
-  // ¸üĞÂÔ±¹¤
+  // æ›´æ–°å‘˜å·¥
   const updateEmployee = async (id: number, data: EmployeeUpdateParams) => {
     try {
       loading.value = true
       const response = await EmployeeApi.updateEmployee(id, data)
       return response.data
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '¸üĞÂÔ±¹¤Ê§°Ü'
+      error.value = err instanceof Error ? err.message : 'æ›´æ–°å‘˜å·¥å¤±è´¥'
       throw err
     } finally {
       loading.value = false
     }
   }
 
-  // É¾³ıÔ±¹¤
+  // åˆ é™¤å‘˜å·¥
   const deleteEmployee = async (id: number) => {
     try {
       loading.value = true
       await EmployeeApi.deleteEmployee(id)
     } catch (err) {
-      error.value = err instanceof Error ? err.message : 'É¾³ıÔ±¹¤Ê§°Ü'
+      error.value = err instanceof Error ? err.message : 'åˆ é™¤å‘˜å·¥å¤±è´¥'
       throw err
     } finally {
       loading.value = false
     }
   }
 
-  // ¸üĞÂÔ±¹¤×´Ì¬
-  const updateEmployeeStatus = async (id: number, status: EmployeeStatus) => {
+  // æ›´æ–°å‘˜å·¥çŠ¶æ€
+  const updateEmployeeStatus = async (id: number, status: ActiveStatus) => {
     try {
       loading.value = true
       const response = await EmployeeApi.updateEmployeeStatus(id, status)
-      // ¸üĞÂÁĞ±íÖĞµÄÔ±¹¤×´Ì¬
+      // æ›´æ–°åˆ—è¡¨ä¸­çš„å‘˜å·¥çŠ¶æ€
       const index = employeeList.value.findIndex(emp => emp.employeeId === id)
       if (index !== -1) {
         employeeList.value[index] = response.data.data
       }
       return response.data
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '¸üĞÂÔ±¹¤×´Ì¬Ê§°Ü'
+      error.value = err instanceof Error ? err.message : 'æ›´æ–°å‘˜å·¥çŠ¶æ€å¤±è´¥'
       throw err
     } finally {
       loading.value = false
@@ -110,13 +110,13 @@ export const useEmployeeStore = defineStore('employee', () => {
   }
 
   return {
-    // ×´Ì¬
+    // çŠ¶æ€
     employeeList,
     currentEmployee,
     total,
     loading,
     error,
-    // ·½·¨
+    // æ–¹æ³•
     fetchEmployees,
     fetchEmployeeById,
     createEmployee,

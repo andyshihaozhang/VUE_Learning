@@ -10,42 +10,46 @@
           </el-button>
         </div>
       </template>
-      <el-table 
-        :data="employeeStore.employeeList" 
-        style="width: 100%"
-        v-loading="employeeStore.loading"
-      >
-        <el-table-column prop="employeeName" label="员工姓名" />
-        <el-table-column prop="employeePhone" label="手机号" />
-        <el-table-column prop="employeeStatus" label="状态">
-          <template #default="scope">
-            <EmployeeStatusTag :status="scope.row.employeeStatus" />
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="180">
-          <template #default="scope">
-            <el-button type="primary" size="small" @click="openEditModal(scope.row)">
-              <el-icon><Edit /></el-icon>
-              编辑
-            </el-button>
-            <el-button type="danger" size="small" @click="handleDeleteEmployee(scope.row.employeeId)">
-              <el-icon><Delete /></el-icon>
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-        class="pagination"
-        background
-        layout="prev, pager, next, jumper, ->, total"
-        :total="employeeStore.total"
-        @current-change="handleCurrentChange"
-        @size-change="handleSizeChange"
-        :current-page="currentPage"
-        :page-size="pageSize"
-        style="text-align: center; margin-top: 20px;"
-      />
+      
+      <div class="table-container">
+        <el-table 
+          :data="employeeStore.employeeList" 
+          style="width: 100%"
+          v-loading="employeeStore.loading"
+          height="calc(100vh - 270px)"
+        >
+          <el-table-column prop="employeeName" label="员工姓名" />
+          <el-table-column prop="employeePhone" label="手机号" />
+          <el-table-column prop="employeeStatus" label="状态">
+            <template #default="scope">
+              <EmployeeStatusTag :status="scope.row.employeeStatus" />
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="180" fixed="right">
+            <template #default="scope">
+              <el-button type="primary" size="small" @click="openEditModal(scope.row)">
+                <el-icon><Edit /></el-icon>
+                编辑
+              </el-button>
+              <el-button type="danger" size="small" @click="handleDeleteEmployee(scope.row.employeeId)">
+                <el-icon><Delete /></el-icon>
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <!-- 分页配置 -->
+        <el-pagination
+          class="pagination"
+          background
+          layout="prev, pager, next, jumper, ->, total"
+          :total="employeeStore.total"
+          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
+          :current-page="currentPage"
+          :page-size="pageSize"
+        />
+      </div>
     </el-card>
 
     <!-- 新增员工模态框 -->
@@ -75,8 +79,8 @@ import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 
-import type { EmployeeDetail } from '@/types/employee'
-import { EmployeeStatus } from '@/types/employee'
+import type { EmployeeDetail } from '@/types/business/employee'
+import { ActiveStatus } from '@/types/business/common'
 import EmployeeStatusTag from '@/components/user/EmployeeStatusTag.vue'
 import EmployeeForm from '@/components/user/EmployeeForm.vue'
 import { useEmployeeStore } from '@/stores/employeeStore'
@@ -115,7 +119,7 @@ const handleAddEmployee = async (employeeData: Partial<EmployeeDetail>) => {
     await employeeStore.createEmployee({
       employeeName: employeeData.employeeName,
       employeePhone: employeeData.employeePhone,
-      employeeStatus: employeeData.employeeStatus as EmployeeStatus
+      employeeStatus: employeeData.employeeStatus as ActiveStatus
     })
     ElMessage.success('添加员工成功')
     showAddModal.value = false
@@ -178,10 +182,46 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.users {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.box-card {
+  height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.table-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.pagination {
+  padding: 15px 0;
+  display: flex;
+  justify-content: center;
+  background-color: white;
+  border-top: 1px solid #f0f0f0;
+  z-index: 10;
+}
+
+:deep(.el-card__body) {
+  height: calc(100% - 60px);
+  padding: 15px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 :deep(.el-card) {
@@ -198,6 +238,23 @@ onMounted(() => {
 :deep(.el-table) {
   --el-table-border-color: #edf2f7;
   --el-table-header-bg-color: #f8fafc;
+}
+
+:deep(.el-table__body-wrapper) {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+:deep(.el-table__header-wrapper) {
+  overflow: hidden;
+}
+
+:deep(.el-scrollbar__bar.is-horizontal) {
+  height: 8px;
+}
+
+:deep(.el-scrollbar__bar.is-vertical) {
+  width: 8px;
 }
 
 :deep(.el-button--primary) {

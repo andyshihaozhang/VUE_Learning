@@ -1,15 +1,11 @@
-// 员工状态枚举
-export enum EmployeeStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive'
-}
+import { ActiveStatus } from './common';
 
 // 用户基本信息接口
 export interface EmployeeBase {
   employeeId: number;
   employeeName: string;
   employeePhone: number;
-  employeeStatus: EmployeeStatus;
+  employeeStatus: ActiveStatus;
   employeeCreateTime: string;
 }
 
@@ -21,21 +17,21 @@ export interface EmployeeQueryParams {
   page: number;
   pageSize: number;
   search?: number;
-  status?: EmployeeStatus;
+  status?: ActiveStatus;
 }
 
 // 用户创建参数接口
 export interface EmployeeCreateParams {
   employeeName: string;
   employeePhone: number;
-  employeeStatus: EmployeeStatus;
+  employeeStatus: ActiveStatus;
 }
 
 // 用户更新参数接口
 export interface EmployeeUpdateParams {
   employeeId?: number;
   employeePhone?: number;
-  employeeStatus?: EmployeeStatus;
+  employeeStatus?: ActiveStatus;
 }
 
 // 用户列表响应接口
@@ -53,10 +49,3 @@ export interface EmployeeOperationResult {
   message: string;
   data?: EmployeeDetail;
 }
-
-// API 响应接口
-export interface ApiResponse<T = any> {
-  code: number;
-  data: T;
-  message: string;
-} 

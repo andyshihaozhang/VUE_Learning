@@ -11,106 +11,136 @@
         </div>
       </template>
 
-      <el-table
-        :data="tableData"
-        style="width: 100%"
-      >
-        <el-table-column type="expand">
-          <template #default="props">
-            <div class="process-detail">
-              <div class="process-header">
-                <div class="process-title">
-                  <el-icon><List /></el-icon>
-                  <span>工序明细</span>
+      <!-- 加载状态显示 -->
+      <div v-if="isLoading" class="loading-container">
+        <el-icon class="loading-icon"><Loading /></el-icon>
+        <span>加载产品数据中...</span>
+      </div>
+
+      <div v-else class="table-container">
+        <el-table
+          :data="productList"
+          style="width: 100%"
+          @expand-change="handleExpandChange"
+          height="calc(100vh - 270px)"
+        >
+          <el-table-column type="expand">
+            <template #default="props">
+              <div class="process-detail">
+                <div v-if="props.row.processLoading" style="text-align:center;padding:30px;">
+                  <el-icon><Loading /></el-icon> 加载工序中...
+                </div>
+                <div v-else>
+                  <div class="process-header">
+                    <div class="process-title">
+                      <el-icon><List /></el-icon>
+                      <span>工序明细</span>
+                    </div>
+                  </div>
+                  <el-table 
+                    :data="props.row.processDetails || []" 
+                    border
+                    class="process-table"
+                    :header-cell-style="{
+                      background: '#f5f7fa',
+                      color: '#606266',
+                      fontWeight: 'bold'
+                    }"
+                  >
+                    <el-table-column label="工序ID" prop="processId" width="100" />
+                    <el-table-column label="工序名称" prop="processName" width="150" />
+                    <el-table-column label="工序描述" prop="processDescription" min-width="200" />
+                    <el-table-column label="工序负责人" prop="employees" min-width="200">
+                      <template #default="scope">
+                        <div class="responser-display">
+                          <el-tag
+                            v-for="employee in scope.row.employees"
+                            :key="employee.employeeId"
+                            size="small"
+                            class="responser-tag"
+                          >
+                            {{ employee.employeeId }}-{{ employee.employeeName }}
+                          </el-tag>
+                          <span v-if="!scope.row.employees.length" class="empty-text">暂无负责人</span>
+                        </div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="工序参考单价" prop="processPrice" width="120">
+                      <template #default="scope">
+                        <span class="price">¥{{ scope.row.processPrice.toFixed(2) }}</span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="200" fixed="right">
+                      <template #default="scope">
+                        <el-button 
+                          type="warning" 
+                          size="small" 
+                          class="process-action-btn"
+                          @click="handleEditProcess(scope.row)"
+                        >
+                          <el-icon><Edit /></el-icon>
+                          修改
+                        </el-button>
+                        <el-button 
+                          type="danger" 
+                          size="small" 
+                          class="process-action-btn"
+                          @click="handleDeleteProcess(scope.row)"
+                        >
+                          <el-icon><Delete /></el-icon>
+                          删除
+                        </el-button>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                  <div class="process-footer">
+                    <el-button 
+                      type="success" 
+                      class="add-process-btn"
+                      @click="handleAddProcess(props.row)"
+                    >
+                      <el-icon><Plus /></el-icon>
+                      添加工序
+                    </el-button>
+                  </div>
                 </div>
               </div>
-              <el-table 
-                :data="props.row.processes" 
-                border
-                class="process-table"
-                :header-cell-style="{
-                  background: '#f5f7fa',
-                  color: '#606266',
-                  fontWeight: 'bold'
-                }"
-              >
-                <el-table-column label="工序ID" prop="id" width="100" />
-                <el-table-column label="工序名称" prop="name" width="150" />
-                <el-table-column label="工序描述" prop="description" min-width="200" />
-                <el-table-column label="工序负责人" prop="responser" min-width="200">
-                  <template #default="scope">
-                    <div class="responser-display">
-                      <el-tag
-                        v-for="(value, index) in scope.row.responser"
-                        :key="value"
-                        size="small"
-                        class="responser-tag"
-                      >
-                        {{ value }}
-                      </el-tag>
-                      <span v-if="!scope.row.responser.length" class="empty-text">暂无负责人</span>
-                    </div>
-                  </template>
-                </el-table-column>
-                <el-table-column label="工序参考单价" prop="price" width="120">
-                  <template #default="scope">
-                    <span class="price">¥{{ scope.row.price.toFixed(2) }}</span>
-                  </template>
-                </el-table-column>
-                <el-table-column label="操作" width="200" fixed="right">
-                  <template #default="scope">
-                    <el-button 
-                      type="warning" 
-                      size="small" 
-                      class="process-action-btn"
-                      @click="handleEditProcess(scope.row)"
-                    >
-                      <el-icon><Edit /></el-icon>
-                      修改
-                    </el-button>
-                    <el-button 
-                      type="danger" 
-                      size="small" 
-                      class="process-action-btn"
-                      @click="handleDeleteProcess(scope.row)"
-                    >
-                      <el-icon><Delete /></el-icon>
-                      删除
-                    </el-button>
-                  </template>
-                </el-table-column>
-              </el-table>
-              <div class="process-footer">
-                <el-button 
-                  type="success" 
-                  class="add-process-btn"
-                  @click="handleAddProcess(props.row)"
-                >
-                  <el-icon><Plus /></el-icon>
-                  添加工序
-                </el-button>
-              </div>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="产品名称" prop="name" min-width="150" />
-        <el-table-column label="产品编号" prop="code" width="120" />
-        <el-table-column label="客户公司" prop="customer" min-width="200" />
-        <el-table-column label="产品状态" prop="status" min-width="200" />
-        <el-table-column label="创建时间" prop="createTime" width="180" />
-        <el-table-column label="操作" width="180" fixed="right">
-          <template #default="scope">
-            <el-button type="primary" size="small" @click="handleEditProduct(scope.row)">
-              <el-icon><Edit /></el-icon>
-              编辑
-            </el-button>
-            <el-button type="danger" size="small" @click="handleDeleteProduct(scope.row)">
-              <el-icon><Delete /></el-icon>
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+            </template>
+          </el-table-column>
+          <el-table-column label="产品名称" prop="productName" min-width="150" />
+          <el-table-column label="产品编号" prop="productCode" width="120" />
+          <el-table-column label="客户公司" prop="customerName" min-width="200" />
+          <el-table-column label="产品状态" prop="productStatus" min-width="200" >
+            <template #default="scope">
+              <ProcessStatusTag :status="scope.row.productStatus" />
+            </template>
+          </el-table-column>
+          <el-table-column label="创建时间" prop="createTime" width="180" />
+          <el-table-column label="操作" width="180" fixed="right">
+            <template #default="scope">
+              <el-button type="primary" size="small" @click="handleEditProduct(scope.row)">
+                <el-icon><Edit /></el-icon>
+                编辑
+              </el-button>
+              <el-button type="danger" size="small" @click="handleDeleteProduct(scope.row)">
+                <el-icon><Delete /></el-icon>
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <!-- 分页配置 -->
+        <el-pagination
+          class="pagination"
+          background
+          layout="prev, pager, next, jumper, ->, total"
+          :total="total"
+          @current-change="handleCurrentChange"
+          @size-change="handleSizeChange"
+          :current-page="currentPage"
+          :page-size="pageSize"
+        />
+      </div>
     </el-card>
 
     <!-- 编辑工序对话框 -->
@@ -151,10 +181,10 @@
             placeholder="请选择负责人"
           >
             <el-option
-              v-for="item in responsers"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              v-for="item in employeeOptions"
+              :key="item.employeeId"
+              :label="`${item.employeeId}-${item.employeeName}`"
+              :value="item.employeeId"
             />
           </el-select>
         </el-form-item>
@@ -166,194 +196,184 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 新增工序对话框 -->
+    <el-dialog
+      v-model="addDialogVisible"
+      title="新增工序"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="addForm" label-width="100px">
+        <el-form-item label="工序名称">
+          <el-input v-model="addForm.name" placeholder="请输入工序名称" />
+        </el-form-item>
+        <el-form-item label="工序描述">
+          <el-input
+            v-model="addForm.description"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入工序描述"
+          />
+        </el-form-item>
+        <el-form-item label="工序单价">
+          <el-input-number
+            v-model="addForm.price"
+            :precision="2"
+            :step="10"
+            :min="0"
+            placeholder="请输入工序单价"
+          />
+        </el-form-item>
+        <el-form-item label="工序负责人">
+          <el-select
+            v-model="addForm.responser"
+            multiple
+            collapse-tags
+            collapse-tags-tooltip
+            :max-collapse-tags="3"
+            placeholder="请选择负责人"
+          >
+            <el-option
+              v-for="item in employeeOptions"
+              :key="item.employeeId"
+              :label="`${item.employeeId}-${item.employeeName}`"
+              :value="item.employeeId"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="addDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleSaveAdd">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Plus, Edit, Delete, List } from '@element-plus/icons-vue'
+import { ref, onMounted } from 'vue'
+import { Plus, Edit, Delete, List, Loading } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
-import type { Product } from '@/types/product'
-import type { Process } from '@/types/process'
+import type { Product } from '@/types/business/product'
+import type { ProcessDetail } from '@/types/business/process'
+import type { EmployeeDetail } from '@/types/business/employee'
+import { ProductApi } from '@/api/productApi'
+import { ProcessDetailApi } from '@/api/processApi'
+import { EmployeeApi } from '@/api/employeeApi'
+import ProcessStatusTag from "@/components/Process/ProcessStatusTag.vue"
 
-// 负责人列表数据
-const responsers = [
-  { value: '张三', label: '张三' },
-  { value: '李四', label: '李四' },
-  { value: '王五', label: '王五' },
-  { value: '赵六', label: '赵六' }
-]
+// 扩展Product类型，增加工序明细及加载状态
+interface ProductWithProcess extends Product {
+  processDetails?: ProcessDetail[]
+  processLoading?: boolean
+}
 
-const tableData = ref<Product[]>([
-  {
-    id: 'P001',
-    name: '高端定制西装',
-    code: 'SUIT-001',
-    customer: '非凡服饰有限公司',
-    createTime: '2024-03-15 10:00:00',
-    processes: [
-      {
-        id: 'PR001',
-        name: '面料裁剪',
-        description: '根据设计图纸进行面料裁剪，确保尺寸精确',
-        price: 150.00,
-        responser: []
-      },
-      {
-        id: 'PR002',
-        name: '面料预缩',
-        description: '对面料进行预缩处理，防止后期变形',
-        price: 80.00,
-        responser: []
-      },
-      {
-        id: 'PR003',
-        name: '缝制',
-        description: '专业缝制工艺，确保缝线均匀美观',
-        price: 300.00,
-        responser: []
-      },
-      {
-        id: 'PR004',
-        name: '内衬制作',
-        description: '制作西装内衬，提升穿着舒适度',
-        price: 200.00,
-        responser: []
-      },
-      {
-        id: 'PR005',
-        name: '整烫',
-        description: '专业整烫定型，确保版型挺括',
-        price: 100.00,
-        responser: []
-      },
-      {
-        id: 'PR006',
-        name: '纽扣安装',
-        description: '安装定制纽扣，确保牢固美观',
-        price: 120.00,
-        responser: []
-      },
-      {
-        id: 'PR007',
-        name: '口袋制作',
-        description: '制作内外部口袋，确保实用美观',
-        price: 150.00,
-        responser: []
-      },
-      {
-        id: 'PR008',
-        name: '袖口处理',
-        description: '处理袖口细节，确保工艺精湛',
-        price: 180.00,
-        responser: []
-      },
-      {
-        id: 'PR009',
-        name: '领子制作',
-        description: '制作西装领子，确保挺括有型',
-        price: 250.00,
-        responser: []
-      },
-      {
-        id: 'PR010',
-        name: '最终质检',
-        description: '全面质量检查，确保产品完美',
-        price: 100.00,
-        responser: []
-      }
-    ]
-  },
-  {
-    id: 'P002',
-    name: '商务休闲裤',
-    code: 'PANT-001',
-    customer: '非凡服饰有限公司',
-    createTime: '2024-03-14 14:30:00',
-    processes: [
-      {
-        id: 'PR011',
-        name: '面料裁剪',
-        description: '根据设计图纸进行面料裁剪，确保尺寸精确',
-        price: 80.00,
-        responser: []
-      },
-      {
-        id: 'PR012',
-        name: '面料预缩',
-        description: '对面料进行预缩处理，防止后期变形',
-        price: 50.00,
-        responser: []
-      },
-      {
-        id: 'PR013',
-        name: '缝制',
-        description: '专业缝制工艺，确保缝线均匀美观',
-        price: 150.00,
-        responser: []
-      },
-      {
-        id: 'PR014',
-        name: '裤腰制作',
-        description: '制作裤腰，确保穿着舒适',
-        price: 100.00,
-        responser: []
-      },
-      {
-        id: 'PR015',
-        name: '整烫',
-        description: '专业整烫定型，确保版型挺括',
-        price: 50.00,
-        responser: []
-      },
-      {
-        id: 'PR016',
-        name: '拉链安装',
-        description: '安装拉链，确保顺滑耐用',
-        price: 60.00,
-        responser: []
-      },
-      {
-        id: 'PR017',
-        name: '口袋制作',
-        description: '制作前后口袋，确保实用美观',
-        price: 80.00,
-        responser: []
-      },
-      {
-        id: 'PR018',
-        name: '裤脚处理',
-        description: '处理裤脚细节，确保工艺精湛',
-        price: 70.00,
-        responser: []
-      },
-      {
-        id: 'PR019',
-        name: '扣眼制作',
-        description: '制作扣眼，确保美观实用',
-        price: 40.00,
-        responser: []
-      },
-      {
-        id: 'PR020',
-        name: '最终质检',
-        description: '全面质量检查，确保产品完美',
-        price: 50.00,
-        responser: []
-      }
-    ]
+const currentPage = ref(1)
+const pageSize = ref(16)
+const total = ref(0)
+const isLoading = ref(false)
+
+const productList = ref<ProductWithProcess[]>([])
+const employeeOptions = ref<EmployeeDetail[]>([])
+
+// 获取产品列表
+const getProducts = async () => {
+  isLoading.value = true
+  try {
+    const res = await ProductApi.getProducts({
+      page: currentPage.value,
+      pageSize: pageSize.value,
+    })
+    
+    // 先设置基本产品信息并标记加载状态
+    productList.value = res.data.data.items.map(item => ({
+      ...item,
+      processDetails: [],  // 初始化为空数组，而不是undefined
+      processLoading: true // 标记为加载中
+    }))
+    total.value = res.data.data.total
+    
+    // 为每个产品预加载工序明细
+    await loadAllProcessDetails()
+  } catch (error) {
+    ElMessage.error('获取产品列表失败')
+  } finally {
+    isLoading.value = false
   }
-])
+}
+
+// 预加载所有产品的工序明细
+const loadAllProcessDetails = async () => {
+  try {
+    // 使用Promise.all并行加载所有产品的工序明细
+    await Promise.all(
+      productList.value.map(async (product) => {
+        try {
+          const res = await ProcessDetailApi.getProcessDetailsByProductId({
+            productId: product.productId,
+            page: 1,
+            pageSize: 100,
+          })
+          
+          // 更新产品的工序明细
+          product.processDetails = res.data.data.items
+        } catch (error) {
+          console.error(`加载产品 ${product.productId} 的工序明细失败:`, error)
+          product.processDetails = [] // 发生错误时设置为空数组
+        } finally {
+          product.processLoading = false // 无论成功失败都标记为加载完成
+        }
+      })
+    )
+  } catch (error) {
+    console.error('预加载工序明细失败:', error)
+  }
+}
+
+// 获取员工列表
+const getEmployees = async () => {
+  try {
+    const res = await EmployeeApi.getEmployees({
+      page: 1,
+      pageSize: 100, // 假设员工不会太多，一次性加载
+    })
+    employeeOptions.value = res.data.data.items
+  } catch (error) {
+    ElMessage.error('获取员工列表失败')
+  }
+}
+
+// 处理展开事件，无需再加载数据，因为已经预加载完成
+const handleExpandChange = async (row: ProductWithProcess, expandedRows: any) => {
+  // 无需加载数据，因为已经预加载完成
+  // 如果数据仍在加载中，可以在模板中显示加载状态
+}
 
 // 添加编辑对话框数据
 const editDialogVisible = ref(false)
-const currentProcess = ref<Process | null>(null)
-const editForm = ref({
+const addDialogVisible = ref(false)
+const currentProcessDetail = ref<ProcessDetail | null>(null)
+interface EditFormType {
+  name: string
+  description: string
+  price: number
+  responser: number[] // 使用员工ID数组
+}
+const editForm = ref<EditFormType>({
   name: '',
   description: '',
   price: 0,
-  responser: [] as string[]
+  responser: []
+})
+const addForm = ref<EditFormType>({
+  name: '',
+  description: '',
+  price: 0,
+  responser: []
 })
 
 // 处理新增产品
@@ -362,84 +382,300 @@ const handleAddProduct = () => {
 }
 
 // 处理编辑产品
-const handleEditProduct = (row: Product) => {
-  ElMessage.info(`编辑产品：${row.name}`)
+const handleEditProduct = async (row: Product) => {
+  try {
+    await ProductApi.updateProduct(row.productId, {
+      productId: row.productId,
+      productName: row.productName,
+      productCode: row.productCode,
+      productStatus: row.productStatus,
+      customerName: row.customerName
+    })
+    ElMessage.success('产品信息已更新')
+  } catch (error) {
+    ElMessage.error('更新产品信息失败')
+  }
 }
 
 // 处理删除产品
-const handleDeleteProduct = (row: Product) => {
-  ElMessage.info(`删除产品：${row.name}`)
+const handleDeleteProduct = async (row: Product) => {
+  try {
+    await ProductApi.deleteProduct(row.productId)
+    ElMessage.success('产品已删除')
+    // 删除成功后刷新列表
+    getProducts()
+  } catch (error) {
+    ElMessage.error('删除产品失败')
+  }
 }
 
 // 处理新增工序
-const handleAddProcess = (row: Product) => {
-  ElMessage.info(`为产品 ${row.name} 添加工序`)
+const handleAddProcess = (row: ProductWithProcess) => {
+  // 重置表单
+  addForm.value = {
+    name: '',
+    description: '',
+    price: 0,
+    responser: []
+  }
+  // 保存当前产品ID到 ref 中以供保存时使用
+  currentProcessDetail.value = {
+    processId: 0,
+    productId: row.productId,
+    processName: '',
+    processDescription: '',
+    processPrice: 0,
+    employees: [],
+    createTime: new Date().toISOString()
+  }
+  addDialogVisible.value = true
+}
+
+// 处理保存新增
+const handleSaveAdd = async () => {
+  if (!currentProcessDetail.value) return
+  
+  try {
+    // 将选中的员工ID转换为完整的员工对象
+    const selectedEmployees = employeeOptions.value.filter(emp => 
+      addForm.value.responser.includes(emp.employeeId)
+    )
+    
+    // 创建新工序
+    await ProcessDetailApi.createProcessDetail({
+      productId: currentProcessDetail.value.productId,
+      processName: addForm.value.name,
+      processDescription: addForm.value.description,
+      processPrice: addForm.value.price,
+      employees: selectedEmployees
+    })
+    
+    ElMessage.success('工序已添加')
+    addDialogVisible.value = false
+    
+    // 找到所属产品并刷新其工序列表
+    const product = productList.value.find(p => 
+      p.productId === currentProcessDetail.value?.productId
+    )
+    
+    if (product) {
+      // 标记为加载中
+      product.processLoading = true
+      try {
+        const res = await ProcessDetailApi.getProcessDetailsByProductId({
+          productId: product.productId,
+          page: 1,
+          pageSize: 100,
+        })
+        product.processDetails = res.data.data.items
+      } finally {
+        product.processLoading = false
+      }
+    }
+  } catch (error) {
+    ElMessage.error('添加工序失败')
+  }
 }
 
 // 处理编辑工序
-const handleEditProcess = (process: Process) => {
-  currentProcess.value = process
+const handleEditProcess = (process: ProcessDetail) => {
+  currentProcessDetail.value = process
   editForm.value = {
-    name: process.name,
-    description: process.description,
-    price: process.price,
-    responser: [...process.responser]
+    name: process.processName,
+    description: process.processDescription,
+    price: process.processPrice,
+    responser: process.employees.map(emp => emp.employeeId)
   }
   editDialogVisible.value = true
 }
 
 // 处理保存编辑
-const handleSaveEdit = () => {
-  if (!currentProcess.value) return
+const handleSaveEdit = async () => {
+  if (!currentProcessDetail.value) return
   
-  // 更新工序数据
-  currentProcess.value.name = editForm.value.name
-  currentProcess.value.description = editForm.value.description
-  currentProcess.value.price = editForm.value.price
-  currentProcess.value.responser = [...editForm.value.responser]
-  
-  ElMessage.success('工序信息已更新')
-  editDialogVisible.value = false
+  try {
+    // 将选中的员工ID转换为完整的员工对象
+    const selectedEmployees = employeeOptions.value.filter(emp => 
+      editForm.value.responser.includes(emp.employeeId)
+    )
+    
+    // 更新工序数据
+    await ProcessDetailApi.updateProcessDetail(currentProcessDetail.value.processId, {
+      processId: currentProcessDetail.value.processId,
+      processName: editForm.value.name,
+      processDescription: editForm.value.description,
+      processPrice: editForm.value.price,
+      employees: selectedEmployees
+    })
+    ElMessage.success('工序信息已更新')
+    editDialogVisible.value = false
+    
+    // 找到所属产品并刷新其工序列表
+    const product = productList.value.find(p => 
+      p.processDetails?.some(pd => pd.processId === currentProcessDetail.value?.processId)
+    )
+    
+    if (product) {
+      // 标记为加载中
+      product.processLoading = true
+      try {
+        const res = await ProcessDetailApi.getProcessDetailsByProductId({
+          productId: product.productId,
+          page: 1,
+          pageSize: 100,
+        })
+        product.processDetails = res.data.data.items
+      } finally {
+        product.processLoading = false
+      }
+    }
+  } catch (error) {
+    ElMessage.error('更新工序信息失败')
+  }
 }
 
 // 处理删除工序
-const handleDeleteProcess = (process: Process) => {
+const handleDeleteProcess = (process: ProcessDetail) => {
   ElMessageBox.confirm(
-    `确定要删除工序"${process.name}"吗？`,
+    `确定要删除工序"${process.processName}"吗？`,
     '删除确认',
     {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
     }
-  ).then(() => {
-    // 找到当前工序所属的产品
-    const product = tableData.value.find(p => 
-      p.processes.some(proc => proc.id === process.id)
+  ).then(async () => {
+    await ProcessDetailApi.deleteProcessDetail(process.processId)
+    ElMessage.success('工序已删除')
+    
+    // 找到所属产品并刷新其工序列表
+    const product = productList.value.find(p => 
+      p.processDetails?.some(pd => pd.processId === process.processId)
     )
+    
     if (product) {
-      // 从产品中移除该工序
-      product.processes = product.processes.filter(p => p.id !== process.id)
-      ElMessage.success('工序已删除')
+      // 标记为加载中
+      product.processLoading = true
+      try {
+        const res = await ProcessDetailApi.getProcessDetailsByProductId({
+          productId: product.productId,
+          page: 1,
+          pageSize: 100,
+        })
+        product.processDetails = res.data.data.items
+      } finally {
+        product.processLoading = false
+      }
     }
   }).catch(() => {
     // 取消删除
+    ElMessage.info('取消删除')
   })
 }
+
+// 处理页码变化
+const handleCurrentChange = (page: number) => {
+  currentPage.value = page
+  getProducts()
+}
+
+// 处理每页条数变化
+const handleSizeChange = (size: number) => {
+  pageSize.value = size
+  currentPage.value = 1 // 重置到第一页
+  getProducts()
+}
+
+// 组件挂载时获取产品列表和员工列表
+onMounted(() => {
+  getProducts()
+  getEmployees()
+})
 </script>
 
 <style scoped>
+.products {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.box-card {
+  height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.table-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+:deep(.el-card__body) {
+  height: calc(100% - 60px);
+  padding: 15px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+:deep(.el-table) {
+  --el-table-border-color: #edf2f7;
+  --el-table-header-bg-color: #f8fafc;
+}
+
+:deep(.el-table__body-wrapper) {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+:deep(.el-table__header-wrapper) {
+  overflow: hidden;
+}
+
+:deep(.el-scrollbar__bar.is-horizontal) {
+  height: 8px;
+}
+
+:deep(.el-scrollbar__bar.is-vertical) {
+  width: 8px;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  width: 100%;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.loading-icon {
+  font-size: 32px;
+  color: #409eff;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .process-detail {
-  padding: 20px;
+  padding: 15px;
   background-color: #e6e8eb;
   border-radius: 4px;
-  margin: 10px;
+  margin: 0;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
 }
 
 .process-header {
@@ -502,11 +738,6 @@ const handleDeleteProcess = (process: Process) => {
   vertical-align: middle;
 }
 
-:deep(.el-table) {
-  --el-table-border-color: #edf2f7;
-  --el-table-header-bg-color: #f8fafc;
-}
-
 :deep(.el-button--primary) {
   --el-button-bg-color: #1a1f36;
   --el-button-border-color: #1a1f36;
@@ -536,6 +767,9 @@ const handleDeleteProcess = (process: Process) => {
 
 :deep(.el-table__expanded-cell) {
   background-color: #e6e8eb !important;
+  padding: 10px 20px !important;
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 :deep(.el-table__expanded-cell:hover) {
@@ -557,6 +791,7 @@ const handleDeleteProcess = (process: Process) => {
   overflow: hidden;
   background-color: #edf0f3;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+  max-height: 400px;
 }
 
 :deep(.process-table .el-table__header) {
@@ -570,6 +805,11 @@ const handleDeleteProcess = (process: Process) => {
 
 :deep(.process-table .el-table__row:hover > td) {
   background-color: #edf0f3 !important;
+}
+
+:deep(.process-table .el-table__body-wrapper) {
+  max-height: 350px;
+  overflow-y: auto;
 }
 
 :deep(.el-select) {
@@ -631,6 +871,15 @@ const handleDeleteProcess = (process: Process) => {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+
+.pagination {
+  padding: 15px 0;
+  display: flex;
+  justify-content: center;
+  background-color: white;
+  border-top: 1px solid #f0f0f0;
+  z-index: 10;
 }
 </style>
   

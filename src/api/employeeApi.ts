@@ -5,9 +5,9 @@ import type {
   EmployeeQueryParams,
   EmployeeCreateParams,
   EmployeeUpdateParams,
-  ApiResponse,
-  EmployeeStatus
-} from '@/types/employee'
+} from '@/types/business/employee'
+import { ActiveStatus, type ApiResponse } from '@/types/business/common'
+
 
 export class EmployeeApi {
   private static readonly BASE_URL = '/api/users'
@@ -32,7 +32,7 @@ export class EmployeeApi {
     return http.delete<ApiResponse<null>>(`${this.BASE_URL}/${id}`)
   }
 
-  static async updateEmployeeStatus(id: number, status: EmployeeStatus) {
+  static async updateEmployeeStatus(id: number, status: ActiveStatus) {
     return http.patch<ApiResponse<EmployeeDetail>>(`${this.BASE_URL}/${id}/status`, { status })
   }
 }
