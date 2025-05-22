@@ -6,11 +6,11 @@ import type {
   ProcessDetailUpdateParams,
   ProcessDetailResponse,
 } from '@/types/business/process'
-import { ActiveStatus, type ApiResponse } from '@/types/business/common'
-
+import { ActiveStatus } from '@/types/business/common'
+  
 // 产品流程API
 export class ProcessDetailApi {
-  private static readonly BASE_URL = '/api/processes'
+  private static readonly BASE_URL = import.meta.env.VITE_API_BASE_URL + '/process'
 
   static async getProcessDetailsByProductId(params: ProcessDetailQueryByProductIdParams) {
     return http.get<ApiResponse<ProcessDetailResponse>>(this.BASE_URL, { params })

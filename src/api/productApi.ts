@@ -6,11 +6,11 @@ import type {
   ProductCreateParams,
   ProductUpdateParams,
 } from '@/types/business/product'
-import { ActiveStatus, type ApiResponse } from '@/types/business/common'
+import { ActiveStatus } from '@/types/business/common'
 
 
 export class ProductApi {
-  private static readonly BASE_URL = '/api/products'
+  private static readonly BASE_URL = import.meta.env.VITE_API_BASE_URL + '/product'
 
   static async getProducts(params: ProductQueryParams) {
     return http.get<ApiResponse<ProductListResponse>>(this.BASE_URL, { params })

@@ -11,10 +11,3 @@ export enum ActiveStatus {
     ACTIVE = '在职',
     INACTIVE = '离职'
 }
-
-// API 响应公共接口
-export interface ApiResponse<T = any> {
-    code: number;
-    data: T;
-    message: string;
-} 

@@ -10,5 +10,3 @@ declare interface ButtonProps {
 declare interface ButtonEvents {
   onClick: (event: MouseEvent) => void
 }
-
-// 可以添加更多组件相关的类型声明 

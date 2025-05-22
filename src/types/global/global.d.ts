@@ -15,7 +15,6 @@ declare interface Window {
 declare interface ImportMetaEnv {
   // 环境变量的类型声明
   readonly VITE_APP_TITLE: string
-  // 更多环境变量...
 }
 
 declare interface ImportMeta {

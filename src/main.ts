@@ -6,10 +6,6 @@ import App from './App.vue'
 import router from './router'
 import './style.css'
 
-// 在开发环境下引入 mock
-if (import.meta.env.DEV) {
-  import('./mock')
-}
 
 const pinia = createPinia()
 const app = createApp(App)
