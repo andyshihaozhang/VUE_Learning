@@ -29,3 +29,7 @@ export interface RegisterParams {
     password: string
 }
 
+export interface ChangePasswordParams {
+    oldPassword: string
+    newPassword: string
+}

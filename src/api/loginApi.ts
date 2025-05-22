@@ -1,6 +1,6 @@
 import { http } from '@/utils/http'
 
-import type { LoginParams, LoginResponse, RegisterParams } from '@/types/business/login'
+import type { ChangePasswordParams, LoginParams, LoginResponse, RegisterParams } from '@/types/business/login'
 
 export class LoginApi {
     private static readonly BASE_URL = import.meta.env.VITE_API_BASE_URL + '/user'
@@ -11,5 +11,9 @@ export class LoginApi {
 
     static async register(params: RegisterParams) {
         return http.post<ApiResponse<null>>(this.BASE_URL + '/register', params)
+    }
+
+    static async changePassword(params: ChangePasswordParams) {
+        return http.post<ApiResponse<null>>(this.BASE_URL + '/change-password', params)
     }
 }

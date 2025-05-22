@@ -108,7 +108,6 @@ import { Iphone, Lock, User } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { useLoginStore } from '@/stores/loginStore'
 import { ElMessage } from 'element-plus'
-import { LoginApi } from '@/api/loginApi'
 import type { LoginParams, RegisterParams } from '@/types/business/login'
 
 const router = useRouter()
@@ -167,9 +166,11 @@ const handleLogin = async () => {
     await loginFormRef.value.validate()
     loading.value = true
 
-    await loginStore.login(loginForm.phone, loginForm.password)
-    ElMessage.success('登录成功')
-    router.push({ name: 'Home' })
+    await loginStore.login(loginForm, () => {
+      // 登录成功后，跳转到首页
+      ElMessage.success('登录成功')
+      router.push({ name: 'Home' })
+    })
   } catch (error: any) {
     console.error('登录失败:', error)
     ElMessage.error(error.response?.data?.message || '登录失败')
@@ -186,13 +187,14 @@ const handleRegister = async () => {
     await registerFormRef.value.validate()
     loading.value = true
 
-    await LoginApi.register(registerForm)
-    ElMessage.success('注册成功，请登录')
-    isLogin.value = true
-    // 清空注册表单
-    registerForm.username = ''
-    registerForm.phone = ''
-    registerForm.password = ''
+    await loginStore.register(registerForm, () => {
+      ElMessage.success('注册成功，请登录')
+      isLogin.value = true
+      // 清空注册表单
+      registerForm.username = ''
+      registerForm.phone = ''
+      registerForm.password = ''
+    })
   } catch (error: any) {
     console.error('注册失败:', error)
     ElMessage.error(error.response?.data?.message || '注册失败')
