@@ -1,8 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import Layout from '../components/Layout.vue'
+import { useLoginStore } from '@/stores/loginStore'
 
 const routes: Array<RouteRecordRaw> = [
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/views/Login.vue')
+  },
   {
     path: '/',
     component: Layout,
@@ -10,32 +16,32 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '',
         name: 'Home',
-        component: () => import('../views/Home.vue')
+        component: () => import('@/views/Home.vue')
       },
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: () => import('../views/Dashboard.vue')
+        component: () => import('@/views/Dashboard.vue')
       },
       {
         path: 'users',
         name: 'Users',
-        component: () => import('../views/Users.vue')
+        component: () => import('@/views/Users.vue')
       },
       {
         path: 'products',
         name: 'Products',
-        component: () => import('../views/Products.vue')
+        component: () => import('@/views/Products.vue')
       },
       {
         path: 'process',
         name: 'Process',
-        component: () => import('../views/Process.vue')
+        component: () => import('@/views/Process.vue')
       },
       {
         path: 'settings',
         name: 'Settings',
-        component: () => import('../views/Settings.vue')
+        component: () => import('@/views/Settings.vue')
       }
     ]
   }
@@ -44,6 +50,13 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach(async (to, from) => {
+  const loginStore = useLoginStore()
+  if (!loginStore.isLoggedIn && to.name !== 'Login') {
+    return { name: 'Login' }
+  }
 })
 
 export default router 
