@@ -14,16 +14,15 @@ export class EmployeeApi {
   private static readonly BASE_URL = import.meta.env.VITE_API_BASE_URL + '/employee'
 
   static async getEmployees(params: EmployeeQueryParams) {
-    return http.get<ApiResponse<EmployeeListResponse>>(this.BASE_URL, { params })
+    return http.get<ApiResponse<EmployeeListResponse>>(`${this.BASE_URL}/all`, { params })
   }
 
   static async createEmployee(data: EmployeeCreateParams) {
-    console.log("api: createEmployee called with data:", data)
-    console.log("api: request URL:", `${this.BASE_URL}/add`)
     return http.post<ApiResponse<EmployeeDetail>>(`${this.BASE_URL}/add`, data)
   }
 
   static async updateEmployee(id: number, data: EmployeeUpdateParams) {
+    console.log("api: updateEmployee called with id:", id, "and data:", data)
     return http.put<ApiResponse<EmployeeDetail>>(`${this.BASE_URL}/update/${id}`, data)
   }
 

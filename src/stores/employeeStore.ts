@@ -2,14 +2,11 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { EmployeeApi } from '@/api/employeeApi'
 import type { EmployeeDetail } from '@/types/business/employee'
-import { ActiveStatus } from '@/types/business/common'
 import type {
   EmployeeQueryParams,
   EmployeeCreateParams,
   EmployeeUpdateParams
 } from '@/types/business/employee'
-import type { ProductListResponse } from '@/types/business/product'
-import type { Process } from '@/types/business/process'
 
 export const useEmployeeStore = defineStore('employee', () => {
   // 状态定义
