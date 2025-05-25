@@ -11,8 +11,8 @@ export const statusOptions = [
  */
 export const getStatusTagType = (status: ActiveStatus): 'success' | 'danger' => {
   const types: Record<ActiveStatus, 'success' | 'danger'> = {
-    active: 'success',
-    inactive: 'danger'
+    [ActiveStatus.ACTIVE]: 'success',
+    [ActiveStatus.INACTIVE]: 'danger'
   }
   return types[status]
 }

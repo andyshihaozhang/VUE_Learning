@@ -6,7 +6,8 @@ import type {
   ProductCreateParams,
   ProductUpdateParams,
 } from '@/types/business/product'
-import { ActiveStatus } from '@/types/business/common'
+import type { EmployeeListResponse } from '@/types/business/employee'
+import type { ProcessDetailResponse } from '@/types/business/process'
 
 
 export class ProductApi {
@@ -14,10 +15,6 @@ export class ProductApi {
 
   static async getProducts(params: ProductQueryParams) {
     return http.get<ApiResponse<ProductListResponse>>(this.BASE_URL, { params })
-  }
-
-  static async getProductById(id: number) {
-    return http.get<ApiResponse<Product>>(`${this.BASE_URL}/${id}`)
   }
 
   static async createProduct(data: ProductCreateParams) {
@@ -32,9 +29,12 @@ export class ProductApi {
     return http.delete<ApiResponse<null>>(`${this.BASE_URL}/${id}`)
   }
 
-  static async updateProductStatus(id: number, status: ActiveStatus) {
-    return http.patch<ApiResponse<Product>>(`${this.BASE_URL}/${id}/status`, { status })
+  static async getEmployeesByProductId(productId: number) {
+    return http.get<ApiResponse<EmployeeListResponse>>(`${this.BASE_URL}/${productId}/employees`)
   }
 
-
+  static async getProcessesByProductId(productId: number) {
+    console.log(`${this.BASE_URL}/${productId}/processes`)
+    return http.get<ApiResponse<ProcessDetailResponse>>(`${this.BASE_URL}/${productId}/processes`)
+  }
 }

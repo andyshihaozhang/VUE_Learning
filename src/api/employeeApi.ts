@@ -6,33 +6,36 @@ import type {
   EmployeeCreateParams,
   EmployeeUpdateParams,
 } from '@/types/business/employee'
-import { ActiveStatus, } from '@/types/business/common'
+import type { ProductListResponse } from '@/types/business/product'
+import type { ProcessListResponse } from '@/types/business/process'
 
 
 export class EmployeeApi {
-  private static readonly BASE_URL = import.meta.env.VITE_API_BASE_URL + '/user'
+  private static readonly BASE_URL = import.meta.env.VITE_API_BASE_URL + '/employee'
 
   static async getEmployees(params: EmployeeQueryParams) {
     return http.get<ApiResponse<EmployeeListResponse>>(this.BASE_URL, { params })
   }
 
-  static async getEmployeeById(id: number) {
-    return http.get<ApiResponse<EmployeeDetail>>(`${this.BASE_URL}/${id}`)
-  }
-
   static async createEmployee(data: EmployeeCreateParams) {
-    return http.post<ApiResponse<EmployeeDetail>>(this.BASE_URL, data)
+    console.log("api: createEmployee called with data:", data)
+    console.log("api: request URL:", `${this.BASE_URL}/add`)
+    return http.post<ApiResponse<EmployeeDetail>>(`${this.BASE_URL}/add`, data)
   }
 
   static async updateEmployee(id: number, data: EmployeeUpdateParams) {
-    return http.put<ApiResponse<EmployeeDetail>>(`${this.BASE_URL}/${id}`, data)
+    return http.put<ApiResponse<EmployeeDetail>>(`${this.BASE_URL}/update/${id}`, data)
   }
 
   static async deleteEmployee(id: number) {
-    return http.delete<ApiResponse<null>>(`${this.BASE_URL}/${id}`)
+    return http.delete<ApiResponse<null>>(`${this.BASE_URL}/delete/${id}`)
   }
 
-  static async updateEmployeeStatus(id: number, status: ActiveStatus) {
-    return http.patch<ApiResponse<EmployeeDetail>>(`${this.BASE_URL}/${id}/status`, { status })
+  static async getProductsByEmployeeId(employeeId: number) {
+    return http.get<ApiResponse<ProductListResponse>>(`${this.BASE_URL}/getProducts/${employeeId}`)
+  }
+
+  static async getProcessesByEmployeeId(employeeId: number) {
+    return http.get<ApiResponse<ProcessListResponse>>(`${this.BASE_URL}/${employeeId}/processes`)
   }
 }

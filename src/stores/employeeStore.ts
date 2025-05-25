@@ -8,6 +8,8 @@ import type {
   EmployeeCreateParams,
   EmployeeUpdateParams
 } from '@/types/business/employee'
+import type { ProductListResponse } from '@/types/business/product'
+import type { Process } from '@/types/business/process'
 
 export const useEmployeeStore = defineStore('employee', () => {
   // 状态定义
@@ -36,26 +38,17 @@ export const useEmployeeStore = defineStore('employee', () => {
     }
   }
 
-  // 获取员工详情
-  const fetchEmployeeById = async (id: number) => {
-    try {
-      loading.value = true
-      const response = await EmployeeApi.getEmployeeById(id)
-      currentEmployee.value = response.data.data
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : '获取员工详情失败'
-    } finally {
-      loading.value = false
-    }
-  }
-
   // 创建员工
   const createEmployee = async (data: EmployeeCreateParams) => {
     try {
+      console.log("store: createEmployee called with data:", data)
       loading.value = true
+      console.log("store: calling EmployeeApi.createEmployee")
       const response = await EmployeeApi.createEmployee(data)
+      console.log("store: EmployeeApi.createEmployee response:", response)
       return response.data
     } catch (err) {
+      console.error("store: createEmployee error:", err)
       error.value = err instanceof Error ? err.message : '创建员工失败'
       throw err
     } finally {
@@ -90,19 +83,28 @@ export const useEmployeeStore = defineStore('employee', () => {
     }
   }
 
-  // 更新员工状态
-  const updateEmployeeStatus = async (id: number, status: ActiveStatus) => {
+  // 获取员工负责的产品列表
+  const getProductsByEmployeeId = async (employeeId: number) => {
     try {
       loading.value = true
-      const response = await EmployeeApi.updateEmployeeStatus(id, status)
-      // 更新列表中的员工状态
-      const index = employeeList.value.findIndex(emp => emp.employeeId === id)
-      if (index !== -1) {
-        employeeList.value[index] = response.data.data
-      }
+      const response = await EmployeeApi.getProductsByEmployeeId(employeeId)
       return response.data
     } catch (err) {
-      error.value = err instanceof Error ? err.message : '更新员工状态失败'
+      error.value = err instanceof Error ? err.message : '获取产品列表失败'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // 获取员工的工序列表
+  const getProcessesByEmployeeId = async (employeeId: number) => {
+    try {
+      loading.value = true
+      const response = await EmployeeApi.getProcessesByEmployeeId(employeeId)
+      return response.data
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : '获取工序列表失败'
       throw err
     } finally {
       loading.value = false
@@ -118,10 +120,10 @@ export const useEmployeeStore = defineStore('employee', () => {
     error,
     // 方法
     fetchEmployees,
-    fetchEmployeeById,
     createEmployee,
     updateEmployee,
     deleteEmployee,
-    updateEmployeeStatus
+    getProductsByEmployeeId,
+    getProcessesByEmployeeId
   }
 })

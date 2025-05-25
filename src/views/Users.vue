@@ -112,19 +112,23 @@ const getEmployees = async () => {
 // 处理新增用户
 const handleAddEmployee = async (employeeData: Partial<EmployeeDetail>) => {
   try {
+    console.log("component: handleAddEmployee called with data:", employeeData)
     if (!employeeData.employeeName || !employeeData.employeePhone) {
       ElMessage.error('员工姓名和手机号为必填项')
       return
     }
+    console.log("component: calling employeeStore.createEmployee")
     await employeeStore.createEmployee({
       employeeName: employeeData.employeeName,
       employeePhone: employeeData.employeePhone,
       employeeStatus: employeeData.employeeStatus as ActiveStatus
     })
+    console.log("component: employeeStore.createEmployee completed")
     ElMessage.success('添加员工成功')
     showAddModal.value = false
     getEmployees()
   } catch (error) {
+    console.error("component: handleAddEmployee error:", error)
     ElMessage.error('添加员工失败')
   }
 }

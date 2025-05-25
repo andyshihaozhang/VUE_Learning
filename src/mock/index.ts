@@ -1,12 +1,14 @@
 import Mock from 'mockjs'
 import { mockUsers } from './user'
 import { mockProducts, mockProcesses } from './product'
+import { mockProcessDetailResponses, mockProcessCreateResponses, mockProcessUpdateResponses } from './process'
 // 设置延迟时间
 Mock.setup({
   timeout: '200-600'
 })
 
-// 用户列表接口
+// 用户模块API接口
+// 获取所有用户信息
 Mock.mock(/\/api\/users(\?.*)?$/, 'get', (options) => {
   const url = new URL(options.url, 'http://localhost')
   const page = parseInt(url.searchParams.get('page') || '1')
@@ -29,7 +31,7 @@ Mock.mock(/\/api\/users(\?.*)?$/, 'get', (options) => {
   }
 })
 
-// 单个用户接口
+// 根据用户id获取用户信息
 Mock.mock(/\/api\/users\/\d+/, 'get', (options) => {
   const employeeId = parseInt(options.url.split('/').pop() || '0')
   const user = mockUsers.find(u => u.employeeId === employeeId)
@@ -49,7 +51,7 @@ Mock.mock(/\/api\/users\/\d+/, 'get', (options) => {
   }
 })
 
-// 创建用户接口
+// 创建新用户接口
 Mock.mock('/api/users', 'post', (options) => {
   const body = JSON.parse(options.body)
   const newUser = {
@@ -66,7 +68,7 @@ Mock.mock('/api/users', 'post', (options) => {
   }
 })
 
-// 更新用户接口
+// 更新用户信息接口
 Mock.mock(/\/api\/users\/\d+/, 'put', (options) => {
   const employeeId = parseInt(options.url.split('/').pop() || '0')
   const body = JSON.parse(options.body)
@@ -112,49 +114,10 @@ Mock.mock(/\/api\/users\/\d+/, 'delete', (options) => {
   }
 })
 
-// 批量删除用户接口
-Mock.mock('/api/users/batch-delete', 'post', (options) => {
-  const { ids } = JSON.parse(options.body)
-  const deletedCount = ids.reduce((count: number, id: number) => {
-    const index = mockUsers.findIndex(u => u.employeeId === id)
-    if (index > -1) {
-      mockUsers.splice(index, 1)
-      return count + 1
-    }
-    return count
-  }, 0)
-  
-  return {
-    code: 200,
-    data: null,
-    message: `成功删除 ${deletedCount} 个用户`
-  }
-})
 
-// 更新用户状态接口
-Mock.mock(/\/api\/users\/\d+\/status/, 'patch', (options) => {
-  const employeeId = parseInt(options.url.split('/')[3] || '0')
-  const { status } = JSON.parse(options.body)
-  const index = mockUsers.findIndex(u => u.employeeId === employeeId)
-  
-  if (index > -1) {
-    mockUsers[index].employeeStatus = status
-    return {
-      code: 200,
-      data: mockUsers[index],
-      message: '状态更新成功'
-    }
-  }
-  
-  return {
-    code: 404,
-    data: null,
-    message: '用户不存在'
-  }
-})
-
-// 产品列表接口
-Mock.mock(/\/api\/products(\?.*)?$/, 'get', (options) => {
+// 产品模块API接口
+// 获取产品列表
+Mock.mock(/\/api\/products$|\/api\/products\?/, 'get', (options) => {
   const url = new URL(options.url, 'http://localhost')
   const page = parseInt(url.searchParams.get('page') || '1')
   const pageSize = parseInt(url.searchParams.get('pageSize') || '10')
@@ -176,23 +139,24 @@ Mock.mock(/\/api\/products(\?.*)?$/, 'get', (options) => {
   }
 })
 
-// 单个产品接口
-Mock.mock(/\/api\/products\/\d+/, 'get', (options) => {
-  const productId = parseInt(options.url.split('/').pop() || '0')
-  const product = mockProducts.find(p => p.productId === productId)
+// 根据产品id获取工序列表
+Mock.mock(/\/api\/products\/\d+\/processes/, 'get', (options) => {
+  console.log("call")
+  const productId = parseInt(options.url.split('/')[3] || '0')
   
-  if (product) {
+  const response = mockProcessDetailResponses[productId]
+  if (!response) {
     return {
-      code: 200,
-      data: product,
-      message: 'success'
+      code: 404,
+      data: null,
+      message: '产品不存在或没有工序数据'
     }
   }
   
   return {
-    code: 404,
-    data: null,
-    message: '产品不存在'
+    code: 200,
+    data: response,
+    message: 'success'
   }
 })
 
@@ -259,28 +223,25 @@ Mock.mock(/\/api\/products\/\d+/, 'delete', (options) => {
   }
 })
 
-// 工序列表接口
-Mock.mock(/\/api\/processes(\?.*)?$/, 'get', (options) => {
-  const url = new URL(options.url, 'http://localhost')
-  const productId = parseInt(url.searchParams.get('productId') || '0')
-  const page = parseInt(url.searchParams.get('page') || '1')
-  const pageSize = parseInt(url.searchParams.get('pageSize') || '10')
+
+// 工序模块API接口
+// 根据工序id获取工序信息
+Mock.mock(/\/api\/processes\/\d+/, 'get', (options) => {
+  const processId = parseInt(options.url.split('/').pop() || '0')
+  const process = mockProcesses.find(p => p.processId === processId)
   
-  const productProcesses = mockProcesses.filter(p => p.productId === productId)
-  const start = (page - 1) * pageSize
-  const end = start + pageSize
-  const items = productProcesses.slice(start, end)
+  if (process) {
+    return {
+      code: 200,
+      data: process,
+      message: 'success'
+    }
+  }
   
   return {
-    code: 200,
-    data: {
-      items,
-      total: productProcesses.length,
-      page,
-      pageSize,
-      totalPages: Math.ceil(productProcesses.length / pageSize)
-    },
-    message: 'success'
+    code: 404,
+    data: null,
+    message: '工序不存在'
   }
 })
 
@@ -290,15 +251,23 @@ Mock.mock('/api/processes', 'post', (options) => {
   const newProcess = {
     processId: mockProcesses.length + 1,
     ...body,
-    createTime: new Date().toISOString(),
-    employees: []
+    createTime: new Date().toISOString()
   }
-  mockProcesses.push(newProcess)
+  
+  const response = mockProcessCreateResponses[newProcess.processId]
+  if (response) {
+    mockProcesses.push(response)
+    return {
+      code: 200,
+      data: response,
+      message: '创建成功'
+    }
+  }
   
   return {
-    code: 200,
-    data: newProcess,
-    message: '创建成功'
+    code: 400,
+    data: null,
+    message: '创建失败'
   }
 })
 
@@ -309,21 +278,21 @@ Mock.mock(/\/api\/processes\/\d+/, 'put', (options) => {
   const index = mockProcesses.findIndex(p => p.processId === processId)
   
   if (index > -1) {
-    mockProcesses[index] = {
-      ...mockProcesses[index],
-      ...body
-    }
-    return {
-      code: 200,
-      data: mockProcesses[index],
-      message: '更新成功'
+    const response = mockProcessUpdateResponses[processId]
+    if (response) {
+      mockProcesses[index] = response
+      return {
+        code: 200,
+        data: response,
+        message: '更新成功'
+      }
     }
   }
   
   return {
     code: 404,
     data: null,
-    message: '工序不存在'
+    message: '工序不存在或更新失败'
   }
 })
 
@@ -346,4 +315,4 @@ Mock.mock(/\/api\/processes\/\d+/, 'delete', (options) => {
     data: null,
     message: '工序不存在'
   }
-}) 
+})

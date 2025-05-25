@@ -16,6 +16,7 @@ export const useLoginStore = defineStore('login', () => {
                 loginInfo.value = response.data.data
                 isLoggedIn.value = true
             }
+            console.log('loginInfo:', loginInfo.value)
             onSuccess()
         } catch (error) {
             console.error('请求异常', error)

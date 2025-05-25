@@ -9,40 +9,40 @@
             <template v-if="divisionType === 'employee'">
               <span class="search-label">员工名：</span>
               <el-select
-                v-model="currentTopSelected"
+                v-model="currentTopEmployeeValue"
                 placeholder="请选择员工"
                 class="search-input"
                 clearable
                 @change="handleTopSelected"
               >
                 <el-option
-                  v-for="item in employeeList"
-                  :key="item.code"
-                  :label="item.name"
-                  :value="item.name"
+                  v-for="item in employeeStore.employeeList"
+                  :key="item.employeeId"
+                  :label="item.employeeName"
+                  :value="item.employeeId"
                 >
-                  <span>{{ item.name }}</span>
-                  <span class="option-code">工号：{{ item.code }}</span>
+                  <span>{{ item.employeeName }}</span>
+                  <span class="option-code">工号：{{ item.employeeId }}</span>
                 </el-option>
               </el-select>
             </template>
             <template v-else>
               <span class="search-label">产品名：</span>
               <el-select
-                v-model="currentTopSelected"
+                v-model="currentTopProductValue"
                 placeholder="请选择产品"
                 class="search-input"
                 clearable
                 @change="handleTopSelected"
               >
                 <el-option
-                  v-for="item in qryResultList"
-                  :key="item.code"
-                  :label="item.name"
-                  :value="item.name"
+                  v-for="item in productStore.productList"
+                  :key="item.productId"
+                  :label="item.productName"
+                  :value="item.productId"
                 >
-                  <span>{{ item.name }}</span>
-                  <span class="option-code">编号：{{ item.code }}</span>
+                  <span>{{ item.productName }}</span>
+                  <span class="option-code">编号：{{ item.productCode }}</span>
                 </el-option>
               </el-select>
             </template>
@@ -86,21 +86,16 @@
 
         <!-- 右侧工序分工 -->
         <el-card class="process-card">
-          <template #header>
-            <div class="card-header">
+        <template #header>
+        <div class="card-header">
               <h3>工序记录</h3>
-            </div>
+        </div>
           </template>
           <el-table :data="currentProcessList" style="width: 100%" v-if="currentProcessList.length > 0">
             <el-table-column prop="name" label="工序名称" />
             <el-table-column prop="price" label="工序单价" width="180">
               <template #default="{ row }">
                 <ProcessPriceInput v-model:price="row.price" />
-              </template>
-            </el-table-column>
-            <el-table-column prop="status" label="状态" width="100">
-              <template #default="{ row }"> 
-                <ProcessStatusTag :status="row.status" />
               </template>
             </el-table-column>
           </el-table>
@@ -116,7 +111,7 @@
             <div class="card-header">
               <h3>负责人列表</h3>
             </div>
-          </template>
+                </template>
           <el-table :data="currentEmployeeList" 
             style="width: 100%" 
             highlight-current-row
@@ -127,7 +122,7 @@
             <el-table-column prop="status" label="状态" width="100">
               <template #default="{ row }"> 
                 <ProcessStatusTag :status="row.status" />
-              </template>
+                </template>
             </el-table-column>
           </el-table>
           <el-empty v-else description="请先选择产品" />
@@ -147,240 +142,68 @@
             <el-table-column prop="price" label="工序单价" width="180">
               <template #default="{ row }">
                 <ProcessPriceInput v-model:price="row.price" />
-              </template>
-            </el-table-column>
-            <el-table-column prop="status" label="状态" width="100">
-              <template #default="{ row }">
-                <ProcessStatusTag :status="row.status" />
-              </template>
+                </template>
             </el-table-column>
           </el-table>
           <el-empty v-else description="请先选择负责人" />
-        </el-card>
+    </el-card>
       </template>
     </div>
-  </div>
+    </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import ProcessStatusTag from '@/components/Process/ProcessStatusTag.vue'
 import ProcessPriceInput from '@/components/Process/ProcessPriceInput.vue'
 import type { Product } from '@/types/business/product'
 import type { Process } from '@/types/business/process'
+import { useProductStore } from '@/stores/productStore'
+import { useEmployeeStore } from '@/stores/employeeStore'
+import type { EmployeeDetail } from '@/types/business/employee'
+
+
+const productStore = useProductStore()
+const employeeStore = useEmployeeStore()
 
 // 分工方式
 const divisionType = ref('employee')
-const currentTopSelected = ref('')
-const currentLeftSelected = ref('')
 
-interface Employee {
-  name: string
-  code: string
-  status: string
-}
-
-const currentProductList = ref<Product[]>([])
-const currentEmployeeList = ref<Employee[]>([])
-const currentProcessList = ref<Process[]>([])
-
-// 员工列表数据
-const employeeList = ref([
-  { name: '张三', code: '001', status: '在岗' },
-  { name: '李四', code: '002', status: '在岗' },
-  { name: '王五', code: '003', status: '休假' },
-  { name: '赵六', code: '004', status: '在岗' },
-  { name: '钱七', code: '005', status: '在岗' },
-  { name: '孙八', code: '006', status: '休假' },
-  { name: '周九', code: '007', status: '在岗' },
-  { name: '吴十', code: '008', status: '在岗' },
-  { name: '郑十一', code: '009', status: '在岗' },
-  { name: '王十二', code: '010', status: '休假' }
-])
-
-// 产品及工序列表数据
-const qryResultList = ref([
-  { 
-    name: '高端定制西装', 
-    code: 'SUIT-001', 
-    status: '进行中', 
-    processes: [
-      { name: '面料裁剪', price: 150.00, status: '已完成', employee: '张三' },
-      { name: '缝制', price: 200.00, status: '进行中', employee: '李四' },
-      { name: '熨烫', price: 100.00, status: '待开始', employee: '王五' },
-      { name: '纽扣安装', price: 80.00, status: '已完成', employee: '赵六' },
-      { name: '口袋制作', price: 120.00, status: '进行中', employee: '钱七' }
-    ]
-  },
-  { 
-    name: '商务休闲裤', 
-    code: 'PANT-001', 
-    status: '待开始', 
-    processes: [
-      { name: '面料裁剪', price: 120.00, status: '待开始', employee: '张三' },
-      { name: '缝制', price: 180.00, status: '待开始', employee: '李四' },
-      { name: '熨烫', price: 80.00, status: '待开始', employee: '王五' },
-      { name: '纽扣安装', price: 60.00, status: '待开始', employee: '赵六' },
-      { name: '口袋制作', price: 100.00, status: '待开始', employee: '钱七' }
-    ]
-  },
-  { 
-    name: '真丝衬衫', 
-    code: 'SHIRT-001', 
-    status: '进行中', 
-    processes: [
-      { name: '面料裁剪', price: 130.00, status: '已完成', employee: '王五' },
-      { name: '缝制', price: 190.00, status: '进行中', employee: '李四' },
-      { name: '熨烫', price: 90.00, status: '待开始', employee: '张三' },
-      { name: '纽扣安装', price: 70.00, status: '待开始', employee: '赵六' },
-      { name: '领子制作', price: 140.00, status: '进行中', employee: '钱七' }
-    ]
-  },
-  { 
-    name: '羊毛大衣', 
-    code: 'COAT-001', 
-    status: '进行中', 
-    processes: [
-      { name: '面料裁剪', price: 180.00, status: '已完成', employee: '张三' },
-      { name: '缝制', price: 250.00, status: '进行中', employee: '李四' },
-      { name: '熨烫', price: 120.00, status: '待开始', employee: '王五' },
-      { name: '纽扣安装', price: 90.00, status: '已完成', employee: '赵六' },
-      { name: '口袋制作', price: 150.00, status: '进行中', employee: '钱七' }
-    ]
-  },
-  { 
-    name: '羊绒围巾', 
-    code: 'SCARF-001', 
-    status: '待开始', 
-    processes: [
-      { name: '面料裁剪', price: 80.00, status: '待开始', employee: '李四' },
-      { name: '缝制', price: 120.00, status: '待开始', employee: '张三' },
-      { name: '熨烫', price: 60.00, status: '待开始', employee: '王五' },
-      { name: '流苏制作', price: 40.00, status: '待开始', employee: '张三' }
-    ]
-  },
-  { 
-    name: '真皮手套', 
-    code: 'GLOVE-001', 
-    status: '进行中', 
-    processes: [
-      { name: '皮革裁剪', price: 100.00, status: '已完成', employee: '王五' },
-      { name: '缝制', price: 150.00, status: '进行中', employee: '李四' },
-      { name: '内衬制作', price: 80.00, status: '待开始', employee: '张三' },
-      { name: '装饰处理', price: 60.00, status: '已完成', employee: '赵六' }
-    ]
-  },
-  { 
-    name: '手工皮鞋', 
-    code: 'SHOE-001', 
-    status: '待开始', 
-    processes: [
-      { name: '皮革裁剪', price: 200.00, status: '待开始', employee: '赵六' },
-      { name: '鞋底制作', price: 180.00, status: '待开始', employee: '张三' },
-      { name: '缝制', price: 250.00, status: '待开始', employee: '李四' },
-      { name: '鞋跟安装', price: 150.00, status: '待开始', employee: '王五' },
-      { name: '鞋面装饰', price: 120.00, status: '待开始', employee: '张三' }
-    ]
-  },
-  { 
-    name: '定制领带', 
-    code: 'TIE-001', 
-    status: '进行中', 
-    processes: [
-      { name: '面料裁剪', price: 60.00, status: '已完成', employee: '钱七' },
-      { name: '缝制', price: 80.00, status: '进行中', employee: '李四' },
-      { name: '熨烫', price: 40.00, status: '待开始', employee: '张三' },
-      { name: '装饰处理', price: 50.00, status: '已完成', employee: '赵六' }
-    ]
-  },
-  { 
-    name: '手工皮包', 
-    code: 'BAG-001', 
-    status: '待开始', 
-    processes: [
-      { name: '皮革裁剪', price: 150.00, status: '待开始', employee: '孙八' },
-      { name: '缝制', price: 200.00, status: '待开始', employee: '李四' },
-      { name: '内衬制作', price: 100.00, status: '待开始', employee: '张三' },
-      { name: '五金安装', price: 80.00, status: '待开始', employee: '王五' },
-      { name: '装饰处理', price: 120.00, status: '待开始', employee: '赵六' }
-    ]
-  },
-  { 
-    name: '真丝睡衣', 
-    code: 'PYJAMA-001', 
-    status: '进行中', 
-    processes: [
-      { name: '面料裁剪', price: 90.00, status: '已完成', employee: '周九' },
-      { name: '缝制', price: 160.00, status: '进行中', employee: '李四' },
-      { name: '熨烫', price: 70.00, status: '待开始', employee: '张三' },
-      { name: '纽扣安装', price: 50.00, status: '已完成', employee: '赵六' },
-      { name: '装饰处理', price: 80.00, status: '进行中', employee: '钱七' }
-    ]
-  },
-  { 
-    name: '羊毛背心', 
-    code: 'VEST-001', 
-    status: '待开始', 
-    processes: [
-      { name: '面料裁剪', price: 110.00, status: '待开始', employee: '吴十' },
-      { name: '缝制', price: 180.00, status: '待开始', employee: '李四' },
-      { name: '熨烫', price: 90.00, status: '待开始', employee: '张三' },
-      { name: '纽扣安装', price: 60.00, status: '待开始', employee: '赵六' },
-      { name: '口袋制作', price: 100.00, status: '待开始', employee: '张三' }
-    ]
-  },
-  { 
-    name: '真丝连衣裙', 
-    code: 'DRESS-001', 
-    status: '进行中', 
-    processes: [
-      { name: '面料裁剪', price: 140.00, status: '已完成', employee: '郑十一' },
-      { name: '缝制', price: 220.00, status: '进行中', employee: '李四' },
-      { name: '熨烫', price: 100.00, status: '待开始', employee: '张三' },
-      { name: '纽扣安装', price: 70.00, status: '已完成', employee: '赵六' },
-      { name: '装饰处理', price: 90.00, status: '进行中', employee: '钱七' }
-    ]
-  },
-  { 
-    name: '手工皮夹', 
-    code: 'WALLET-001', 
-    status: '待开始', 
-    processes: [
-      { name: '皮革裁剪', price: 80.00, status: '待开始', employee: '王十二' },
-      { name: '缝制', price: 120.00, status: '待开始', employee: '张三' },
-      { name: '内衬制作', price: 60.00, status: '待开始', employee: '李四' },
-      { name: '五金安装', price: 40.00, status: '待开始', employee: '王五' },
-      { name: '装饰处理', price: 50.00, status: '待开始', employee: '赵六' }
-    ]
-  },
-  { 
-    name: '定制帽子', 
-    code: 'HAT-001', 
-    status: '进行中', 
-    processes: [
-      { name: '面料裁剪', price: 70.00, status: '已完成', employee: '周九' },
-      { name: '缝制', price: 110.00, status: '进行中', employee: '李四' },
-      { name: '熨烫', price: 50.00, status: '待开始', employee: '张三' },
-      { name: '装饰处理', price: 60.00, status: '已完成', employee: '赵六' }
-    ]
-  },
-  { 
-    name: '真丝丝巾', 
-    code: 'SCARF-002', 
-    status: '待开始', 
-    processes: [
-      { name: '面料裁剪', price: 60.00, status: '待开始', employee: '吴十' },
-      { name: '缝制', price: 90.00, status: '待开始', employee: '李四' },
-      { name: '熨烫', price: 40.00, status: '待开始', employee: '张三' },
-      { name: '流苏制作', price: 30.00, status: '待开始', employee: '王五' }
-    ]
+// 计算属性处理选择值
+const currentTopEmployeeValue = computed({
+  get: () => currentTopEmployeeSelected.value?.employeeId || '',
+  set: (val) => {
+    const employee = employeeStore.employeeList.find(e => e.employeeId === val)
+    currentTopEmployeeSelected.value = employee || null
   }
-])
+})
+
+const currentTopProductValue = computed({
+  get: () => currentTopProductSelected.value?.productId || '',
+  set: (val) => {
+    const product = productStore.productList.find(p => p.productId === val)
+    currentTopProductSelected.value = product || null
+  }
+})
+
+// employee对应数据源
+const currentTopEmployeeSelected = ref<EmployeeDetail | null>(null)
+const currentLeftProductSelected = ref<Product | null>(null)
+const currentProductList = ref<Product[]>([])
+
+// product对应数据源
+const currentTopProductSelected = ref<Product | null>(null)
+const currentLeftEmployeeSelected = ref<EmployeeDetail | null>(null)
+const currentEmployeeList = ref<EmployeeDetail[]>([])
+
+const currentProcessList = ref<Process[]>([])
 
 // 重置界面
 const resetInterface = () => {
-  currentTopSelected.value = ''
-  currentLeftSelected.value = ''
+  currentTopProductSelected.value = null
+  currentTopEmployeeSelected.value = null
+  currentLeftProductSelected.value = null
+  currentLeftEmployeeSelected.value = null
   currentProductList.value = []
   currentProcessList.value = []
 }
@@ -391,52 +214,36 @@ const handleDivisionTypeChange = () => {
 }
 
 // 顶部选择处理
-const handleTopSelected = (selection: any) => {
+const handleTopSelected = async (selection: Product | EmployeeDetail) => {
   console.log('顶部选择:', selection)
-  currentTopSelected.value = selection
   if (divisionType.value === 'employee') {
+    currentTopEmployeeSelected.value = selection as EmployeeDetail
     // 根据员工选择的产品列表
-    currentProductList.value = qryResultList.value.filter(result => 
-      result.processes.some(process => process.employee === selection)
-    )
+    currentProductList.value = (await employeeStore.getProductsByEmployeeId(currentTopEmployeeSelected.value.employeeId)).data.items
   } else {
     // 根据产品选择的产品列表
-    const selectedProduct = qryResultList.value.find(result => result.name === selection)
-    if (selectedProduct) {
-      // 获取该产品所有工序的负责人
-      const employees = selectedProduct.processes.map(process => process.employee)
-      // 从员工列表中获取完整的员工信息
-      currentEmployeeList.value = employeeList.value
-        .filter(employee => employees.includes(employee.name))
-    }
+    currentTopProductSelected.value = selection as Product
+    currentEmployeeList.value = (await productStore.getEmployeesByProductId(currentTopProductSelected.value.productId)).data.items
   }
   // 清空右侧工序列表
   currentProcessList.value = []
 }
 
 // 左侧选择处理
-const handleLeftSelected = (row: any) => {
+const handleLeftSelected = async (row: any) => {
   if (!row) return
   console.log('左侧选择:', row)
-  currentLeftSelected.value = row.name
   if (divisionType.value === 'employee') {
     // 根据员工选择的产品列表
-    const selectedProduct = qryResultList.value.find(result => result.name === row.name)
-    if (selectedProduct) {
-      // 只显示当前员工负责的工序
-      currentProcessList.value = selectedProduct.processes.filter(
-        process => process.employee === currentTopSelected.value
-      )
+    currentLeftProductSelected.value = row as Product
+      // api获取当前产品工序列表
+      currentProcessList.value = (await productStore.getProcessesByProductId(currentLeftProductSelected.value.productId)).data.items
     }
-  } else {
+  else {
     // 根据产品选择的产品列表
-    const selectedProduct = qryResultList.value.find(result => result.name === currentTopSelected.value)
-    if (selectedProduct) {
-      // 只显示当前员工负责的工序
-      currentProcessList.value = selectedProduct.processes.filter(
-        process => process.employee === row.name
-      )
-    }
+    currentLeftEmployeeSelected.value = row as EmployeeDetail
+    // api获取当前产品工序列表
+    currentProcessList.value = (await employeeStore.getProcessesByEmployeeId(currentLeftEmployeeSelected.value.employeeId)).data.items
   }
 }
 </script>
@@ -546,18 +353,18 @@ const handleLeftSelected = (row: any) => {
 
 .my-autocomplete {
   li {
-    line-height: normal;
-    padding: 7px;
+  line-height: normal;
+  padding: 7px;
 
     .value {
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
 
     .link {
-      font-size: 12px;
-      color: #b4b4b4;
-    }
+  font-size: 12px;
+  color: #b4b4b4;
+}
   }
 }
 

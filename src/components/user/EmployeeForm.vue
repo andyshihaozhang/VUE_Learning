@@ -74,6 +74,7 @@ watch(
 
 // 提交表单
 const handleSubmit = () => {
+  console.log("form: handleSubmit called with data:", formData.value)
   emit('submit', formData.value)
 }
 </script>

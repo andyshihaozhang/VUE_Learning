@@ -1,7 +1,6 @@
 import { ProcessStatus } from '../types/business/common'
 import type { Product } from '../types/business/product'
 import type { ProcessDetail } from '../types/business/process'
-import { mockUsers } from './user'
 
 // 模拟产品列表数据
 export const mockProducts: Product[] = [
@@ -10,7 +9,7 @@ export const mockProducts: Product[] = [
     productCode: 'PROD-001',
     productName: '高端定制西装',
     productStatus: ProcessStatus.IN_PROGRESS,
-    customerName: '某服装公司',
+    customerSource: '某服装公司',
     createTime: new Date().toISOString()
   },
   {
@@ -18,7 +17,7 @@ export const mockProducts: Product[] = [
     productCode: 'PROD-002',
     productName: '羊毛大衣',
     productStatus: ProcessStatus.PENDING,
-    customerName: '某服装公司',
+    customerSource: '某服装公司',
     createTime: new Date().toISOString()
   },
   {
@@ -26,7 +25,7 @@ export const mockProducts: Product[] = [
     productCode: 'PROD-003',
     productName: '羊绒围巾',
     productStatus: ProcessStatus.COMPLETED,
-    customerName: '某服装公司',
+    customerSource: '某服装公司',
     createTime: new Date().toISOString()
   },
   {
@@ -34,7 +33,7 @@ export const mockProducts: Product[] = [
     productCode: 'PROD-004',
     productName: '真丝衬衫',
     productStatus: ProcessStatus.IN_PROGRESS,
-    customerName: '某服装公司',
+    customerSource: '某服装公司',
     createTime: new Date().toISOString()
   },
   {
@@ -42,7 +41,7 @@ export const mockProducts: Product[] = [
     productCode: 'PROD-005',
     productName: '棉质T恤',
     productStatus: ProcessStatus.PENDING,
-    customerName: '某服装公司',
+    customerSource: '某服装公司',
     createTime: new Date().toISOString()
   }
 ]
@@ -56,7 +55,7 @@ export const mockProcesses: ProcessDetail[] = [
     processDescription: '根据设计图纸进行面料裁剪',
     processPrice: 180.00,
     createTime: new Date().toISOString(),
-    employees: [mockUsers[0], mockUsers[1]]
+    employees: [1, 2]
   },
   {
     processId: 2,
@@ -65,7 +64,7 @@ export const mockProcesses: ProcessDetail[] = [
     processDescription: '进行服装缝制',
     processPrice: 250.00,
     createTime: new Date().toISOString(),
-    employees: [mockUsers[2], mockUsers[3]]
+    employees: [3, 4]
   },
   {
     processId: 3,
@@ -74,7 +73,7 @@ export const mockProcesses: ProcessDetail[] = [
     processDescription: '进行服装熨烫',
     processPrice: 120.00,
     createTime: new Date().toISOString(),
-    employees: [mockUsers[4]]
+    employees: [5]
   },
   {
     processId: 4,
@@ -83,7 +82,7 @@ export const mockProcesses: ProcessDetail[] = [
     processDescription: '根据设计图纸进行面料裁剪',
     processPrice: 150.00,
     createTime: new Date().toISOString(),
-    employees: [mockUsers[5], mockUsers[6]]
+    employees: [6, 7]
   },
   {
     processId: 5,
@@ -92,6 +91,6 @@ export const mockProcesses: ProcessDetail[] = [
     processDescription: '进行服装缝制',
     processPrice: 200.00,
     createTime: new Date().toISOString(),
-    employees: [mockUsers[7], mockUsers[8]]
+    employees: [8, 9]
   }
 ] 

@@ -30,6 +30,7 @@ export interface EmployeeCreateParams {
 // 用户更新参数接口
 export interface EmployeeUpdateParams {
   employeeId?: number;
+  employeeName?: string;
   employeePhone?: number;
   employeeStatus?: ActiveStatus;
 }

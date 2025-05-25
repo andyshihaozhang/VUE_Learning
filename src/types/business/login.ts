@@ -1,7 +1,6 @@
 export interface LoginInfo {
     userId: number
     username: string
-    password: string
     phone: string
     status: number
     role: string
@@ -16,7 +15,6 @@ export interface LoginParams {
 export interface LoginResponse {
     userId: number
     username: string
-    password: string
     phone: string
     status: number
     role: string

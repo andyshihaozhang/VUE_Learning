@@ -18,14 +18,13 @@
       </div>
 
       <div v-else class="table-container">
-        <el-table
+    <el-table
           :data="productList"
           style="width: 100%"
-          @expand-change="handleExpandChange"
           height="calc(100vh - 270px)"
-        >
-          <el-table-column type="expand">
-            <template #default="props">
+    >
+      <el-table-column type="expand">
+        <template #default="props">
               <div class="process-detail">
                 <div v-if="props.row.processLoading" style="text-align:center;padding:30px;">
                   <el-icon><Loading /></el-icon> 加载工序中...
@@ -54,12 +53,12 @@
                       <template #default="scope">
                         <div class="responser-display">
                           <el-tag
-                            v-for="employee in scope.row.employees"
-                            :key="employee.employeeId"
+                            v-for="employeeId in scope.row.employees"
+                            :key="employeeId"
                             size="small"
                             class="responser-tag"
                           >
-                            {{ employee.employeeId }}-{{ employee.employeeName }}
+                            {{ getEmployeeName(employeeId) }}
                           </el-tag>
                           <span v-if="!scope.row.employees.length" class="empty-text">暂无负责人</span>
                         </div>
@@ -92,7 +91,7 @@
                         </el-button>
                       </template>
                     </el-table-column>
-                  </el-table>
+            </el-table>
                   <div class="process-footer">
                     <el-button 
                       type="success" 
@@ -104,12 +103,12 @@
                     </el-button>
                   </div>
                 </div>
-              </div>
-            </template>
-          </el-table-column>
+          </div>
+        </template>
+      </el-table-column>
           <el-table-column label="产品名称" prop="productName" min-width="150" />
           <el-table-column label="产品编号" prop="productCode" width="120" />
-          <el-table-column label="客户公司" prop="customerName" min-width="200" />
+          <el-table-column label="客户公司" prop="customerSource" min-width="200" />
           <el-table-column label="产品状态" prop="productStatus" min-width="200" >
             <template #default="scope">
               <ProcessStatusTag :status="scope.row.productStatus" />
@@ -128,7 +127,7 @@
               </el-button>
             </template>
           </el-table-column>
-        </el-table>
+    </el-table>
         <!-- 分页配置 -->
         <el-pagination
           class="pagination"
@@ -250,9 +249,81 @@
         </span>
       </template>
     </el-dialog>
-  </div>
-</template>
 
+    <!-- 新增产品对话框 -->
+    <el-dialog
+      v-model="addProductDialogVisible"
+      title="新增产品"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="addProductForm" label-width="100px" ref="addProductFormRef" :rules="productRules">
+        <el-form-item label="产品编号" prop="productCode">
+          <el-input v-model="addProductForm.productCode" placeholder="请输入产品编号" />
+        </el-form-item>
+        <el-form-item label="产品名称" prop="productName">
+          <el-input v-model="addProductForm.productName" placeholder="请输入产品名称" />
+        </el-form-item>
+        <el-form-item label="客户公司" prop="customerSource">
+          <el-input v-model="addProductForm.customerSource" placeholder="请输入客户公司" />
+        </el-form-item>
+        <el-form-item label="产品状态" prop="productStatus">
+          <el-select v-model="addProductForm.productStatus" placeholder="请选择产品状态">
+            <el-option
+              v-for="status in Object.values(ProcessStatus)"
+              :key="status"
+              :label="status"
+              :value="status"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="addProductDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleSaveAddProduct">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <!-- 编辑产品对话框 -->
+    <el-dialog
+      v-model="editProductDialogVisible"
+      title="编辑产品"
+      width="500px"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="editProductForm" label-width="100px" ref="editProductFormRef" :rules="productRules">
+        <el-form-item label="产品编号" prop="productCode">
+          <el-input v-model="editProductForm.productCode" placeholder="请输入产品编号" />
+        </el-form-item>
+        <el-form-item label="产品名称" prop="productName">
+          <el-input v-model="editProductForm.productName" placeholder="请输入产品名称" />
+        </el-form-item>
+        <el-form-item label="客户公司" prop="customerSource">
+          <el-input v-model="editProductForm.customerSource" placeholder="请输入客户公司" />
+        </el-form-item>
+        <el-form-item label="产品状态" prop="productStatus">
+          <el-select v-model="editProductForm.productStatus" placeholder="请选择产品状态">
+            <el-option
+              v-for="status in Object.values(ProcessStatus)"
+              :key="status"
+              :label="status"
+              :value="status"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="editProductDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="handleSaveEditProduct">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
+  </template>
+  
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { Plus, Edit, Delete, List, Loading } from '@element-plus/icons-vue'
@@ -261,10 +332,13 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { Product } from '@/types/business/product'
 import type { ProcessDetail } from '@/types/business/process'
 import type { EmployeeDetail } from '@/types/business/employee'
-import { ProductApi } from '@/api/productApi'
+import { ProcessStatus } from '@/types/business/common'
 import { ProcessDetailApi } from '@/api/processApi'
 import { EmployeeApi } from '@/api/employeeApi'
+import { ProductApi } from '@/api/productApi'
 import ProcessStatusTag from "@/components/Process/ProcessStatusTag.vue"
+import { useEmployeeStore } from '@/stores/employeeStore'
+import { useProductStore } from '@/stores/productStore'
 
 // 扩展Product类型，增加工序明细及加载状态
 interface ProductWithProcess extends Product {
@@ -279,48 +353,56 @@ const isLoading = ref(false)
 
 const productList = ref<ProductWithProcess[]>([])
 const employeeOptions = ref<EmployeeDetail[]>([])
+const employeeStore = useEmployeeStore()
+const productStore = useProductStore()
 
 // 获取产品列表
 const getProducts = async () => {
-  isLoading.value = true
   try {
-    const res = await ProductApi.getProducts({
+    await productStore.fetchProducts({
       page: currentPage.value,
       pageSize: pageSize.value,
     })
     
-    // 先设置基本产品信息并标记加载状态
-    productList.value = res.data.data.items.map(item => ({
+    // 为每个产品添加工序明细相关属性
+    productList.value = productStore.productList.map(item => ({
       ...item,
-      processDetails: [],  // 初始化为空数组，而不是undefined
-      processLoading: true // 标记为加载中
+      processDetails: [],
+      processLoading: true
     }))
-    total.value = res.data.data.total
     
     // 为每个产品预加载工序明细
     await loadAllProcessDetails()
   } catch (error) {
     ElMessage.error('获取产品列表失败')
-  } finally {
-    isLoading.value = false
   }
 }
 
 // 预加载所有产品的工序明细
 const loadAllProcessDetails = async () => {
   try {
+    // 收集所有工序中涉及的员工ID
+    const employeeIds = new Set<number>()
+    
     // 使用Promise.all并行加载所有产品的工序明细
     await Promise.all(
       productList.value.map(async (product) => {
         try {
-          const res = await ProcessDetailApi.getProcessDetailsByProductId({
-            productId: product.productId,
-            page: 1,
-            pageSize: 100,
-          })
+          const res = await ProductApi.getProcessesByProductId(product.productId)
+          // 更新产品的工序明细，添加空的employees数组
+          product.processDetails = res.data.data.items.map(process => ({
+            ...process,
+            employees: [] // 添加空的employees数组
+          }))
           
-          // 更新产品的工序明细
-          product.processDetails = res.data.data.items
+          // 收集所有员工ID
+          product.processDetails.forEach(process => {
+            if (process.employees) {
+              process.employees.forEach(employeeId => {
+                employeeIds.add(employeeId)
+              })
+            }
+          })
         } catch (error) {
           console.error(`加载产品 ${product.productId} 的工序明细失败:`, error)
           product.processDetails = [] // 发生错误时设置为空数组
@@ -329,6 +411,14 @@ const loadAllProcessDetails = async () => {
         }
       })
     )
+
+    // 预加载所有相关员工信息
+    if (employeeIds.size > 0) {
+      await employeeStore.fetchEmployees({
+        page: 1,
+        pageSize: employeeIds.size
+      })
+    }
   } catch (error) {
     console.error('预加载工序明细失败:', error)
   }
@@ -345,12 +435,6 @@ const getEmployees = async () => {
   } catch (error) {
     ElMessage.error('获取员工列表失败')
   }
-}
-
-// 处理展开事件，无需再加载数据，因为已经预加载完成
-const handleExpandChange = async (row: ProductWithProcess, expandedRows: any) => {
-  // 无需加载数据，因为已经预加载完成
-  // 如果数据仍在加载中，可以在模板中显示加载状态
 }
 
 // 添加编辑对话框数据
@@ -376,31 +460,123 @@ const addForm = ref<EditFormType>({
   responser: []
 })
 
+// 产品表单验证规则
+const productRules = {
+  productCode: [
+    { required: true, message: '请输入产品编号', trigger: 'blur' },
+    { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
+  ],
+  productName: [
+    { required: true, message: '请输入产品名称', trigger: 'blur' },
+    { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
+  ],
+  customerSource: [
+    { required: true, message: '请输入客户公司', trigger: 'blur' }
+  ],
+  productStatus: [
+    { required: true, message: '请选择产品状态', trigger: 'change' }
+  ]
+}
+
+// 添加新增产品对话框数据
+const addProductDialogVisible = ref(false)
+const addProductFormRef = ref()
+const addProductForm = ref({
+  productCode: '',
+  productName: '',
+  customerSource: '',
+  productStatus: ProcessStatus.PENDING
+})
+
+// 添加编辑产品对话框数据
+const editProductDialogVisible = ref(false)
+const editProductFormRef = ref()
+const editProductForm = ref({
+  productId: 0,
+  productCode: '',
+  productName: '',
+  customerSource: '',
+  productStatus: ProcessStatus.PENDING
+})
+
 // 处理新增产品
 const handleAddProduct = () => {
-  ElMessage.info('新增产品功能开发中...')
+  addProductForm.value = {
+    productCode: '',
+    productName: '',
+    customerSource: '',
+    productStatus: ProcessStatus.PENDING
+  }
+  addProductDialogVisible.value = true
+}
+
+// 处理保存新增产品
+const handleSaveAddProduct = async () => {
+  if (!addProductFormRef.value) return
+  
+  await addProductFormRef.value.validate(async (valid: boolean) => {
+    if (valid) {
+      try {
+        await productStore.createProduct({
+          productCode: addProductForm.value.productCode,
+          productName: addProductForm.value.productName,
+          customerSource: addProductForm.value.customerSource,
+          productStatus: addProductForm.value.productStatus
+        })
+        ElMessage.success('产品已添加')
+        addProductDialogVisible.value = false
+        getProducts() // 刷新产品列表
+      } catch (error) {
+        ElMessage.error('添加产品失败')
+      }
+    } else {
+      return false
+    }
+  })
 }
 
 // 处理编辑产品
-const handleEditProduct = async (row: Product) => {
-  try {
-    await ProductApi.updateProduct(row.productId, {
-      productId: row.productId,
-      productName: row.productName,
-      productCode: row.productCode,
-      productStatus: row.productStatus,
-      customerName: row.customerName
-    })
-    ElMessage.success('产品信息已更新')
-  } catch (error) {
-    ElMessage.error('更新产品信息失败')
+const handleEditProduct = (row: Product) => {
+  editProductForm.value = {
+    productId: row.productId,
+    productCode: row.productCode,
+    productName: row.productName,
+    customerSource: row.customerSource,
+    productStatus: row.productStatus
   }
+  editProductDialogVisible.value = true
+}
+
+// 处理保存编辑产品
+const handleSaveEditProduct = async () => {
+  if (!editProductFormRef.value) return
+  
+  await editProductFormRef.value.validate(async (valid: boolean) => {
+    if (valid) {
+      try {
+        await productStore.updateProduct(editProductForm.value.productId, {
+          productId: editProductForm.value.productId,
+          productCode: editProductForm.value.productCode,
+          productName: editProductForm.value.productName,
+          customerSource: editProductForm.value.customerSource,
+          productStatus: editProductForm.value.productStatus
+        })
+        ElMessage.success('产品信息已更新')
+        editProductDialogVisible.value = false
+        getProducts() // 刷新产品列表
+      } catch (error) {
+        ElMessage.error('更新产品信息失败')
+      }
+    } else {
+      return false
+    }
+  })
 }
 
 // 处理删除产品
 const handleDeleteProduct = async (row: Product) => {
   try {
-    await ProductApi.deleteProduct(row.productId)
+    await productStore.deleteProduct(row.productId)
     ElMessage.success('产品已删除')
     // 删除成功后刷新列表
     getProducts()
@@ -436,18 +612,13 @@ const handleSaveAdd = async () => {
   if (!currentProcessDetail.value) return
   
   try {
-    // 将选中的员工ID转换为完整的员工对象
-    const selectedEmployees = employeeOptions.value.filter(emp => 
-      addForm.value.responser.includes(emp.employeeId)
-    )
-    
     // 创建新工序
     await ProcessDetailApi.createProcessDetail({
       productId: currentProcessDetail.value.productId,
       processName: addForm.value.name,
       processDescription: addForm.value.description,
       processPrice: addForm.value.price,
-      employees: selectedEmployees
+      employees: addForm.value.responser // 直接使用选中的员工ID数组
     })
     
     ElMessage.success('工序已添加')
@@ -484,7 +655,7 @@ const handleEditProcess = (process: ProcessDetail) => {
     name: process.processName,
     description: process.processDescription,
     price: process.processPrice,
-    responser: process.employees.map(emp => emp.employeeId)
+    responser: process.employees // 直接使用员工ID数组
   }
   editDialogVisible.value = true
 }
@@ -494,18 +665,13 @@ const handleSaveEdit = async () => {
   if (!currentProcessDetail.value) return
   
   try {
-    // 将选中的员工ID转换为完整的员工对象
-    const selectedEmployees = employeeOptions.value.filter(emp => 
-      editForm.value.responser.includes(emp.employeeId)
-    )
-    
     // 更新工序数据
     await ProcessDetailApi.updateProcessDetail(currentProcessDetail.value.processId, {
       processId: currentProcessDetail.value.processId,
       processName: editForm.value.name,
       processDescription: editForm.value.description,
       processPrice: editForm.value.price,
-      employees: selectedEmployees
+      employees: editForm.value.responser // 直接使用选中的员工ID数组
     })
     ElMessage.success('工序信息已更新')
     editDialogVisible.value = false
@@ -586,12 +752,18 @@ const handleSizeChange = (size: number) => {
   getProducts()
 }
 
+// 获取员工姓名的辅助函数
+const getEmployeeName = (employeeId: number) => {
+  const employee = employeeStore.employeeList.find((emp: EmployeeDetail) => emp.employeeId === employeeId)
+  return employee ? `${employee.employeeName}` : `未知员工(${employeeId})`
+}
+
 // 组件挂载时获取产品列表和员工列表
 onMounted(() => {
   getProducts()
   getEmployees()
 })
-</script>
+  </script>
 
 <style scoped>
 .products {

@@ -6,18 +6,13 @@ import type {
   ProcessDetailUpdateParams,
   ProcessDetailResponse,
 } from '@/types/business/process'
-import { ActiveStatus } from '@/types/business/common'
-  
+
 // 产品流程API
 export class ProcessDetailApi {
   private static readonly BASE_URL = import.meta.env.VITE_API_BASE_URL + '/process'
 
   static async getProcessDetailsByProductId(params: ProcessDetailQueryByProductIdParams) {
     return http.get<ApiResponse<ProcessDetailResponse>>(this.BASE_URL, { params })
-  }
-
-  static async getProcessDetailById(id: number) {
-    return http.get<ApiResponse<ProcessDetail>>(`${this.BASE_URL}/${id}`)
   }
 
   static async createProcessDetail(data: ProcessDetailCreateParams) {
@@ -31,12 +26,4 @@ export class ProcessDetailApi {
   static async deleteProcessDetail(id: number) {
     return http.delete<ApiResponse<null>>(`${this.BASE_URL}/${id}`)
   }
-
-  static async updateProcessDetailStatus(id: number, status: ActiveStatus) {
-    return http.patch<ApiResponse<ProcessDetail>>(`${this.BASE_URL}/${id}/status`, { status })
-  }
-
-  static async getProcessDetail(id: number) {
-    return http.get<ApiResponse<ProcessDetailResponse>>(`${this.BASE_URL}/${id}/detail`)
-  }
-}
+} 
