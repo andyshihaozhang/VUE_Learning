@@ -8,6 +8,6 @@ export enum ProcessStatus {
 
 // 状态枚举
 export enum ActiveStatus {
-    ACTIVE = '在职',
-    INACTIVE = '离职'
+    ACTIVE = 0,
+    INACTIVE = 1
 }
