@@ -26,4 +26,8 @@ export class ProcessDetailApi {
   static async deleteProcessDetail(id: number) {
     return http.delete<ApiResponse<null>>(`${this.BASE_URL}/${id}`)
   }
+
+  static async getProcessesByProductId(productId: number) {
+    return http.get<ApiResponse<ProcessDetailResponse>>(`${this.BASE_URL}/all/${productId}`)
+  }
 } 

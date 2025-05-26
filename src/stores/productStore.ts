@@ -2,13 +2,11 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { ProductApi } from '@/api/productApi'
 import type { Product } from '@/types/business/product'
-import { ProcessStatus } from '@/types/business/common'
 import type {
   ProductQueryParams,
   ProductCreateParams,
   ProductUpdateParams,
 } from '@/types/business/product'
-import type { Process } from '@/types/business/process'
 
 export const useProductStore = defineStore('product', () => {
   // 状态定义

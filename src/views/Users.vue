@@ -53,24 +53,22 @@
     </el-card>
 
     <!-- 新增员工模态框 -->
-    <el-dialog v-model="showAddModal" title="新增员工" width="400px">
-      <EmployeeForm
-        v-model="currentEmployeeForm"
-        :is-edit="false"
-        @submit="handleAddEmployee"
-        @cancel="showAddModal = false"
-      />
-    </el-dialog>
+    <EmployeeForm
+      v-model="currentEmployeeForm"
+      :is-edit="false"
+      :visible="showAddModal"
+      @submit="handleAddEmployee"
+      @cancel="handleCancelAddEmployee"
+    />
 
     <!-- 编辑员工模态框 -->
-    <el-dialog v-model="showEditModal" title="编辑员工" width="400px">
-      <EmployeeForm
-        v-model="currentEmployeeForm"
-        :is-edit="true"
-        @submit="handleEditEmployee"
-        @cancel="showEditModal = false"
-      />
-    </el-dialog>
+    <EmployeeForm
+      v-model="currentEmployeeForm"
+      :is-edit="true"
+      :visible="showEditModal"
+      @submit="handleEditEmployee"
+      @cancel="handleCancelEditEmployee"
+    />
   </div>
 </template>
 
@@ -112,25 +110,30 @@ const getEmployees = async () => {
 // 处理新增用户
 const handleAddEmployee = async (employeeData: Partial<EmployeeDetail>) => {
   try {
-    console.log("component: handleAddEmployee called with data:", employeeData)
     if (!employeeData.employeeName || !employeeData.employeePhone) {
       ElMessage.error('员工姓名和手机号为必填项')
       return
     }
-    console.log("component: calling employeeStore.createEmployee")
     await employeeStore.createEmployee({
       employeeName: employeeData.employeeName,
       employeePhone: employeeData.employeePhone,
       employeeStatus: employeeData.employeeStatus as ActiveStatus
     })
-    console.log("component: employeeStore.createEmployee completed")
     ElMessage.success('添加员工成功')
+    currentEmployeeForm.value = {}
     showAddModal.value = false
     getEmployees()
   } catch (error) {
     console.error("component: handleAddEmployee error:", error)
     ElMessage.error('添加员工失败')
   }
+}
+
+// 处理取消新增员工
+const handleCancelAddEmployee = () => {
+  // 重置表单
+  currentEmployeeForm.value = {}
+  showAddModal.value = false
 }
 
 // 处理删除员工
@@ -148,11 +151,14 @@ const handleDeleteEmployee = async (id: number) => {
 const handleEditEmployee = async (employeeData: Partial<EmployeeDetail>) => {
   if (!currentEmployeeForm.value.employeeId) return
   try {
+    console.log("component: handleEditEmployee called with data:", employeeData)
     await employeeStore.updateEmployee(
       currentEmployeeForm.value.employeeId,
       employeeData
     )
     ElMessage.success('更新员工成功')
+    // 重置表单
+    currentEmployeeForm.value = {}
     showEditModal.value = false
     getEmployees()
   } catch (error) {
@@ -166,6 +172,12 @@ const openEditModal = (employee: EmployeeDetail) => {
   showEditModal.value = true
 }
 
+// 处理取消编辑员工
+const handleCancelEditEmployee = () => {
+  // 重置表单
+  currentEmployeeForm.value = {}
+  showEditModal.value = false
+}
 // 处理页码变化
 const handleCurrentChange = (page: number) => {
   currentPage.value = page

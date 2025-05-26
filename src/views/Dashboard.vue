@@ -3,11 +3,11 @@
     <h2>仪表盘</h2>
     <div class="dashboard-grid">
       <div class="card">
-        <h3>总用户数</h3>
+        <h3>当前员工数</h3>
         <p class="number">1,234</p>
       </div>
       <div class="card">
-        <h3>今日访问</h3>
+        <h3>当前产品数</h3>
         <p class="number">256</p>
       </div>
       <div class="card">

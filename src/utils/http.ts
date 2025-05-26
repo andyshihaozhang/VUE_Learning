@@ -18,9 +18,7 @@ http.interceptors.request.use(
     console.log('Request:', config.method?.toUpperCase(), config.url)
     // 从 store 中获取 token
     const loginStore = useLoginStore()
-    console.log('loginStore:', loginStore)
     if (loginStore.loginInfo?.token) {
-      console.log('token:', loginStore.loginInfo.token)
       config.headers.Authorization = `Bearer ${loginStore.loginInfo.token}`
     }
     return config

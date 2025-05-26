@@ -22,7 +22,6 @@ export class EmployeeApi {
   }
 
   static async updateEmployee(id: number, data: EmployeeUpdateParams) {
-    console.log("api: updateEmployee called with id:", id, "and data:", data)
     return http.put<ApiResponse<EmployeeDetail>>(`${this.BASE_URL}/update/${id}`, data)
   }
 
