@@ -12,26 +12,26 @@ export class ProcessDetailApi {
 
   // 获取产品流程分配
   static async getProcessAllocationByProductId(productId: number) {
-    return http.get<ApiResponse<ProcessAllocationsResponse>>(`${this.BASE_URL}/all/${productId}`)
+    return http.get<ApiResponse<ProcessAllocationsResponse>>(`${this.BASE_URL}/allAllocation/${productId}`)
   }
 
   // 创建产品流程分配
   static async createProcessAllocation(data: ProcessAllocationCreateRequest) {
-    return http.post<ApiResponse<null>>(`${this.BASE_URL}/add/${data.productId}`, data)
+    return http.post<ApiResponse<null>>(`${this.BASE_URL}/addAllocation/${data.productId}`, data)
   }
 
   // 更新产品流程分配
   static async updateProcessAllocation(data: ProcessAllocationUpdateRequest) {
-    return http.put<ApiResponse<null>>(`${this.BASE_URL}/update/${data.processId}`, data)
+    return http.put<ApiResponse<null>>(`${this.BASE_URL}/updateAllocation/${data.processId}`, data)
   }
 
   // 删除产品流程
   static async deleteProcessAllocation(processId: number) {
-    return http.delete<ApiResponse<null>>(`${this.BASE_URL}/delete/${processId}`)
+    return http.delete<ApiResponse<null>>(`${this.BASE_URL}/deleteAllocation/${processId}`)
   }
 
   // 获取产品流程
   static async getProcessesByProductId(productId: number) {
-    return http.get<ApiResponse<ProcessListResponse>>(`${this.BASE_URL}/all/${productId}`)
+    return http.get<ApiResponse<ProcessListResponse>>(`${this.BASE_URL}/allAllocation/${productId}`)
   }
 } 

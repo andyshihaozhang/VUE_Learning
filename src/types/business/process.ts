@@ -12,7 +12,7 @@ export interface Process {
   productId: number
   processName: string
   processDescription: string
-  processPrice: number
+  referencePrice: number
   createTime: string
 }
 
@@ -40,7 +40,7 @@ export interface ProcessAllocationCreateRequest {
   productId: number
   processName: string
   processDescription: string
-  processPrice: number
+  referencePrice: number
   employees: number[] // 存储员工ID数组
 }
 
@@ -49,7 +49,7 @@ export interface ProcessAllocationUpdateRequest {
   processId: number
   processName: string
   processDescription: string
-  processPrice: number
+  referencePrice: number
   employees: number[] // 存储员工ID数组
 }
 

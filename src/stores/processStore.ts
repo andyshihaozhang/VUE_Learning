@@ -10,24 +10,25 @@ export const useProcessStore = defineStore('process', () => {
   const processAllocationList = ref<ProcessAllocation[]>([])
   const total = ref(0)
 
-  // 获取产品流程分配
+  // 鑾峰彇浜у搧娴佺▼鍒嗛厤
   const getProcessAllocationByProductId = async (productId: number) => {
     const response = await ProcessDetailApi.getProcessAllocationByProductId(productId)
-    processAllocationList.value = response.data.data.items
-    return response.data
+    console.log("response", response)
+    processAllocationList.value = response.data.data.items || []
+    return processAllocationList.value
   }
 
-  // 创建产品流程分配
+  // 鍒涘缓浜у搧娴佺▼鍒嗛厤
   const createProcessAllocation = async (data: ProcessAllocationCreateRequest) => {
     await ProcessDetailApi.createProcessAllocation(data)
   }
 
-  // 更新产品流程分配
+  // 鏇存柊浜у搧娴佺▼鍒嗛厤
   const updateProcessAllocation = async (data: ProcessAllocationUpdateRequest) => {
     await ProcessDetailApi.updateProcessAllocation(data)
   }
 
-  // 删除产品流程分配
+  // 鍒犻櫎浜у搧娴佺▼鍒嗛厤
   const deleteProcessAllocation = async (processId: number) => {
     await ProcessDetailApi.deleteProcessAllocation(processId)
   }

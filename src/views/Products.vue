@@ -36,7 +36,7 @@
                     </div>
                   </div>
                   <el-table 
-                    :data="props.row.processDetails || []" 
+                    :data="props.row.processAllocations || []" 
                     border
                     class="process-table"
                     :header-cell-style="{
@@ -47,6 +47,7 @@
                     <el-table-column label="工序ID" prop="processId" width="100" />
                     <el-table-column label="工序名称" prop="processName" width="150" />
                     <el-table-column label="工序描述" prop="processDescription" min-width="200" />
+                    <el-table-column label="工序创建时间" prop="createTime" width="180" />
                     <el-table-column label="工序负责人" prop="employees" min-width="200">
                       <template #default="scope">
                         <div class="responser-display">
@@ -61,9 +62,9 @@
                         </div>
                       </template>
                     </el-table-column>
-                    <el-table-column label="工序参考单价" prop="processPrice" width="120">
+                    <el-table-column label="工序参考单价" prop="referencePrice" width="120">
                       <template #default="scope">
-                        <span class="price">¥{{ scope.row.processPrice.toFixed(2) }}</span>
+                        <span class="price">¥{{ scope.row.referencePrice.toFixed(2) }}</span>
                       </template>
                     </el-table-column>
                     <el-table-column label="操作" width="200" fixed="right">
@@ -211,6 +212,7 @@ const editProductFormRef = ref<InstanceType<typeof ProductForm>>()
 // 获取当前页的产品列表
 const loadProducts = async () => {
   try {
+    console.log("loadProducts")
     await productStore.fetchProducts({
       page: currentPage.value,
       pageSize: pageSize.value,
@@ -219,7 +221,7 @@ const loadProducts = async () => {
     // 为每个产品添加工序明细相关属性
     productList.value = productStore.productList.map(item => ({
       ...item,
-      processDetails: [],
+      processAllocations: [],
       processLoading: true
     }))
     
@@ -233,21 +235,22 @@ const loadProducts = async () => {
 // 预加载当前页产品的工序明细
 const loadProcessAllocations = async () => {
   try {
+    console.log("loadProcessAllocations")
     // 收集所有工序中涉及的员工ID
     const employeeIds = new Set<number>()
     
-    // 使用Promise.all并行加载当前页产品的工序明细
     await Promise.all(
       productList.value.map(async (product) => {
         try {
-          const res = await processStore.getProcessAllocationByProductId(product.productId)
-          // 更新产品的工序明细，添加空的employees数组
-          product.processAllocations = res.data.items
+          const res = await processStore.getProcessAllocationByProductId(product.productId)      
+          console.log(res)
+          product.processAllocations = res || []
+          console.log(product.processAllocations)
         } catch (error) {
           console.error(`加载产品 ${product.productId} 的工序明细失败:`, error)
-          product.processAllocations = [] // 发生错误时设置为空数组
+          product.processAllocations = []
         } finally {
-          product.processLoading = false // 无论成功失败都标记为加载完成
+          product.processLoading = false
         }
       })
     )
@@ -282,13 +285,12 @@ const flushProcessesByProductId = async (productId: number) => {
   const product = productList.value.find(p => 
       p.productId === productId
     )
-    
     if (product) {
       // 标记为加载中
       product.processLoading = true
       try {
         const res = await processStore.getProcessAllocationByProductId(product.productId)
-        product.processAllocations = res.data.items
+        product.processAllocations = res
       } finally {
         product.processLoading = false
       }
@@ -337,8 +339,11 @@ const handleAddProcess = (productId: number) => {
 // 处理保存新增工序
 const handleSaveAddProcess = async (processData: ProcessAllocation) => {  
   try {
+    console.log("handleSaveAddProcess")
     addProcessFormRef.value?.closeForm()
-    flushProcessesByProductId(processData.productId)
+    // flushProcessesByProductId(processData.productId)
+    loadProducts()
+    console.log(productList)
   } catch (error) {
     ElMessage.error('添加工序失败')
   }
@@ -360,7 +365,8 @@ const handleSaveEditProcess = async (processData: ProcessAllocation) => {
   try {
     ElMessage.success('工序信息已更新')
     editProcessFormRef.value?.closeForm()
-    flushProcessesByProductId(processData.productId)
+    // flushProcessesByProductId(processData.productId)
+    loadProducts()
   } catch (error) {
     ElMessage.error('更新工序信息失败')
   }

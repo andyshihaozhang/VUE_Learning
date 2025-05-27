@@ -21,7 +21,7 @@
                 </el-form-item>
                 <el-form-item label="工序单价">
                 <el-input-number
-                    v-model="formModel.processPrice"
+                    v-model="formModel.referencePrice"
                     :precision="2"
                     :step="10"
                     :min="0"
@@ -66,7 +66,7 @@ const formModel = ref<ProcessAllocation>({
     productId: 0,
     processName: '',
     processDescription: '',
-    processPrice: 0,
+    referencePrice: 0,
     employees: [],
     createTime: ''
 })
@@ -76,7 +76,7 @@ function resetProcessForm() {
     productId: 0,
     processName: '',
     processDescription: '',
-    processPrice: 0,
+    referencePrice: 0,
     employees: [],
     createTime: ''
   }
@@ -104,7 +104,7 @@ const handleSave = () => {
             processId: formModel.value.processId,
             processName: formModel.value.processName,
             processDescription: formModel.value.processDescription,
-            processPrice: formModel.value.processPrice,
+            referencePrice: formModel.value.referencePrice,
             employees: formModel.value.employees
         })
         ElMessage.success('工序已更新')
@@ -113,7 +113,7 @@ const handleSave = () => {
             productId: formModel.value.productId,
             processName: formModel.value.processName,
             processDescription: formModel.value.processDescription,
-            processPrice: formModel.value.processPrice,
+            referencePrice: formModel.value.referencePrice,
             employees: formModel.value.employees
         })
         ElMessage.success('工序已添加')
