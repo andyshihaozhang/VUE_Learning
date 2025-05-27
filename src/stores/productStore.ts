@@ -94,20 +94,6 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
-  // 获取产品的工序列表
-  const getProcessesByProductId = async (productId: number) => {
-    try {
-      loading.value = true
-      const response = await ProductApi.getProcessesByProductId(productId)
-      return response.data
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : '获取工序列表失败'
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
-
   return {
     // 状态
     productList,
@@ -121,6 +107,5 @@ export const useProductStore = defineStore('product', () => {
     updateProduct,
     deleteProduct,
     getEmployeesByProductId,
-    getProcessesByProductId
   }
 }) 

@@ -11,7 +11,6 @@ import type {
 export const useEmployeeStore = defineStore('employee', () => {
   // 状态定义
   const employeeList = ref<EmployeeDetail[]>([])
-  const currentEmployee = ref<EmployeeDetail | null>(null)
   const total = ref(0)
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -111,7 +110,6 @@ export const useEmployeeStore = defineStore('employee', () => {
   return {
     // 状态
     employeeList,
-    currentEmployee,
     total,
     loading,
     error,

@@ -161,10 +161,11 @@ import type { Process } from '@/types/business/process'
 import { useProductStore } from '@/stores/productStore'
 import { useEmployeeStore } from '@/stores/employeeStore'
 import type { EmployeeDetail } from '@/types/business/employee'
-
+import { useProcessStore } from '@/stores/processStore'
 
 const productStore = useProductStore()
 const employeeStore = useEmployeeStore()
+const processStore = useProcessStore()
 
 // 分工方式
 const divisionType = ref('employee')
@@ -237,7 +238,7 @@ const handleLeftSelected = async (row: any) => {
     // 根据员工选择的产品列表
     currentLeftProductSelected.value = row as Product
       // api获取当前产品工序列表
-      currentProcessList.value = (await productStore.getProcessesByProductId(currentLeftProductSelected.value.productId)).data.items
+      currentProcessList.value = (await processStore.getProcessAllocationByProductId(currentLeftProductSelected.value.productId)).data.items
     }
   else {
     // 根据产品选择的产品列表

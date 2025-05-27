@@ -4,7 +4,7 @@
       <template #header>
         <div class="card-header">
           <h2>员工管理</h2>
-          <el-button type="primary" @click="showAddModal = true">
+          <el-button type="primary" @click="handleAddEmployee">
             <el-icon><Plus /></el-icon>
             新增员工
           </el-button>
@@ -53,21 +53,15 @@
     </el-card>
 
     <!-- 新增员工模态框 -->
-    <EmployeeForm
-      v-model="currentEmployeeForm"
-      :is-edit="false"
-      :visible="showAddModal"
-      @submit="handleAddEmployee"
-      @cancel="handleCancelAddEmployee"
+    <EmployeeAddForm
+      ref="addEmployeeFormRef"
+      @formOver="handleAddEmployeeOver"
     />
 
     <!-- 编辑员工模态框 -->
-    <EmployeeForm
-      v-model="currentEmployeeForm"
-      :is-edit="true"
-      :visible="showEditModal"
-      @submit="handleEditEmployee"
-      @cancel="handleCancelEditEmployee"
+    <EmployeeEditForm
+      ref="editEmployeeFormRef"
+      @formOver="handleEditEmployeeOver"
     />
   </div>
 </template>
@@ -78,19 +72,16 @@ import { ElMessage } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 
 import type { EmployeeDetail } from '@/types/business/employee'
-import { ActiveStatus } from '@/types/business/common'
 import EmployeeStatusTag from '@/components/user/EmployeeStatusTag.vue'
-import EmployeeForm from '@/components/user/EmployeeForm.vue'
+import EmployeeAddForm from '@/components/user/EmployeeAddForm.vue'
+import EmployeeEditForm from '@/components/user/EmployeeEditForm.vue'
 import { useEmployeeStore } from '@/stores/employeeStore'
 
 const employeeStore = useEmployeeStore()
 
-// 控制新增员工模态框显示
-const showAddModal = ref(false)
-// 控制编辑员工模态框显示
-const showEditModal = ref(false)
-// 当前编辑的员工表单
-const currentEmployeeForm = ref<Partial<EmployeeDetail>>({})
+// 表单
+const addEmployeeFormRef = ref<InstanceType<typeof EmployeeAddForm>>()
+const editEmployeeFormRef = ref<InstanceType<typeof EmployeeEditForm>>()
 
 const currentPage = ref(1)
 const pageSize = ref(16)
@@ -107,34 +98,21 @@ const getEmployees = async () => {
   }
 }
 
+// 打开新增员工表单
+const handleAddEmployee = () => {
+  addEmployeeFormRef.value?.openForm()
+}
+
 // 处理新增用户
-const handleAddEmployee = async (employeeData: Partial<EmployeeDetail>) => {
+const handleAddEmployeeOver = async () => {
   try {
-    if (!employeeData.employeeName || !employeeData.employeePhone) {
-      ElMessage.error('员工姓名和手机号为必填项')
-      return
-    }
-    await employeeStore.createEmployee({
-      employeeName: employeeData.employeeName,
-      employeePhone: employeeData.employeePhone,
-      employeeStatus: employeeData.employeeStatus as ActiveStatus
-    })
-    ElMessage.success('添加员工成功')
-    currentEmployeeForm.value = {}
-    showAddModal.value = false
+    addEmployeeFormRef.value?.closeForm()
     getEmployees()
   } catch (error) {
-    console.error("component: handleAddEmployee error:", error)
     ElMessage.error('添加员工失败')
   }
 }
 
-// 处理取消新增员工
-const handleCancelAddEmployee = () => {
-  // 重置表单
-  currentEmployeeForm.value = {}
-  showAddModal.value = false
-}
 
 // 处理删除员工
 const handleDeleteEmployee = async (id: number) => {
@@ -148,18 +126,9 @@ const handleDeleteEmployee = async (id: number) => {
 }
 
 // 处理编辑员工
-const handleEditEmployee = async (employeeData: Partial<EmployeeDetail>) => {
-  if (!currentEmployeeForm.value.employeeId) return
+const handleEditEmployeeOver = async () => {
   try {
-    console.log("component: handleEditEmployee called with data:", employeeData)
-    await employeeStore.updateEmployee(
-      currentEmployeeForm.value.employeeId,
-      employeeData
-    )
-    ElMessage.success('更新员工成功')
-    // 重置表单
-    currentEmployeeForm.value = {}
-    showEditModal.value = false
+    editEmployeeFormRef.value?.closeForm()
     getEmployees()
   } catch (error) {
     ElMessage.error('更新员工失败')
@@ -168,16 +137,10 @@ const handleEditEmployee = async (employeeData: Partial<EmployeeDetail>) => {
 
 // 打开编辑模态框
 const openEditModal = (employee: EmployeeDetail) => {
-  currentEmployeeForm.value = { ...employee }
-  showEditModal.value = true
+  editEmployeeFormRef.value?.initForm(employee)
+  editEmployeeFormRef.value?.openForm()
 }
 
-// 处理取消编辑员工
-const handleCancelEditEmployee = () => {
-  // 重置表单
-  currentEmployeeForm.value = {}
-  showEditModal.value = false
-}
 // 处理页码变化
 const handleCurrentChange = (page: number) => {
   currentPage.value = page

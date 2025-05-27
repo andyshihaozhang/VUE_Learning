@@ -51,14 +51,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import BaseForm from '@/components/common/BaseForm.vue'
+import { useProcessStore } from '@/stores/processStore'
 import { useEmployeeStore } from '@/stores/employeeStore'
-import type { ProcessDetail } from '@/types/business/process'
 
+import type { ProcessAllocation } from '@/types/business/process'
+import { ElMessage } from 'element-plus'
+const processStore = useProcessStore()
 const employeeStore = useEmployeeStore()
 
-const formModel = ref<ProcessDetail>({
+const formModel = ref<ProcessAllocation>({
     processId: 0,
     productId: 0,
     processName: '',
@@ -67,41 +70,70 @@ const formModel = ref<ProcessDetail>({
     employees: [],
     createTime: ''
 })
-
+function resetProcessForm() {
+  formModel.value = {
+    processId: 0,
+    productId: 0,
+    processName: '',
+    processDescription: '',
+    processPrice: 0,
+    employees: [],
+    createTime: ''
+  }
+}
 const title = computed(() => {
     return props.isEdit ? '编辑工序' : '新增工序'
 })
 
 const props = defineProps<{
     isEdit: boolean
-    formModel: ProcessDetail
 }>()
 
-watch(
-    () => props.formModel,
-    (newValue) => {
-        formModel.value = newValue
-    },
-    { immediate: true }
-)
-
 const emit = defineEmits<{
-    (e: 'update:visible', value: boolean): void
-    (e: 'save', processData: ProcessDetail): void
+    (e: 'formOver'): void
 }>()
 
 const handleCancel = () => {
-    emit('update:visible', false)
+    resetProcessForm()
+    emit('formOver')
 }
 
 const handleSave = () => {
-    emit('save', formModel.value)
+    if (props.isEdit) {
+        processStore.updateProcessAllocation({
+            processId: formModel.value.processId,
+            processName: formModel.value.processName,
+            processDescription: formModel.value.processDescription,
+            processPrice: formModel.value.processPrice,
+            employees: formModel.value.employees
+        })
+        ElMessage.success('工序已更新')
+    } else {
+        processStore.createProcessAllocation({
+            productId: formModel.value.productId,
+            processName: formModel.value.processName,
+            processDescription: formModel.value.processDescription,
+            processPrice: formModel.value.processPrice,
+            employees: formModel.value.employees
+        })
+        ElMessage.success('工序已添加')
+    }
+    resetProcessForm()
+    emit('formOver')
 }
 
 // 暴露方法
 const formRef = ref<InstanceType<typeof BaseForm>>()
 
 defineExpose({
+    initForm: (productId: number, process?: ProcessAllocation) => {
+        if (process) {
+            formModel.value = {...process}      
+        } else {
+            resetProcessForm()
+        }
+        formModel.value.productId = productId
+    },
     openForm: () => formRef.value?.openForm(),
     closeForm: () => formRef.value?.closeForm()
 })

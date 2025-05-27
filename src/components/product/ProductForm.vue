@@ -32,12 +32,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import BaseForm from '@/components/common/BaseForm.vue'
 import { ProcessStatus } from '@/types/business/common'
 import type { Product } from '@/types/business/product'
+import { ElMessage } from 'element-plus'
+import { useProductStore } from '@/stores/productStore'
 
 // 属性
+const productStore = useProductStore()
 const formRef = ref<InstanceType<typeof BaseForm>>()
 const title = computed(() => {
   return props.isEdit ? '编辑产品' : '新增产品'
@@ -53,33 +56,69 @@ const formModel = ref<Product>({
 
 // 交互
 const props = defineProps<{
-  modelValue: Product
   isEdit: boolean
 }>()
 const emit = defineEmits<{
-  (e: 'cancel'): void
-  (e: 'update:modelValue', value: Product): void
-  (e: 'save', product: Product): void
+  (e: 'formOver'): void
 }>()
-// 监听 modelValue 变化
-watch(
-    () => props.modelValue,
-  (newValue) => {
-    formModel.value = { ...newValue }
-  },
-  { immediate: true }
-)
 
 // 方法
 // 保存
 const handleSave = async () => {
-  emit('save', formModel.value)
+  try {
+    if (props.isEdit) {
+      await productStore.updateProduct(formModel.value.productId, {
+        productId: formModel.value.productId,
+        productCode: formModel.value.productCode,
+        productName: formModel.value.productName,
+        customerSource: formModel.value.customerSource,
+        productStatus: formModel.value.productStatus
+      })
+      ElMessage.success('产品已更新')
+    }
+    else{
+      await productStore.createProduct({
+        productCode: formModel.value.productCode,
+        productName: formModel.value.productName,
+        customerSource: formModel.value.customerSource,
+        productStatus: formModel.value.productStatus
+      })
+      ElMessage.success('产品已添加')
+    }
+    // 重置表单
+    resetProductForm()
+    emit('formOver')
+    formRef.value?.closeForm()
+    } catch (error) {
+      ElMessage.error('产品操作失败')
+    }
 }
 
 // 取消
 const handleCancel = () => {
-  emit('cancel')
+  resetProductForm()
+  emit('formOver')
 }
+
+function resetProductForm() {
+  formModel.value = {
+    productId: 0,
+    productCode: '',
+    productName: '',
+    productStatus: ProcessStatus.IN_PROGRESS,
+    customerSource: '',
+    createTime: ''
+  }
+}
+
+// 暴露方法
+defineExpose({
+  initForm: (product: Product) => {
+    formModel.value = {...product}
+  },
+  openForm: () => formRef.value?.openForm(),
+  closeForm: () => formRef.value?.closeForm()
+})
 
 // 校验
 const productRules = {
@@ -98,16 +137,6 @@ const productRules = {
     { required: true, message: '请选择产品状态', trigger: 'change' }
   ]
 }
-
-
-// 暴露方法
-defineExpose({
-  openForm: () => {
-    console.log("open BaseForm")
-    formRef.value?.openForm()
-  },
-  closeForm: () => formRef.value?.closeForm()
-})
 </script>
 
 

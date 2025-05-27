@@ -140,7 +140,6 @@
     <!-- 新增工序对话框 -->
     <ProcessDetailForm
       ref="addProcessFormRef"
-      v-model:form-model="ProcessFormModel"
       :is-edit="false"
       @cancel="handleCancelAddProcess"
       @save="handleSaveAddProcess"
@@ -149,7 +148,6 @@
     <!-- 编辑工序对话框 -->
     <ProcessDetailForm
       ref="editProcessFormRef"
-      v-model:form-model="ProcessFormModel"
       :is-edit="true"
       @cancel="handleCancelEditProcess"
       @save="handleSaveEditProcess"
@@ -158,19 +156,15 @@
     <!-- 新增产品对话框 -->
     <ProductForm
       ref="addProductFormRef"
-      v-model:modelValue="ProductFormModel"
       :is-edit="false"
-      @cancel="handleCancelAddProduct"
-      @save="handleSaveAddProduct"
+      @formOver="handleAddProductOver"
     />
 
     <!-- 编辑产品对话框 -->
     <ProductForm
       ref="editProductFormRef"
-      v-model:modelValue="ProductFormModel"
       :is-edit="true"
-      @cancel="handleCancelEditProduct"
-      @save="handleSaveEditProduct"
+      @formOver="handleEditProductOver"
     />
   </div>
   </template>
@@ -181,20 +175,19 @@ import { Plus, Edit, Delete, List, Loading } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 import type { Product } from '@/types/business/product'
-import type { ProcessDetail } from '@/types/business/process'
+import type { ProcessAllocation } from '@/types/business/process'
 import type { EmployeeDetail } from '@/types/business/employee'
-import { ProcessStatus } from '@/types/business/common'
-import { ProcessDetailApi } from '@/api/processApi'
 import { EmployeeApi } from '@/api/employeeApi'
 import ProcessStatusTag from "@/components/Process/ProcessStatusTag.vue"
 import { useEmployeeStore } from '@/stores/employeeStore'
 import { useProductStore } from '@/stores/productStore'
+import { useProcessStore } from '@/stores/processStore'
 import ProductForm from '@/components/product/ProductForm.vue'
 import ProcessDetailForm from '@/components/product/ProcessDetailForm.vue'
 
 // 扩展Product类型，增加工序明细及加载状态
 interface ProductWithProcess extends Product {
-  processDetails?: ProcessDetail[]
+  processAllocations?: ProcessAllocation[]
   processLoading?: boolean
 }
 // 分页配置
@@ -208,55 +201,15 @@ const productList = ref<ProductWithProcess[]>([])
 const employeeOptions = ref<EmployeeDetail[]>([])
 const employeeStore = useEmployeeStore()
 const productStore = useProductStore()
-
+const processStore = useProcessStore()
 // 表单配置
 const addProcessFormRef = ref<InstanceType<typeof ProcessDetailForm>>()
 const editProcessFormRef = ref<InstanceType<typeof ProcessDetailForm>>()
 const addProductFormRef = ref<InstanceType<typeof ProductForm>>()
 const editProductFormRef = ref<InstanceType<typeof ProductForm>>()
 
-
-const ProductFormModel = ref<Product>({
-  productId: 0,
-  productCode: '',
-  productName: '',
-  productStatus: ProcessStatus.IN_PROGRESS,
-  customerSource: '',
-  createTime: ''
-})
-function resetProductForm() {
-  ProductFormModel.value = {
-    productId: 0,
-    productCode: '',
-    productName: '',
-    productStatus: ProcessStatus.IN_PROGRESS,
-    customerSource: '',
-    createTime: ''
-  }
-}
-const ProcessFormModel = ref<ProcessDetail>({
-  processId: 0,
-  productId: 0,
-  processName: '',
-  processDescription: '',
-  processPrice: 0,
-  employees: [],
-  createTime: ''
-})
-function resetProcessForm() {
-  ProcessFormModel.value = {
-    processId: 0,
-    productId: 0,
-    processName: '',
-    processDescription: '',
-    processPrice: 0,
-    employees: [],
-    createTime: ''
-  }
-}
-
-// 获取产品列表
-const getProducts = async () => {
+// 获取当前页的产品列表
+const loadProducts = async () => {
   try {
     await productStore.fetchProducts({
       page: currentPage.value,
@@ -271,28 +224,28 @@ const getProducts = async () => {
     }))
     
     // 为每个产品预加载工序明细
-    await loadAllProcessDetails()
+    await loadProcessAllocations()
   } catch (error) {
     ElMessage.error('获取产品列表失败')
   }
 }
 
-// 预加载所有产品的工序明细
-const loadAllProcessDetails = async () => {
+// 预加载当前页产品的工序明细
+const loadProcessAllocations = async () => {
   try {
     // 收集所有工序中涉及的员工ID
     const employeeIds = new Set<number>()
     
-    // 使用Promise.all并行加载所有产品的工序明细
+    // 使用Promise.all并行加载当前页产品的工序明细
     await Promise.all(
       productList.value.map(async (product) => {
         try {
-          const res = await ProcessDetailApi.getProcessesByProductId(product.productId)
+          const res = await processStore.getProcessAllocationByProductId(product.productId)
           // 更新产品的工序明细，添加空的employees数组
-          product.processDetails = res.data.data.items
+          product.processAllocations = res.data.items
         } catch (error) {
           console.error(`加载产品 ${product.productId} 的工序明细失败:`, error)
-          product.processDetails = [] // 发生错误时设置为空数组
+          product.processAllocations = [] // 发生错误时设置为空数组
         } finally {
           product.processLoading = false // 无论成功失败都标记为加载完成
         }
@@ -311,8 +264,8 @@ const loadAllProcessDetails = async () => {
   }
 }
 
-// 获取员工列表
-const getEmployees = async () => {
+// 预加载所有可分配的员工
+const loadEmployees = async () => {
   try {
     const res = await EmployeeApi.getEmployees({
       page: 1,
@@ -324,70 +277,42 @@ const getEmployees = async () => {
   }
 }
 
-// 处理新增产品
+const flushProcessesByProductId = async (productId: number) => {
+  // 找到所属产品并刷新其工序列表
+  const product = productList.value.find(p => 
+      p.productId === productId
+    )
+    
+    if (product) {
+      // 标记为加载中
+      product.processLoading = true
+      try {
+        const res = await processStore.getProcessAllocationByProductId(product.productId)
+        product.processAllocations = res.data.items
+      } finally {
+        product.processLoading = false
+      }
+    }
+}
+
+// 打开新增产品表单
 const handleAddProduct = () => {
   addProductFormRef.value?.openForm()
 }
 
-// 处理保存新增产品
-const handleSaveAddProduct = async (productData: Product) => {
-    try {
-      console.log(productData)
-      await productStore.createProduct({
-        productCode: productData.productCode,
-        productName: productData.productName,
-        customerSource: productData.customerSource,
-        productStatus: productData.productStatus
-      })
-      ElMessage.success('产品已添加')
-      // 重置表单
-      resetProductForm()
-      addProductFormRef.value?.closeForm()
-      getProducts() // 刷新产品列表
-    } catch (error) {
-      ElMessage.error('添加产品失败')
-    }
-}
-
-// 处理取消新增产品
-const handleCancelAddProduct = () => {
-  // 重置表单
-  resetProductForm()
+const handleAddProductOver = () => {
+  loadProducts()
   addProductFormRef.value?.closeForm()
 }
 
-// 处理编辑产品
+// 打开编辑产品表单
 const handleEditProduct = (row: Product) => {
-  // 重置表单
-  ProductFormModel.value = {...row}
+  editProductFormRef.value?.initForm(row)
   editProductFormRef.value?.openForm()
 }
 
-// 处理保存编辑产品
-const handleSaveEditProduct = async (productData: Product) => {
-  try {
-
-    await productStore.updateProduct(productData.productId, {
-      productId: productData.productId,
-      productCode: productData.productCode,
-      productName: productData.productName,
-      customerSource: productData.customerSource,
-      productStatus: productData.productStatus
-    })
-        ElMessage.success('产品信息已更新')
-        // 重置表单
-        resetProductForm()
-        editProductFormRef.value?.closeForm()
-        getProducts() // 刷新产品列表
-      } catch (error) {
-        ElMessage.error('更新产品信息失败')
-  }
-}
-
-// 处理取消编辑产品
-const handleCancelEditProduct = () => {
-  // 重置表单
-  resetProductForm()
+const handleEditProductOver = () => {
+  loadProducts()
   editProductFormRef.value?.closeForm()
 }
 
@@ -397,54 +322,23 @@ const handleDeleteProduct = async (row: Product) => {
     await productStore.deleteProduct(row.productId)
     ElMessage.success('产品已删除')
     // 删除成功后刷新列表
-    getProducts()
+    loadProducts()
   } catch (error) {
     ElMessage.error('删除产品失败')
   }
 }
 
-// 处理新增工序
+// 打开新增工序表单
 const handleAddProcess = (productId: number) => {
-  ProcessFormModel.value.productId = productId
+  addProcessFormRef.value?.initForm(productId)
   addProcessFormRef.value?.openForm()
 }
 
 // 处理保存新增工序
-const handleSaveAddProcess = async (processData: ProcessDetail) => {  
+const handleSaveAddProcess = async (processData: ProcessAllocation) => {  
   try {
-    // 创建新工序
-    await ProcessDetailApi.createProcessDetail({
-      productId: processData.productId,
-      processName: processData.processName,
-      processDescription: processData.processDescription,
-      processPrice: processData.processPrice,
-      employees: processData.employees // 直接使用选中的员工ID数组
-    })
-    
-    ElMessage.success('工序已添加')
-    // 重置表单
-    resetProcessForm()
     addProcessFormRef.value?.closeForm()
-    
-    // 找到所属产品并刷新其工序列表
-    const product = productList.value.find(p => 
-      p.productId === processData.productId
-    )
-    
-    if (product) {
-      // 标记为加载中
-      product.processLoading = true
-      try {
-        const res = await ProcessDetailApi.getProcessDetailsByProductId({
-          productId: product.productId,
-          page: 1,
-          pageSize: 100,
-        })
-        product.processDetails = res.data.data.items
-      } finally {
-        product.processLoading = false
-      }
-    }
+    flushProcessesByProductId(processData.productId)
   } catch (error) {
     ElMessage.error('添加工序失败')
   }
@@ -452,52 +346,21 @@ const handleSaveAddProcess = async (processData: ProcessDetail) => {
 
 // 处理取消新增工序
 const handleCancelAddProcess = () => {
-  // 重置表单
-  resetProcessForm()
   addProcessFormRef.value?.closeForm()
 }
 
 // 处理编辑工序
-const handleEditProcess = (row: ProcessDetail) => {
-  ProcessFormModel.value = {...row}
+const handleEditProcess = (row: ProcessAllocation) => {
+  editProcessFormRef.value?.initForm(row.productId, row)
   editProcessFormRef.value?.openForm()
 }
 
 // 处理保存编辑工序
-const handleSaveEditProcess = async (processData: ProcessDetail) => {  
+const handleSaveEditProcess = async (processData: ProcessAllocation) => {  
   try {
-    // 更新工序数据
-    await ProcessDetailApi.updateProcessDetail(processData.processId, {
-      processId: processData.processId,
-      processName: processData.processName,
-      processDescription: processData.processDescription,
-      processPrice: processData.processPrice,
-      employees: processData.employees // 直接使用选中的员工ID数组
-    })
     ElMessage.success('工序信息已更新')
-    // 重置表单
-    resetProcessForm()
     editProcessFormRef.value?.closeForm()
-    
-    // 找到所属产品并刷新其工序列表
-    const product = productList.value.find(p => 
-      p.processDetails?.some(pd => pd.processId === processData.processId)
-    )
-    
-    if (product) {
-      // 标记为加载中
-      product.processLoading = true
-      try {
-        const res = await ProcessDetailApi.getProcessDetailsByProductId({
-          productId: product.productId,
-          page: 1,
-          pageSize: 100,
-        })
-        product.processDetails = res.data.data.items
-      } finally {
-        product.processLoading = false
-      }
-    }
+    flushProcessesByProductId(processData.productId)
   } catch (error) {
     ElMessage.error('更新工序信息失败')
   }
@@ -505,13 +368,11 @@ const handleSaveEditProcess = async (processData: ProcessDetail) => {
 
 // 处理取消编辑工序
 const handleCancelEditProcess = () => {
-  // 重置表单
-  resetProcessForm()
   editProcessFormRef.value?.closeForm()
 }
 
 // 处理删除工序
-const handleDeleteProcess = (row: ProcessDetail) => {
+const handleDeleteProcess = (row: ProcessAllocation) => {
   ElMessageBox.confirm(
     `确定要删除工序"${row.processName}"吗？`,
     '删除确认',
@@ -521,28 +382,9 @@ const handleDeleteProcess = (row: ProcessDetail) => {
       type: 'warning'
     }
   ).then(async () => {
-    await ProcessDetailApi.deleteProcessDetail(row.processId)
+    await processStore.deleteProcessAllocation(row.processId)
     ElMessage.success('工序已删除')
-    
-    // 找到所属产品并刷新其工序列表
-    const product = productList.value.find(p => 
-      p.processDetails?.some(pd => pd.processId === row.processId)
-    )
-    
-    if (product) {
-      // 标记为加载中
-      product.processLoading = true
-      try {
-        const res = await ProcessDetailApi.getProcessDetailsByProductId({
-          productId: product.productId,
-          page: 1,
-          pageSize: 100,
-        })
-        product.processDetails = res.data.data.items
-      } finally {
-        product.processLoading = false
-      }
-    }
+    flushProcessesByProductId(row.productId)
   }).catch(() => {
     // 取消删除
     ElMessage.info('取消删除')
@@ -552,14 +394,14 @@ const handleDeleteProcess = (row: ProcessDetail) => {
 // 处理页码变化
 const handleCurrentChange = (page: number) => {
   currentPage.value = page
-  getProducts()
+  loadProducts()
 }
 
 // 处理每页条数变化
 const handleSizeChange = (size: number) => {
   pageSize.value = size
   currentPage.value = 1 // 重置到第一页
-  getProducts()
+  loadProducts()
 }
 
 // 获取员工姓名的辅助函数
@@ -568,10 +410,10 @@ const getEmployeeName = (employeeId: number) => {
   return employee ? `${employee.employeeName}` : `未知员工(${employeeId})`
 }
 
-// 组件挂载时获取产品列表和员工列表
+// 组件挂载时初始化相关信息
 onMounted(() => {
-  getProducts()
-  getEmployees()
+  loadProducts()
+  loadEmployees()
 })
   </script>
 

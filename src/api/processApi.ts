@@ -1,33 +1,37 @@
 import { http } from '@/utils/http'
 import type {
-  ProcessDetail,
-  ProcessDetailQueryByProductIdParams,
-  ProcessDetailCreateParams,
-  ProcessDetailUpdateParams,
-  ProcessDetailResponse,
+  ProcessAllocationCreateRequest,
+  ProcessAllocationUpdateRequest,
+  ProcessListResponse,
+  ProcessAllocationsResponse,
 } from '@/types/business/process'
 
 // 产品流程API
 export class ProcessDetailApi {
   private static readonly BASE_URL = import.meta.env.VITE_API_BASE_URL + '/process'
 
-  static async getProcessDetailsByProductId(params: ProcessDetailQueryByProductIdParams) {
-    return http.get<ApiResponse<ProcessDetailResponse>>(this.BASE_URL, { params })
+  // 获取产品流程分配
+  static async getProcessAllocationByProductId(productId: number) {
+    return http.get<ApiResponse<ProcessAllocationsResponse>>(`${this.BASE_URL}/all/${productId}`)
   }
 
-  static async createProcessDetail(data: ProcessDetailCreateParams) {
-    return http.post<ApiResponse<ProcessDetail>>(this.BASE_URL, data)
+  // 创建产品流程分配
+  static async createProcessAllocation(data: ProcessAllocationCreateRequest) {
+    return http.post<ApiResponse<null>>(`${this.BASE_URL}/add/${data.productId}`, data)
   }
 
-  static async updateProcessDetail(id: number, data: ProcessDetailUpdateParams) {
-    return http.put<ApiResponse<ProcessDetail>>(`${this.BASE_URL}/${id}`, data)
+  // 更新产品流程分配
+  static async updateProcessAllocation(data: ProcessAllocationUpdateRequest) {
+    return http.put<ApiResponse<null>>(`${this.BASE_URL}/update/${data.processId}`, data)
   }
 
-  static async deleteProcessDetail(id: number) {
-    return http.delete<ApiResponse<null>>(`${this.BASE_URL}/${id}`)
+  // 删除产品流程
+  static async deleteProcessAllocation(processId: number) {
+    return http.delete<ApiResponse<null>>(`${this.BASE_URL}/delete/${processId}`)
   }
 
+  // 获取产品流程
   static async getProcessesByProductId(productId: number) {
-    return http.get<ApiResponse<ProcessDetailResponse>>(`${this.BASE_URL}/all/${productId}`)
+    return http.get<ApiResponse<ProcessListResponse>>(`${this.BASE_URL}/all/${productId}`)
   }
 } 

@@ -17,21 +17,26 @@ export interface Process {
 }
 
 
-// 产品流程明细
-export interface ProcessDetail extends Process {
+export interface ProcessListResponse {
+  items: Process[]
+  total: number
+}
+
+// 产品流程分配明细
+export interface ProcessAllocation extends Process {
   employees: number[] // 存储员工ID数组
 }
 
-// 产品流程查询参数
-export interface ProcessDetailQueryByProductIdParams {
+// 产品流程分配查询参数
+export interface ProcessAllocationByProductIdRequest {
   productId: number
   page: number
   pageSize: number
   search?: string
 }
 
-// 产品流程创建参数 
-export interface ProcessDetailCreateParams {
+// 产品流程分配创建参数 
+export interface ProcessAllocationCreateRequest {
   productId: number
   processName: string
   processDescription: string
@@ -40,7 +45,7 @@ export interface ProcessDetailCreateParams {
 }
 
 // 产品流程更新参数
-export interface ProcessDetailUpdateParams {
+export interface ProcessAllocationUpdateRequest {
   processId: number
   processName: string
   processDescription: string
@@ -48,12 +53,7 @@ export interface ProcessDetailUpdateParams {
   employees: number[] // 存储员工ID数组
 }
 
-// 产品流程明细响应
-export interface ProcessDetailResponse {
-  items: ProcessDetail[]
-}
-
-export interface ProcessListResponse {
-  items: Process[]
-  total: number
+// 产品流程分配响应
+export interface ProcessAllocationsResponse {
+  items: ProcessAllocation[]
 }
