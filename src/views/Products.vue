@@ -139,8 +139,8 @@
 
     <!-- 新增工序对话框 -->
     <ProcessDetailForm
-      :visible="addProcessDialogVisible"
-      :form-model="ProcessFormModel"
+      ref="addProcessFormRef"
+      v-model:form-model="ProcessFormModel"
       :is-edit="false"
       @cancel="handleCancelAddProcess"
       @save="handleSaveAddProcess"
@@ -148,8 +148,8 @@
     
     <!-- 编辑工序对话框 -->
     <ProcessDetailForm
-      :visible="editProcessDialogVisible"
-      :form-model="ProcessFormModel"
+      ref="editProcessFormRef"
+      v-model:form-model="ProcessFormModel"
       :is-edit="true"
       @cancel="handleCancelEditProcess"
       @save="handleSaveEditProcess"
@@ -157,8 +157,8 @@
 
     <!-- 新增产品对话框 -->
     <ProductForm
+      ref="addProductFormRef"
       v-model:modelValue="ProductFormModel"
-      :visible="addProductDialogVisible"
       :is-edit="false"
       @cancel="handleCancelAddProduct"
       @save="handleSaveAddProduct"
@@ -166,8 +166,8 @@
 
     <!-- 编辑产品对话框 -->
     <ProductForm
+      ref="editProductFormRef"
       v-model:modelValue="ProductFormModel"
-      :visible="editProductDialogVisible"
       :is-edit="true"
       @cancel="handleCancelEditProduct"
       @save="handleSaveEditProduct"
@@ -210,10 +210,12 @@ const employeeStore = useEmployeeStore()
 const productStore = useProductStore()
 
 // 表单配置
-const addProcessDialogVisible = ref(false)
-const editProcessDialogVisible = ref(false)
-const addProductDialogVisible = ref(false)
-const editProductDialogVisible = ref(false)
+const addProcessFormRef = ref<InstanceType<typeof ProcessDetailForm>>()
+const editProcessFormRef = ref<InstanceType<typeof ProcessDetailForm>>()
+const addProductFormRef = ref<InstanceType<typeof ProductForm>>()
+const editProductFormRef = ref<InstanceType<typeof ProductForm>>()
+
+
 const ProductFormModel = ref<Product>({
   productId: 0,
   productCode: '',
@@ -324,7 +326,7 @@ const getEmployees = async () => {
 
 // 处理新增产品
 const handleAddProduct = () => {
-  addProductDialogVisible.value = true
+  addProductFormRef.value?.openForm()
 }
 
 // 处理保存新增产品
@@ -340,7 +342,7 @@ const handleSaveAddProduct = async (productData: Product) => {
       ElMessage.success('产品已添加')
       // 重置表单
       resetProductForm()
-      addProductDialogVisible.value = false
+      addProductFormRef.value?.closeForm()
       getProducts() // 刷新产品列表
     } catch (error) {
       ElMessage.error('添加产品失败')
@@ -351,14 +353,14 @@ const handleSaveAddProduct = async (productData: Product) => {
 const handleCancelAddProduct = () => {
   // 重置表单
   resetProductForm()
-  addProductDialogVisible.value = false
+  addProductFormRef.value?.closeForm()
 }
 
 // 处理编辑产品
 const handleEditProduct = (row: Product) => {
   // 重置表单
   ProductFormModel.value = {...row}
-  editProductDialogVisible.value = true
+  editProductFormRef.value?.openForm()
 }
 
 // 处理保存编辑产品
@@ -375,7 +377,7 @@ const handleSaveEditProduct = async (productData: Product) => {
         ElMessage.success('产品信息已更新')
         // 重置表单
         resetProductForm()
-        editProductDialogVisible.value = false
+        editProductFormRef.value?.closeForm()
         getProducts() // 刷新产品列表
       } catch (error) {
         ElMessage.error('更新产品信息失败')
@@ -386,7 +388,7 @@ const handleSaveEditProduct = async (productData: Product) => {
 const handleCancelEditProduct = () => {
   // 重置表单
   resetProductForm()
-  editProductDialogVisible.value = false
+  editProductFormRef.value?.closeForm()
 }
 
 // 处理删除产品
@@ -404,7 +406,7 @@ const handleDeleteProduct = async (row: Product) => {
 // 处理新增工序
 const handleAddProcess = (productId: number) => {
   ProcessFormModel.value.productId = productId
-  addProcessDialogVisible.value = true
+  addProcessFormRef.value?.openForm()
 }
 
 // 处理保存新增工序
@@ -422,7 +424,7 @@ const handleSaveAddProcess = async (processData: ProcessDetail) => {
     ElMessage.success('工序已添加')
     // 重置表单
     resetProcessForm()
-    addProcessDialogVisible.value = false
+    addProcessFormRef.value?.closeForm()
     
     // 找到所属产品并刷新其工序列表
     const product = productList.value.find(p => 
@@ -452,13 +454,13 @@ const handleSaveAddProcess = async (processData: ProcessDetail) => {
 const handleCancelAddProcess = () => {
   // 重置表单
   resetProcessForm()
-  addProcessDialogVisible.value = false
+  addProcessFormRef.value?.closeForm()
 }
 
 // 处理编辑工序
 const handleEditProcess = (row: ProcessDetail) => {
   ProcessFormModel.value = {...row}
-  editProcessDialogVisible.value = true
+  editProcessFormRef.value?.openForm()
 }
 
 // 处理保存编辑工序
@@ -475,7 +477,7 @@ const handleSaveEditProcess = async (processData: ProcessDetail) => {
     ElMessage.success('工序信息已更新')
     // 重置表单
     resetProcessForm()
-    editProcessDialogVisible.value = false
+    editProcessFormRef.value?.closeForm()
     
     // 找到所属产品并刷新其工序列表
     const product = productList.value.find(p => 
@@ -505,7 +507,7 @@ const handleSaveEditProcess = async (processData: ProcessDetail) => {
 const handleCancelEditProcess = () => {
   // 重置表单
   resetProcessForm()
-  editProcessDialogVisible.value = false
+  editProcessFormRef.value?.closeForm()
 }
 
 // 处理删除工序

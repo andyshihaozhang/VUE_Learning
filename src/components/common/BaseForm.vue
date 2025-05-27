@@ -1,6 +1,6 @@
 <template>
   <el-dialog 
-    v-model="props.visible" 
+    v-model="formVisible" 
     :title="props.title" 
     :width="500" 
     :close-on-click-modal="false" 
@@ -16,8 +16,10 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
+const formVisible = ref(false)
+
 const props = defineProps<{
-  visible: boolean
   title: string
 }>()
 
@@ -33,6 +35,11 @@ const handleCancel = () => {
 const handleSave = () => {
   emit('save')
 }
+
+defineExpose({
+  openForm: () => formVisible.value = true,
+  closeForm: () => formVisible.value = false
+})
 
 </script>
 

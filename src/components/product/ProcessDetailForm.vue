@@ -1,7 +1,7 @@
 <template>
     <BaseForm
+        ref="formRef"
         :title="title"
-        :visible="visible"
         :close-on-click-modal="false"
         @cancel="handleCancel"
         @save="handleSave"
@@ -73,7 +73,6 @@ const title = computed(() => {
 })
 
 const props = defineProps<{
-    visible: boolean
     isEdit: boolean
     formModel: ProcessDetail
 }>()
@@ -99,5 +98,11 @@ const handleSave = () => {
     emit('save', formModel.value)
 }
 
+// 暴露方法
+const formRef = ref<InstanceType<typeof BaseForm>>()
 
+defineExpose({
+    openForm: () => formRef.value?.openForm(),
+    closeForm: () => formRef.value?.closeForm()
+})
 </script>

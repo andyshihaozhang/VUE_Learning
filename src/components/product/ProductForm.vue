@@ -1,7 +1,7 @@
 <template>
   <BaseForm 
+      ref="formRef"
       :title="title"
-      :visible="props.visible"
       :close-on-click-modal="false"
       @cancel="handleCancel"
       @save="handleSave">
@@ -36,10 +36,12 @@ import { computed, ref, watch } from 'vue'
 import BaseForm from '@/components/common/BaseForm.vue'
 import { ProcessStatus } from '@/types/business/common'
 import type { Product } from '@/types/business/product'
+
+// 属性
+const formRef = ref<InstanceType<typeof BaseForm>>()
 const title = computed(() => {
   return props.isEdit ? '编辑产品' : '新增产品'
 })
-
 const formModel = ref<Product>({
   productId: 0,
   productCode: '',
@@ -49,18 +51,16 @@ const formModel = ref<Product>({
   createTime: ''
 })
 
+// 交互
 const props = defineProps<{
-  visible: boolean
   modelValue: Product
   isEdit: boolean
 }>()
-
 const emit = defineEmits<{
   (e: 'cancel'): void
   (e: 'update:modelValue', value: Product): void
   (e: 'save', product: Product): void
 }>()
-
 // 监听 modelValue 变化
 watch(
     () => props.modelValue,
@@ -70,13 +70,13 @@ watch(
   { immediate: true }
 )
 
-// 处理保存
+// 方法
+// 保存
 const handleSave = async () => {
-  console.log(formModel.value)
   emit('save', formModel.value)
 }
 
-// 处理取消
+// 取消
 const handleCancel = () => {
   emit('cancel')
 }
@@ -98,6 +98,16 @@ const productRules = {
     { required: true, message: '请选择产品状态', trigger: 'change' }
   ]
 }
+
+
+// 暴露方法
+defineExpose({
+  openForm: () => {
+    console.log("open BaseForm")
+    formRef.value?.openForm()
+  },
+  closeForm: () => formRef.value?.closeForm()
+})
 </script>
 
 
