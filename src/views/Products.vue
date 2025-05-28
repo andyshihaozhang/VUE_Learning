@@ -142,16 +142,14 @@
     <ProcessDetailForm
       ref="addProcessFormRef"
       :is-edit="false"
-      @cancel="handleCancelAddProcess"
-      @save="handleSaveAddProcess"
+      @formOver="handleSaveAddProcess"
     />
     
     <!-- 编辑工序对话框 -->
     <ProcessDetailForm
       ref="editProcessFormRef"
       :is-edit="true"
-      @cancel="handleCancelEditProcess"
-      @save="handleSaveEditProcess"
+      @formOver="handleSaveEditProcess"
     />
 
     <!-- 新增产品对话框 -->
@@ -337,21 +335,13 @@ const handleAddProcess = (productId: number) => {
 }
 
 // 处理保存新增工序
-const handleSaveAddProcess = async (processData: ProcessAllocation) => {  
+const handleSaveAddProcess = async (productId: number) => {  
   try {
-    console.log("handleSaveAddProcess")
     addProcessFormRef.value?.closeForm()
-    // flushProcessesByProductId(processData.productId)
-    loadProducts()
-    console.log(productList)
+    flushProcessesByProductId(productId)
   } catch (error) {
     ElMessage.error('添加工序失败')
   }
-}
-
-// 处理取消新增工序
-const handleCancelAddProcess = () => {
-  addProcessFormRef.value?.closeForm()
 }
 
 // 处理编辑工序
@@ -361,20 +351,13 @@ const handleEditProcess = (row: ProcessAllocation) => {
 }
 
 // 处理保存编辑工序
-const handleSaveEditProcess = async (processData: ProcessAllocation) => {  
+const handleSaveEditProcess = async (productId: number) => {  
   try {
-    ElMessage.success('工序信息已更新')
     editProcessFormRef.value?.closeForm()
-    // flushProcessesByProductId(processData.productId)
-    loadProducts()
+    flushProcessesByProductId(productId)
   } catch (error) {
-    ElMessage.error('更新工序信息失败')
+    ElMessage.error(`更新工序信息失败: ${error}`)
   }
-}
-
-// 处理取消编辑工序
-const handleCancelEditProcess = () => {
-  editProcessFormRef.value?.closeForm()
 }
 
 // 处理删除工序

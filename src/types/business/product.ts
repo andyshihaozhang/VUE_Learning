@@ -1,5 +1,5 @@
 import { ProcessStatus } from "./common"
-import { ProcessDetail } from "./process"
+import { ProcessAllocation } from "./process"
 
 // 产品基本信息
 export interface Product {
@@ -13,7 +13,7 @@ export interface Product {
 
 // 扩展Product类型，增加工序明细及加载状态
 interface ProductWithProcess extends Product {
-    processDetails?: ProcessDetail[]
+    processAllocations?: ProcessAllocation[]
     processLoading?: boolean
   }
 

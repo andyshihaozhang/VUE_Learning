@@ -238,13 +238,13 @@ const handleLeftSelected = async (row: any) => {
     // 根据员工选择的产品列表
     currentLeftProductSelected.value = row as Product
       // api获取当前产品工序列表
-      currentProcessList.value = (await processStore.getProcessAllocationByProductId(currentLeftProductSelected.value.productId)).data.items
+      currentProcessList.value = (await processStore.getProcessAllocationByProductId(currentLeftProductSelected.value.productId))
     }
   else {
     // 根据产品选择的产品列表
     currentLeftEmployeeSelected.value = row as EmployeeDetail
     // api获取当前产品工序列表
-    currentProcessList.value = (await employeeStore.getProcessesByEmployeeId(currentLeftEmployeeSelected.value.employeeId)).data.items
+    currentProcessList.value = (await processStore.getProcessAllocationByEmployeeId(currentLeftEmployeeSelected.value.employeeId))
   }
 }
 </script>

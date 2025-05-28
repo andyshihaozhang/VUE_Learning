@@ -90,12 +90,12 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-    (e: 'formOver'): void
+    (e: 'formOver', productId: number): void
 }>()
 
 const handleCancel = () => {
     resetProcessForm()
-    emit('formOver')
+    emit('formOver', formModel.value.productId)
 }
 
 const handleSave = () => {
@@ -119,7 +119,7 @@ const handleSave = () => {
         ElMessage.success('工序已添加')
     }
     resetProcessForm()
-    emit('formOver')
+    emit('formOver', formModel.value.productId)
 }
 
 // 暴露方法
