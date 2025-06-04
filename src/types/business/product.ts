@@ -49,3 +49,8 @@ export interface ProductListResponse {
     pageSize: number
     totalPages: number
 }
+
+export interface ProductListByEmployeeResponse {
+    items: Product[]
+    total: number
+}

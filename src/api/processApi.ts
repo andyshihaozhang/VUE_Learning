@@ -4,6 +4,8 @@ import type {
   ProcessAllocationUpdateRequest,
   ProcessListResponse,
   ProcessAllocationsResponse,
+  ProcessAllocationByEmployeeIdAndProductIdRequest,
+  ProcessAllocationByEmployeeIdAndProductIdResponse
 } from '@/types/business/process'
 
 // 产品流程API
@@ -33,5 +35,10 @@ export class ProcessDetailApi {
   // 获取产品流程
   static async getProcessesByProductId(productId: number) {
     return http.get<ApiResponse<ProcessListResponse>>(`${this.BASE_URL}/allAllocation/${productId}`)
+  }
+
+  // 根据员工ID和产品ID获取工序列表
+  static async getProcessAllocationByEmployeeIdAndProductId(data: ProcessAllocationByEmployeeIdAndProductIdRequest) {
+    return http.post<ApiResponse<ProcessAllocationByEmployeeIdAndProductIdResponse>>(`${this.BASE_URL}/allAllocationByEmployeeIdAndProductId`, data)
   }
 } 

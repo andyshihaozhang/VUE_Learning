@@ -1,6 +1,7 @@
 import { ProcessDetailApi } from '@/api/processApi'
 import type { 
     ProcessAllocation, 
+    ProcessAllocationByEmployeeIdAndProductIdRequest, 
     ProcessAllocationCreateRequest, 
     ProcessAllocationUpdateRequest } from '@/types/business/process'
 import { defineStore } from 'pinia'
@@ -33,12 +34,21 @@ export const useProcessStore = defineStore('process', () => {
     await ProcessDetailApi.deleteProcessAllocation(processId)
   }
 
+  // 根据员工ID和产品ID获取工序列表
+  const getProcessAllocationByEmployeeIdAndProductId = async (data: ProcessAllocationByEmployeeIdAndProductIdRequest) => {
+    console.log("data", data)
+    const response = await ProcessDetailApi.getProcessAllocationByEmployeeIdAndProductId(data)
+    console.log("response test", response)
+    return response.data.data.items || []
+  }
+
   return {
     processAllocationList,
     total,
     getProcessAllocationByProductId,
     createProcessAllocation,
     updateProcessAllocation,
-    deleteProcessAllocation
+    deleteProcessAllocation,
+    getProcessAllocationByEmployeeIdAndProductId
   }
 })

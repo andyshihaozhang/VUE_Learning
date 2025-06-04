@@ -6,7 +6,7 @@ import type {
   EmployeeCreateParams,
   EmployeeUpdateParams,
 } from '@/types/business/employee'
-import type { ProductListResponse } from '@/types/business/product'
+import type { ProductListByEmployeeResponse } from '@/types/business/product'
 import type { ProcessListResponse } from '@/types/business/process'
 
 
@@ -30,7 +30,7 @@ export class EmployeeApi {
   }
 
   static async getProductsByEmployeeId(employeeId: number) {
-    return http.get<ApiResponse<ProductListResponse>>(`${this.BASE_URL}/getProducts/${employeeId}`)
+    return http.get<ApiResponse<ProductListByEmployeeResponse>>(`${this.BASE_URL}/getProducts/${employeeId}`)
   }
 
   static async getProcessesByEmployeeId(employeeId: number) {

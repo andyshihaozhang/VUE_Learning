@@ -9,7 +9,7 @@
             <template v-if="divisionType === 'employee'">
               <span class="search-label">员工名：</span>
               <el-select
-                v-model="currentTopEmployeeValue"
+                v-model="currentTopId"
                 placeholder="请选择员工"
                 class="search-input"
                 clearable
@@ -29,7 +29,7 @@
             <template v-else>
               <span class="search-label">产品名：</span>
               <el-select
-                v-model="currentTopProductValue"
+                v-model="currentTopId"
                 placeholder="请选择产品"
                 class="search-input"
                 clearable
@@ -73,11 +73,11 @@
             highlight-current-row
             @current-change="handleLeftSelected"
             v-if="currentProductList.length > 0">
-            <el-table-column prop="name" label="产品名称" />
-            <el-table-column prop="code" label="产品编号" width="120" />
-            <el-table-column prop="status" label="状态" width="100">
+            <el-table-column prop="productName" label="产品名称" />
+            <el-table-column prop="productCode" label="产品编号" width="120" />
+            <el-table-column prop="productStatus" label="状态" width="100">
               <template #default="{ row }"> 
-                <ProcessStatusTag :status="row.status" />
+                <ProcessStatusTag :status="row.productStatus" />
               </template>
             </el-table-column>
           </el-table>
@@ -91,11 +91,13 @@
               <h3>工序记录</h3>
         </div>
           </template>
-          <el-table :data="currentProcessList" style="width: 100%" v-if="currentProcessList.length > 0">
-            <el-table-column prop="name" label="工序名称" />
-            <el-table-column prop="price" label="工序单价" width="180">
+          <el-table :data="currentAllocationList" style="width: 100%" v-if="currentAllocationList.length > 0">
+            <el-table-column prop="processName" label="工序名称" />
+            <el-table-column prop="processDescription" label="工序描述" />
+            <el-table-column prop="referencePrice" label="参考单价" width="180"/>
+            <el-table-column prop="actualPrice" label="实际单价" width="180">
               <template #default="{ row }">
-                <ProcessPriceInput v-model:price="row.price" />
+                <ProcessPriceInput v-model:price="row.actualPrice" />
               </template>
             </el-table-column>
           </el-table>
@@ -117,11 +119,11 @@
             highlight-current-row
             @row-click="handleLeftSelected"
             v-if="currentEmployeeList.length > 0">
-            <el-table-column prop="name" label="员工姓名" />
-            <el-table-column prop="code" label="员工工号" width="120" />
-            <el-table-column prop="status" label="状态" width="100">
+            <el-table-column prop="employeeName" label="员工姓名" />
+            <el-table-column prop="employeeId" label="员工工号" width="120" />
+            <el-table-column prop="employeeStatus" label="状态" width="100">
               <template #default="{ row }"> 
-                <ProcessStatusTag :status="row.status" />
+                <ProcessStatusTag :status="row.employeeStatus" />
                 </template>
             </el-table-column>
           </el-table>
@@ -135,13 +137,15 @@
               <h3>工序记录</h3>
             </div>
           </template>
-          <el-table :data="currentProcessList" 
+          <el-table :data="currentAllocationList" 
             style="width: 100%" 
-            v-if="currentProcessList.length > 0">
-            <el-table-column prop="name" label="工序名称" />
-            <el-table-column prop="price" label="工序单价" width="180">
+            v-if="currentAllocationList.length > 0">
+            <el-table-column prop="processName" label="工序名称" />
+            <el-table-column prop="processDescription" label="工序描述" />
+            <el-table-column prop="referencePrice" label="参考单价" width="180"/>
+            <el-table-column prop="actualPrice" label="实际单价" width="180">
               <template #default="{ row }">
-                <ProcessPriceInput v-model:price="row.price" />
+                <ProcessPriceInput v-model:price="row.actualPrice" />
                 </template>
             </el-table-column>
           </el-table>
@@ -153,16 +157,16 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import ProcessStatusTag from '@/components/Process/ProcessStatusTag.vue'
 import ProcessPriceInput from '@/components/Process/ProcessPriceInput.vue'
 import type { Product } from '@/types/business/product'
-import type { Process } from '@/types/business/process'
+import type { Allocation } from '@/types/business/process'
 import { useProductStore } from '@/stores/productStore'
 import { useEmployeeStore } from '@/stores/employeeStore'
 import type { EmployeeDetail } from '@/types/business/employee'
 import { useProcessStore } from '@/stores/processStore'
-
+import { ElMessage } from 'element-plus'
 const productStore = useProductStore()
 const employeeStore = useEmployeeStore()
 const processStore = useProcessStore()
@@ -170,43 +174,24 @@ const processStore = useProcessStore()
 // 分工方式
 const divisionType = ref('employee')
 
-// 计算属性处理选择值
-const currentTopEmployeeValue = computed({
-  get: () => currentTopEmployeeSelected.value?.employeeId || '',
-  set: (val) => {
-    const employee = employeeStore.employeeList.find(e => e.employeeId === val)
-    currentTopEmployeeSelected.value = employee || null
-  }
-})
-
-const currentTopProductValue = computed({
-  get: () => currentTopProductSelected.value?.productId || '',
-  set: (val) => {
-    const product = productStore.productList.find(p => p.productId === val)
-    currentTopProductSelected.value = product || null
-  }
-})
-
+const currentTopId = ref<number | null>(null)
+const currentLeftId = ref<number | null>(null)
 // employee对应数据源
-const currentTopEmployeeSelected = ref<EmployeeDetail | null>(null)
-const currentLeftProductSelected = ref<Product | null>(null)
 const currentProductList = ref<Product[]>([])
 
 // product对应数据源
-const currentTopProductSelected = ref<Product | null>(null)
-const currentLeftEmployeeSelected = ref<EmployeeDetail | null>(null)
 const currentEmployeeList = ref<EmployeeDetail[]>([])
 
-const currentProcessList = ref<Process[]>([])
+// process对应数据源
+const currentAllocationList = ref<Allocation[]>([])
 
 // 重置界面
 const resetInterface = () => {
-  currentTopProductSelected.value = null
-  currentTopEmployeeSelected.value = null
-  currentLeftProductSelected.value = null
-  currentLeftEmployeeSelected.value = null
+  currentTopId.value = null
+  currentLeftId.value = null
   currentProductList.value = []
-  currentProcessList.value = []
+  currentEmployeeList.value = []
+  currentAllocationList.value = []
 }
 
 // 分工方式切换处理
@@ -215,36 +200,46 @@ const handleDivisionTypeChange = () => {
 }
 
 // 顶部选择处理
-const handleTopSelected = async (selection: Product | EmployeeDetail) => {
-  console.log('顶部选择:', selection)
+const handleTopSelected = async (topId: number) => {
   if (divisionType.value === 'employee') {
-    currentTopEmployeeSelected.value = selection as EmployeeDetail
     // 根据员工选择的产品列表
-    currentProductList.value = (await employeeStore.getProductsByEmployeeId(currentTopEmployeeSelected.value.employeeId)).data.items
+    currentProductList.value = (await employeeStore.getProductsByEmployeeId(topId)).data.items
+    console.log("currentProductList", currentProductList.value)
   } else {
     // 根据产品选择的产品列表
-    currentTopProductSelected.value = selection as Product
-    currentEmployeeList.value = (await productStore.getEmployeesByProductId(currentTopProductSelected.value.productId)).data.items
+    currentEmployeeList.value = (await productStore.getEmployeesByProductId(topId)).data.items
+    console.log("currentEmployeeList", currentEmployeeList.value)
   }
   // 清空右侧工序列表
-  currentProcessList.value = []
+  currentAllocationList.value = []
 }
 
 // 左侧选择处理
 const handleLeftSelected = async (row: any) => {
-  if (!row) return
-  console.log('左侧选择:', row)
+  if (currentTopId.value === null) {
+    ElMessage.warning('请先选择负责人或产品')
+    return
+  }
   if (divisionType.value === 'employee') {
-    // 根据员工选择的产品列表
-    currentLeftProductSelected.value = row as Product
-      // api获取当前产品工序列表
-      currentProcessList.value = (await processStore.getProcessAllocationByProductId(currentLeftProductSelected.value.productId))
-    }
+    var selectedProduct = row as Product
+    currentLeftId.value = selectedProduct.productId
+    // api获取当前产品工序列表
+    currentAllocationList.value = (await processStore.getProcessAllocationByEmployeeIdAndProductId({
+      employeeId: currentTopId.value,
+      productId: selectedProduct.productId
+    }))
+    console.log("currentAllocationList", currentAllocationList.value)
+  }
   else {
     // 根据产品选择的产品列表
-    currentLeftEmployeeSelected.value = row as EmployeeDetail
+    var selectedEmployee = row as EmployeeDetail
+    currentLeftId.value = selectedEmployee.employeeId
     // api获取当前产品工序列表
-    currentProcessList.value = (await processStore.getProcessAllocationByEmployeeId(currentLeftEmployeeSelected.value.employeeId))
+    currentAllocationList.value = (await processStore.getProcessAllocationByEmployeeIdAndProductId({
+      employeeId: selectedEmployee.employeeId,
+      productId: currentTopId.value
+    }))
+    console.log("currentAllocationList", currentAllocationList.value)
   }
 }
 </script>

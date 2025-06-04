@@ -16,6 +16,15 @@ export interface Process {
   createTime: string
 }
 
+// 流程分配接口
+export interface Allocation {
+  processId: number
+  processName: string
+  processDescription: string
+  referencePrice: number
+  actualPrice: number
+  createTime: string
+}
 
 export interface ProcessListResponse {
   items: Process[]
@@ -57,3 +66,17 @@ export interface ProcessAllocationUpdateRequest {
 export interface ProcessAllocationsResponse {
   items: ProcessAllocation[]
 }
+
+// 根据员工ID和产品ID获取工序列表请求
+export interface ProcessAllocationByEmployeeIdAndProductIdRequest {
+  employeeId: number
+  productId: number
+}
+
+// 根据员工ID和产品ID获取工序列表响应
+export interface ProcessAllocationByEmployeeIdAndProductIdResponse {
+  items: Allocation[]
+  total: number
+}
+
+
