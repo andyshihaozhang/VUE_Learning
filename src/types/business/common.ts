@@ -1,5 +1,5 @@
-// 进程状态枚举
-export enum ProcessStatus {
+// 工序状态枚举
+export enum ProgressStatus {
     PENDING = 0,
     IN_PROGRESS = 1,
     CANCELLED = 2,

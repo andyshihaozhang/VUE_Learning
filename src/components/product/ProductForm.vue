@@ -19,9 +19,8 @@
           <el-form-item label="产品状态" prop="productStatus">
             <el-select v-model="formModel.productStatus" placeholder="请选择产品状态">
               <el-option
-                v-for="status in Object.values(ProcessStatus)"
-                :key="status"
-                :label="status"
+                v-for="status in getEnumValues(ProgressStatus)"
+                :label="progressStatusConverter(status)"
                 :value="status"
               />
             </el-select>
@@ -34,11 +33,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import BaseForm from '@/components/common/BaseForm.vue'
-import { ProcessStatus } from '@/types/business/common'
+import { ProgressStatus } from '@/types/business/common'
 import type { Product } from '@/types/business/product'
 import { ElMessage } from 'element-plus'
 import { useProductStore } from '@/stores/productStore'
-
+import { progressStatusConverter, getEnumValues } from '@/utils/converter'
 // 属性
 const productStore = useProductStore()
 const formRef = ref<InstanceType<typeof BaseForm>>()
@@ -49,7 +48,7 @@ const formModel = ref<Product>({
   productId: 0,
   productCode: '',
   productName: '',
-  productStatus: ProcessStatus.IN_PROGRESS,
+  productStatus: ProgressStatus.IN_PROGRESS,
   customerSource: '',
   createTime: ''
 })
@@ -105,7 +104,7 @@ function resetProductForm() {
     productId: 0,
     productCode: '',
     productName: '',
-    productStatus: ProcessStatus.IN_PROGRESS,
+    productStatus: ProgressStatus.IN_PROGRESS,
     customerSource: '',
     createTime: ''
   }

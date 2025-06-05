@@ -77,7 +77,7 @@
             <el-table-column prop="productCode" label="产品编号" width="120" />
             <el-table-column prop="productStatus" label="状态" width="100">
               <template #default="{ row }"> 
-                <ProcessStatusTag :status="row.productStatus" />
+                <ProgressStatusTag :status="row.productStatus" />
               </template>
             </el-table-column>
           </el-table>
@@ -93,12 +93,14 @@
           </template>
           <el-table :data="currentAllocationList" style="width: 100%" v-if="currentAllocationList.length > 0">
             <el-table-column prop="processName" label="工序名称" />
-            <el-table-column prop="processDescription" label="工序描述" />
             <el-table-column prop="referencePrice" label="参考单价" width="180"/>
             <el-table-column prop="actualPrice" label="实际单价" width="180">
               <template #default="{ row }">
                 <ProcessPriceInput v-model:price="row.actualPrice" />
               </template>
+            </el-table-column>
+            <el-table-column label="个人产值" width="100">
+
             </el-table-column>
           </el-table>
           <el-empty v-else description="请先选择产品" />
@@ -123,7 +125,7 @@
             <el-table-column prop="employeeId" label="员工工号" width="120" />
             <el-table-column prop="employeeStatus" label="状态" width="100">
               <template #default="{ row }"> 
-                <ProcessStatusTag :status="row.employeeStatus" />
+                <ProgressStatusTag :status="row.employeeStatus" />
                 </template>
             </el-table-column>
           </el-table>
@@ -158,7 +160,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import ProcessStatusTag from '@/components/Process/ProcessStatusTag.vue'
+import ProgressStatusTag from '@/components/common/ProgressStatusTag.vue'
 import ProcessPriceInput from '@/components/Process/ProcessPriceInput.vue'
 import type { Product } from '@/types/business/product'
 import type { Allocation } from '@/types/business/process'
@@ -182,8 +184,11 @@ const currentProductList = ref<Product[]>([])
 // product对应数据源
 const currentEmployeeList = ref<EmployeeDetail[]>([])
 
-// process对应数据源
+// process工序分配对应数据源
 const currentAllocationList = ref<Allocation[]>([])
+
+// process工序记录对应数据源
+
 
 // 重置界面
 const resetInterface = () => {

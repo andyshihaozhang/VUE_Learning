@@ -107,7 +107,7 @@
           <el-table-column label="客户公司" prop="customerSource" min-width="200" />
           <el-table-column label="产品状态" prop="productStatus" min-width="200" >
             <template #default="scope">
-              <ProcessStatusTag :status="scope.row.productStatus" />
+              <ProgressStatusTag :status="scope.row.productStatus" />
             </template>
           </el-table-column>
           <el-table-column label="创建时间" prop="createTime" width="180" />
@@ -179,7 +179,7 @@ import type { Product } from '@/types/business/product'
 import type { ProcessAllocation } from '@/types/business/process'
 import type { EmployeeDetail } from '@/types/business/employee'
 import { EmployeeApi } from '@/api/employeeApi'
-import ProcessStatusTag from "@/components/Process/ProcessStatusTag.vue"
+import ProgressStatusTag from "@/components/common/ProgressStatusTag.vue"
 import { useEmployeeStore } from '@/stores/employeeStore'
 import { useProductStore } from '@/stores/productStore'
 import { useProcessStore } from '@/stores/processStore'

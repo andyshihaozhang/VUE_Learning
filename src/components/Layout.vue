@@ -21,10 +21,10 @@
             <span>首页</span>
           </el-menu-item>
           <el-menu-item index="/dashboard">
-            <el-icon><DataLine /></el-icon>
+            <el-icon><Cpu /></el-icon>
             <span>仪表盘</span>
           </el-menu-item>
-          <el-menu-item index="/users">
+          <el-menu-item index="/employees">
             <el-icon><User /></el-icon>
             <span>员工信息</span>
           </el-menu-item>
@@ -35,6 +35,10 @@
           <el-menu-item index="/process">
             <el-icon><Calendar /></el-icon>
             <span>生产记录</span>
+          </el-menu-item>
+          <el-menu-item index="/data-center">
+            <el-icon><DataLine /></el-icon>
+            <span>数据中心</span>
           </el-menu-item>
           <el-menu-item index="/settings" class="settings-menu-item">
             <el-icon><Setting /></el-icon>
@@ -56,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { House, DataLine, User, Goods, Setting, Scissor, Calendar } from '@element-plus/icons-vue'
+import { House, Cpu, User, Setting, Scissor, Calendar, DataLine } from '@element-plus/icons-vue'
 </script>
 
 <style scoped>

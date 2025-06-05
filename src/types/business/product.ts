@@ -1,4 +1,4 @@
-import { ProcessStatus } from "./common"
+import { ProgressStatus } from "./common"
 import { ProcessAllocation } from "./process"
 
 // 产品基本信息
@@ -6,7 +6,7 @@ export interface Product {
     productId: number
     productCode: string
     productName: string
-    productStatus: ProcessStatus
+    productStatus: ProgressStatus
     customerSource: string
     createTime: string
 }
@@ -28,7 +28,7 @@ export interface ProductQueryParams {
 export interface ProductCreateParams {
     productCode: string
     productName: string
-    productStatus: ProcessStatus
+    productStatus: ProgressStatus
     customerSource: string
 }
 
@@ -37,7 +37,7 @@ export interface ProductUpdateParams {
     productId: number
     productCode: string
     productName: string
-    productStatus: ProcessStatus
+    productStatus: ProgressStatus
     customerSource: string
 }
 

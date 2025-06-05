@@ -24,9 +24,12 @@
         />
       </el-form-item>
       <el-form-item label="状态" prop="employeeStatus">
-        <el-select v-model="formAddModel.employeeStatus">
-          <el-option :value="ActiveStatus.ACTIVE">在职</el-option>
-          <el-option :value="ActiveStatus.INACTIVE">离职</el-option>
+        <el-select v-model="formAddModel.employeeStatus" placeholder="请选择状态">
+          <el-option
+            v-for="status in getEnumValues(ActiveStatus)"
+            :label="employeeStatusConverter(status)"
+            :value="status"
+          />
         </el-select>
       </el-form-item>
     </el-form>
@@ -40,6 +43,7 @@ import type { EmployeeCreateParams } from '@/types/business/employee'
 import { ActiveStatus } from '@/types/business/common'
 import BaseForm from '@/components/common/BaseForm.vue'
 import { useEmployeeStore } from '@/stores/employeeStore'
+import { employeeStatusConverter, getEnumValues } from '@/utils/converter'
 
 const employeeStore = useEmployeeStore()
 const formRef = ref<InstanceType<typeof BaseForm>>()
