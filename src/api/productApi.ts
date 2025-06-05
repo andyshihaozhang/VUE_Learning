@@ -6,7 +6,7 @@ import type {
   ProductCreateParams,
   ProductUpdateParams,
 } from '@/types/business/product'
-import type { EmployeeListResponse } from '@/types/business/employee'
+import type { EmployeeListByProductResponse } from '@/types/business/employee'
 
 
 export class ProductApi {
@@ -29,6 +29,6 @@ export class ProductApi {
   }
 
   static async getEmployeesByProductId(productId: number) {
-    return http.get<ApiResponse<EmployeeListResponse>>(`${this.BASE_URL}/employees/${productId}`)
+    return http.get<ApiResponse<EmployeeListByProductResponse>>(`${this.BASE_URL}/getEmployees/${productId}`)
   }
 }

@@ -23,7 +23,6 @@
 </template>
 
 <script setup lang="ts">
-// 首页组件逻辑
 </script>
 
 <style scoped>

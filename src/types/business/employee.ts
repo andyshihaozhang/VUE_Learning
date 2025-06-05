@@ -50,3 +50,8 @@ export interface EmployeeOperationResult {
   message: string;
   data?: EmployeeDetail;
 }
+
+export interface EmployeeListByProductResponse {
+  items: EmployeeDetail[]
+  total: number
+}
