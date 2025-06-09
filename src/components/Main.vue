@@ -1,13 +1,13 @@
 <template>
-  <div class="app-wrapper">
+  <el-container>
     <!-- 顶部标题栏 -->
-    <el-header class="fixed-header">
+    <el-header>
       <h1>FEIFAN-SYSTEM</h1>
     </el-header>
     
-    <div class="main-wrapper">
+    <el-container>
       <!-- 左侧菜单栏 -->
-      <el-aside class="fixed-aside">
+      <el-aside>
         <el-menu
           :default-active="$route.path"
           class="el-menu-vertical-demo"
@@ -48,15 +48,15 @@
       </el-aside>
       
       <!-- 右侧视图栏 -->
-      <el-main class="scrollable-main">
+      <el-main>
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />
           </transition>
         </router-view>
       </el-main>
-    </div>
-  </div>
+    </el-container>
+  </el-container>
 </template>
 
 <script setup lang="ts">
@@ -64,60 +64,47 @@ import { House, Cpu, User, Setting, Scissor, Calendar, DataLine } from '@element
 </script>
 
 <style scoped>
-.app-wrapper {
-  min-height: 100vh;
-  position: relative;
-  background: #f0f2f5;
+.el-container {
+  padding: 0px;
+  margin: 0px;
+  height: 100%;
+  width: 100%;
 }
 
-.fixed-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 60px;
-  background: #1a1f36;
-  color: #fff;
+.el-header {
+  position: static;
   display: flex;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  z-index: 1000;
-}
-
-.fixed-header h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 500;
-}
-
-.main-wrapper {
-  padding-top: 60px; /* 为固定header留出空间 */
-  min-height: calc(100vh - 60px);
-  position: relative;
-}
-
-.fixed-aside {
-  position: fixed;
-  left: 0;
-  top: 60px; /* header的高度 */
-  bottom: 0;
-  width: 200px;
   background: #1a1f36;
-  color: #fff;
-  z-index: 999;
-  overflow-y: auto;
+  height: 60px;
+  flex-shrink: 0;
+  z-index: 100;
+  align-items: center;
 }
 
-.scrollable-main {
-  margin-left: 200px; /* aside的宽度 */
-  min-height: calc(100vh - 60px);
+.el-header h1 {
+  display: inline-flex;
+  margin-left: 10px;
+  color: #fff;
+  font-size: 20px;
+  
+}
+
+.el-aside {
+  width: 200px;
+  flex-shrink: 0;
+  position: static;
+  height: calc(100vh - 60px);  
+}
+
+.el-main {
+  position: static;
+  height: calc(100vh - 60px);  
   padding: 20px;
-  background: #f0f2f5;
-  position: relative;
-  z-index: 1;
 }
 
 :deep(.el-menu) {
+  display: flex;
+  flex-direction: column;
   height: 100%;
   border-right: none;
 }

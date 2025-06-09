@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
-import Layout from '../components/Layout.vue'
+import Main from '@/components/Main.vue'
 import { useLoginStore } from '@/stores/loginStore'
 
 const routes: Array<RouteRecordRaw> = [
@@ -11,7 +11,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/',
-    component: Layout,
+    component: Main,
     children: [
       {
         path: '',

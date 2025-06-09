@@ -1,25 +1,27 @@
-<script setup lang="ts">
-// App level logic can be added here
-</script>
-
 <template>
   <router-view></router-view>
 </template>
 
+<script setup lang="ts">
+// App level logic can be added here
+</script>
+
 <style>
-* {
-  margin: 0;
+html,
+body,
+#app {
   padding: 0;
-  box-sizing: border-box;
+  margin: 0;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+/* 隐藏所有滚动条 */
+::-webkit-scrollbar {
+  display: none;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f0f2f5;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #333;
 }
 </style>

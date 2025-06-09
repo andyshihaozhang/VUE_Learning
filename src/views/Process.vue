@@ -2,57 +2,54 @@
   <div class="process-container">
     <!-- 顶部搜索区 -->
     <el-card class="search-card">
-      <div class="search-header">
-        <h2 class="page-title">录入对象</h2>
-        <div class="search-content">
-          <div class="search-item">
-            <template v-if="divisionType === 'employee'">
-              <span class="search-label">员工名：</span>
-              <el-select
-                v-model="currentTopId"
-                placeholder="请选择员工"
-                class="search-input"
-                clearable
-                @change="handleTopSelected"
+      <div class="search-content">
+        <div class="search-item">
+          <h3 class="card-header">录入对象</h3>
+          <el-divider direction="vertical" />
+          <template v-if="divisionType === 'employee'">
+            <el-select
+              v-model="currentTopId"
+              placeholder="请选择员工"
+              class="search-input"
+              clearable
+              @change="handleTopSelected"
+            >
+              <el-option
+                v-for="item in employeeStore.employeeList"
+                :key="item.employeeId"
+                :label="item.employeeName"
+                :value="item.employeeId"
               >
-                <el-option
-                  v-for="item in employeeStore.employeeList"
-                  :key="item.employeeId"
-                  :label="item.employeeName"
-                  :value="item.employeeId"
-                >
-                  <span>{{ item.employeeName }}</span>
-                  <span class="option-code">工号：{{ item.employeeId }}</span>
-                </el-option>
-              </el-select>
-            </template>
-            <template v-else>
-              <span class="search-label">产品名：</span>
-              <el-select
-                v-model="currentTopId"
-                placeholder="请选择产品"
-                class="search-input"
-                clearable
-                @change="handleTopSelected"
+                <span>{{ item.employeeName }}</span>
+                <span class="option-code">工号：{{ item.employeeId }}</span>
+              </el-option>
+            </el-select>
+          </template>
+          <template v-else>
+            <el-select
+              v-model="currentTopId"
+              placeholder="请选择产品"
+              class="search-input"
+              clearable
+              @change="handleTopSelected"
+            >
+              <el-option
+                v-for="item in productStore.productList"
+                :key="item.productId"
+                :label="item.productName"
+                :value="item.productId"
               >
-                <el-option
-                  v-for="item in productStore.productList"
-                  :key="item.productId"
-                  :label="item.productName"
-                  :value="item.productId"
-                >
-                  <span>{{ item.productName }}</span>
-                  <span class="option-code">编号：{{ item.productCode }}</span>
-                </el-option>
-              </el-select>
-            </template>
-          </div>
-          <div class="division-type">
-            <el-radio-group v-model="divisionType" @change="handleDivisionTypeChange">
-              <el-radio-button label="employee">按负责人记录</el-radio-button>
-              <el-radio-button label="product">按产品记录</el-radio-button>
-            </el-radio-group>
-          </div>
+                <span>{{ item.productName }}</span>
+                <span class="option-code">编号：{{ item.productCode }}</span>
+              </el-option>
+            </el-select>
+          </template>
+        </div>
+        <div class="division-type">
+          <el-radio-group v-model="divisionType" @change="handleDivisionTypeChange">
+            <el-radio-button label="employee">按负责人记录</el-radio-button>
+            <el-radio-button label="product">按产品记录</el-radio-button>
+          </el-radio-group>
         </div>
       </div>
     </el-card>
@@ -69,7 +66,7 @@
             </div>
           </template>
           <el-table :data="currentProductList" 
-            style="width: 100%" 
+            style="width: 100%; height: 100%" 
             highlight-current-row
             @current-change="handleLeftSelected"
             v-if="currentProductList.length > 0">
@@ -91,7 +88,7 @@
               <h3>工序记录</h3>
         </div>
           </template>
-          <el-table :data="currentAllocationList" style="width: 100%" v-if="currentAllocationList.length > 0">
+          <el-table :data="currentAllocationList" style="width: 100%; height: 100%" v-if="currentAllocationList.length > 0">
             <el-table-column prop="processName" label="工序名称" />
             <el-table-column prop="referencePrice" label="参考单价" width="180"/>
             <el-table-column prop="actualPrice" label="实际单价" width="180">
@@ -256,21 +253,14 @@ const handleLeftSelected = async (row: any) => {
   gap: 20px;
 }
 
-.search-card {
-  margin-bottom: 20px;
+.process-container {
+  padding: 5px;
 }
 
 .search-header {
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-
-.page-title {
-  margin: 0;
-  font-size: 20px;
-  color: #303133;
-  font-weight: 500;
 }
 
 .search-content {
@@ -283,11 +273,6 @@ const handleLeftSelected = async (row: any) => {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.search-label {
-  white-space: nowrap;
-  min-width: 60px;
 }
 
 .search-input {
