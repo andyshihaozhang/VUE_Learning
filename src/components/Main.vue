@@ -10,12 +10,10 @@
       <el-aside>
         <el-menu
           :default-active="$route.path"
-          class="el-menu-vertical-demo"
           background-color="#1a1f36"
           text-color="#a3aed0"
           active-text-color="#fff"
-          router
-        >
+          router = "true">
           <el-menu-item index="/">
             <el-icon><House /></el-icon>
             <span>首页</span>
@@ -28,14 +26,24 @@
             <el-icon><User /></el-icon>
             <span>员工信息</span>
           </el-menu-item>
-          <el-menu-item index="/products">
-            <el-icon><Scissor /></el-icon>
-            <span>产品管理</span>
-          </el-menu-item>
-          <el-menu-item index="/process">
-            <el-icon><Calendar /></el-icon>
-            <span>生产记录</span>
-          </el-menu-item>
+          <el-sub-menu>
+            <template #title>
+              <el-icon><Scissor /></el-icon>
+              <span>产品管理</span>
+            </template>
+            <el-menu-item index="/products">
+              <el-icon><Paperclip /></el-icon>
+              <span>产品信息</span>
+            </el-menu-item>
+            <el-menu-item index="/allocations">
+              <el-icon><Postcard /></el-icon>
+              <span>工序分工</span>
+            </el-menu-item>
+            <el-menu-item index="/process">
+              <el-icon><Calendar /></el-icon>
+              <span>生产记录</span>
+            </el-menu-item>
+          </el-sub-menu>
           <el-menu-item index="/data-center">
             <el-icon><DataLine /></el-icon>
             <span>数据中心</span>
@@ -60,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { House, Cpu, User, Setting, Scissor, Calendar, DataLine } from '@element-plus/icons-vue'
+import { House, Cpu, User, Setting, Scissor, Calendar, DataLine, Paperclip, Postcard } from '@element-plus/icons-vue'
 </script>
 
 <style scoped>
@@ -72,13 +80,14 @@ import { House, Cpu, User, Setting, Scissor, Calendar, DataLine } from '@element
 }
 
 .el-header {
-  position: static;
+  position: relative;
   display: flex;
   background: #1a1f36;
   height: 60px;
   flex-shrink: 0;
   z-index: 100;
   align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .el-header h1 {
@@ -86,18 +95,17 @@ import { House, Cpu, User, Setting, Scissor, Calendar, DataLine } from '@element
   margin-left: 10px;
   color: #fff;
   font-size: 20px;
-  
 }
 
 .el-aside {
   width: 200px;
   flex-shrink: 0;
-  position: static;
+  position: relative;
   height: calc(100vh - 60px);  
 }
 
 .el-main {
-  position: static;
+  position: relative;
   height: calc(100vh - 60px);  
   padding: 20px;
 }

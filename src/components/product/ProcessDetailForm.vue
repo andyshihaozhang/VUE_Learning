@@ -23,7 +23,7 @@
                 <el-input-number
                     v-model="formModel.referencePrice"
                     :precision="2"
-                    :step="10"
+                    :step="0.01"
                     :min="0"
                     placeholder="请输入工序单价"
                 />

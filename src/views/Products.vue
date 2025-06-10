@@ -1,157 +1,139 @@
 <template>
-  <div class="products">
-    <el-card class="box-card">
-      <template #header>
-        <div class="card-header">
-          <h2>产品管理</h2>
-          <el-button type="primary" @click="handleAddProduct">
-            <el-icon><Plus /></el-icon>
-            新增产品
-          </el-button>
-        </div>
-      </template>
-
-      <!-- 加载状态显示 -->
-      <div v-if="isLoading" class="loading-container">
-        <el-icon class="loading-icon"><Loading /></el-icon>
-        <span>加载产品数据中...</span>
+  <el-card class="products">
+    <template #header>
+      <div class="card-header">
+        <h2>产品管理</h2>
+        <el-button type="primary" @click="handleAddProduct">
+          <el-icon><Plus /></el-icon>
+          新增产品
+        </el-button>
       </div>
-      <!-- 产品列表 -->
-      <div v-else class="table-container">
-        <el-table
-          :data="productList"
-          style="width: 100%"
-          height="calc(100vh - 270px)">
-          <el-table-column type="expand">
-            <template #default="props">
-              <div class="process-detail">
-                <div v-if="props.row.processLoading" style="text-align:center;padding:30px;">
-                  <el-icon><Loading /></el-icon> 加载工序中...
-                </div>
-                <div v-else>
-                  <div class="process-header">
-                    <div class="process-title">
-                      <el-icon><List /></el-icon>
-                      <span>工序明细</span>
-                    </div>
-                  </div>
-                  <el-table 
-                    :data="props.row.processAllocations || []" 
-                    border
-                    class="process-table"
-                    :header-cell-style="{
-                      background: '#f5f7fa',
-                      color: '#606266',
-                      fontWeight: 'bold'
-                    }">
-                    <el-table-column label="工序ID" prop="processId" width="100" />
-                    <el-table-column label="工序名称" prop="processName" width="150" />
-                    <el-table-column label="工序描述" prop="processDescription" min-width="200" />
-                    <el-table-column label="工序创建时间" prop="createTime" width="180" />
-                    <el-table-column label="工序负责人" prop="employees" min-width="200">
-                      <template #default="scope">
-                        <div class="responser-display">
-                          <el-tag
-                            v-for="employeeId in scope.row.employees"
-                            :key="employeeId"
-                            size="small"
-                            class="responser-tag">
-                            {{ getEmployeeName(employeeId) }}
-                          </el-tag>
-                          <span v-if="!scope.row.employees.length" class="empty-text">暂无负责人</span>
-                        </div>
-                      </template>
-                    </el-table-column>
-                    <el-table-column label="工序参考单价" prop="referencePrice" width="120">
-                      <template #default="scope">
-                        <span class="price">¥{{ scope.row.referencePrice.toFixed(2) }}</span>
-                      </template>
-                    </el-table-column>
-                    <el-table-column label="操作" width="200" fixed="right">
-                      <template #default="scope">
-                        <el-button 
-                          type="warning" 
-                          size="small" 
-                          class="process-action-btn"
-                          @click="handleEditProcess(scope.row)">
-                          <el-icon><Edit /></el-icon>
-                          修改
-                        </el-button>
-                        <el-button 
-                          type="danger" 
-                          size="small" 
-                          class="process-action-btn"
-                          @click="handleDeleteProcess(scope.row)">
-                          <el-icon><Delete /></el-icon>
-                          删除
-                        </el-button>
-                      </template>
-                    </el-table-column>
-                  </el-table>
-                  <div class="process-footer">
-                    <el-button 
-                      type="success" 
-                      class="add-process-btn"
-                      @click="handleAddProcess(props.row.productId)"
-                    >
-                      <el-icon><Plus /></el-icon>
-                      添加工序
-                    </el-button>
-                  </div>
-                </div>
+    </template>
+
+    <!-- 产品列表 -->
+    <el-table
+      class="table-container"
+      :loading="isLoadingProduct"
+      :data="productList">
+      <el-table-column type="expand">
+        <template #default="props">
+          <div class="process-detail">
+              <div class="process-title">
+                <el-icon><List /></el-icon>
+                <span>工序明细</span>
               </div>
-            </template>
-          </el-table-column>
-          <el-table-column label="产品名称" prop="productName" min-width="150" />
-          <el-table-column label="产品编号" prop="productCode" width="120" />
-          <el-table-column label="客户公司" prop="customerSource" min-width="200" />
-          <el-table-column label="产品状态" prop="productStatus" min-width="200" >
-            <template #default="scope">
-              <ProgressStatusTag :status="scope.row.productStatus" />
-            </template>
-          </el-table-column>
-          <el-table-column label="创建时间" prop="createTime" width="180" />
-          <el-table-column label="操作" width="180" fixed="right">
-            <template #default="scope">
-              <el-button type="primary" size="small" @click="handleEditProduct(scope.row)">
-                <el-icon><Edit /></el-icon>
-                编辑
+            <el-table 
+              :data="props.row.processAllocations || []" 
+              border
+              class="process-table"
+              :header-cell-style="{
+                background: '#f5f7fa',
+                color: '#606266',
+                fontWeight: 'bold'
+              }">
+              <el-table-column label="工序ID" prop="processId" width="100" />
+              <el-table-column label="工序名称" prop="processName" width="150" />
+              <el-table-column label="工序描述" prop="processDescription" min-width="200" />
+              <el-table-column label="工序创建时间" prop="createTime" width="180" />
+              <el-table-column label="工序负责人" prop="employees" min-width="200">
+                <template #default="scope">
+                  <div class="responser-display">
+                    <el-tag
+                      v-for="employeeId in scope.row.employees"
+                      :key="employeeId"
+                      size="small"
+                      class="responser-tag">
+                      {{ getEmployeeName(employeeId) }}
+                    </el-tag>
+                    <span v-if="!scope.row.employees.length" class="empty-text">暂无负责人</span>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column label="工序参考单价" prop="referencePrice" width="120">
+                <template #default="scope">
+                  <span class="price">¥{{ scope.row.referencePrice.toFixed(2) }}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" width="200" fixed="right">
+                <template #default="scope">
+                  <el-button 
+                    type="warning" 
+                    size="small" 
+                    class="process-action-btn"
+                    @click="handleEditProcess(scope.row)">
+                    <el-icon><Edit /></el-icon>
+                    修改
+                  </el-button>
+                  <el-button 
+                    type="danger" 
+                    size="small" 
+                    class="process-action-btn"
+                    @click="handleDeleteProcess(scope.row)">
+                    <el-icon><Delete /></el-icon>
+                    删除
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            <div class="process-footer">
+              <el-button 
+                type="success" 
+                class="add-process-btn"
+                @click="handleAddProcess(props.row.productId)"
+              >
+                <el-icon><Plus /></el-icon>
+                添加工序
               </el-button>
-              <el-button type="danger" size="small" @click="handleDeleteProduct(scope.row)">
-                <el-icon><Delete /></el-icon>
-                删除
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <!-- 分页配置 -->
-        <el-pagination
-          class="pagination"
-          background
-          layout="prev, pager, next, jumper, ->, total"
-          :total="total"
-          @current-change="handleCurrentChange"
-          @size-change="handleSizeChange"
-          :current-page="currentPage"
-          :page-size="pageSize"
-        />
-      </div>
-    </el-card>
-
+            </div>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="产品名称" prop="productName" min-width="150" />
+      <el-table-column label="产品编号" prop="productCode" width="120" />
+      <el-table-column label="客户公司" prop="customerSource" min-width="200" />
+      <el-table-column label="产品状态" prop="productStatus" min-width="200" >
+        <template #default="scope">
+          <ProgressStatusTag :status="scope.row.productStatus" />
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" prop="createTime" width="180" />
+      <el-table-column label="操作" width="180" fixed="right">
+        <template #default="scope">
+          <el-button type="primary" size="small" @click="handleEditProduct(scope.row)">
+            <el-icon><Edit /></el-icon>
+            编辑
+          </el-button>
+          <el-button type="danger" size="small" @click="handleDeleteProduct(scope.row)">
+            <el-icon><Delete /></el-icon>
+            删除
+          </el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 分页配置 -->
+    <el-pagination
+      class="pagination"
+      background
+      layout="prev, pager, next, jumper, ->, total"
+      :total="total"
+      @current-change="handleCurrentChange"
+      @size-change="handleSizeChange"
+      :current-page="currentPage"
+      :page-size="pageSize"
+    />
+  
     <!-- 新增工序对话框 -->
     <ProcessDetailForm
       ref="addProcessFormRef"
       :is-edit="false"
-      @cancel="handleCancelAddProcess"
-      @save="handleSaveAddProcess"
+      @formOver="handleSaveAddProcess"
     />
     
     <!-- 编辑工序对话框 -->
     <ProcessDetailForm
       ref="editProcessFormRef"
       :is-edit="true"
-      @cancel="handleCancelEditProcess"
-      @save="handleSaveEditProcess"
+      @formOver="handleSaveEditProcess"
     />
 
     <!-- 新增产品对话框 -->
@@ -166,9 +148,9 @@
       ref="editProductFormRef"
       :is-edit="true"
       @formOver="handleEditProductOver"
-    />
-  </div>
-  </template>
+  />
+  </el-card>
+</template>
   
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
@@ -195,8 +177,7 @@ interface ProductWithProcess extends Product {
 const currentPage = ref(1)
 const pageSize = ref(16)
 const total = ref(0)
-const isLoading = ref(false)
-
+const isLoadingProduct = ref(true)
 // 实例配置
 const productList = ref<ProductWithProcess[]>([])
 const employeeOptions = ref<EmployeeDetail[]>([])
@@ -224,7 +205,7 @@ const loadProducts = async () => {
       processAllocations: [],
       processLoading: true
     }))
-    
+    isLoadingProduct.value = false
     // 为每个产品预加载工序明细
     await loadProcessAllocations()
   } catch (error) {
@@ -335,20 +316,15 @@ const handleAddProcess = (productId: number) => {
 }
 
 // 处理保存新增工序
-const handleSaveAddProcess = async (processData: ProcessAllocation) => {  
+const handleSaveAddProcess = async (productId: number) => {  
   try {
     console.log("handleSaveAddProcess")
     addProcessFormRef.value?.closeForm()
-    flushProcessesByProductId(processData.productId)
+    flushProcessesByProductId(productId)
     console.log(productList)
   } catch (error) {
     ElMessage.error('添加工序失败')
   }
-}
-
-// 处理取消新增工序
-const handleCancelAddProcess = () => {
-  addProcessFormRef.value?.closeForm()
 }
 
 // 处理编辑工序
@@ -358,20 +334,16 @@ const handleEditProcess = (row: ProcessAllocation) => {
 }
 
 // 处理保存编辑工序
-const handleSaveEditProcess = async (processData: ProcessAllocation) => {  
+const handleSaveEditProcess = async (productId: number) => {  
   try {
     ElMessage.success('工序信息已更新')
     editProcessFormRef.value?.closeForm()
-    flushProcessesByProductId(processData.productId)
+    flushProcessesByProductId(productId)
   } catch (error) {
     ElMessage.error('更新工序信息失败' + error)
   }
 }
 
-// 处理取消编辑工序
-const handleCancelEditProcess = () => {
-  editProcessFormRef.value?.closeForm()
-}
 
 // 处理删除工序
 const handleDeleteProcess = (row: ProcessAllocation) => {
@@ -417,7 +389,7 @@ onMounted(() => {
   loadProducts()
   loadEmployees()
 })
-  </script>
+</script>
 
 <style scoped>
 .products {
@@ -426,17 +398,12 @@ onMounted(() => {
   flex-direction: column;
 }
 
-.box-card {
-  height: calc(100vh - 80px);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
 .table-container {
   flex: 1;
   overflow: hidden;
   position: relative;
+  height: 100%;
+  width: 100%;
 }
 
 :deep(.el-card__body) {
@@ -445,11 +412,6 @@ onMounted(() => {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-}
-
-:deep(.el-table) {
-  --el-table-border-color: #edf2f7;
-  --el-table-header-bg-color: #f8fafc;
 }
 
 :deep(.el-table__body-wrapper) {
@@ -497,19 +459,7 @@ onMounted(() => {
 }
 
 .process-detail {
-  padding: 15px;
-  background-color: #e6e8eb;
-  border-radius: 4px;
-  margin: 0;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
-}
-
-.process-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  padding: 0 4px;
+  margin-left: 20px;
 }
 
 .process-title {
@@ -518,6 +468,7 @@ onMounted(() => {
   font-size: 16px;
   font-weight: 500;
   color: #606266;
+  margin-bottom: 16px;
 }
 
 .process-title .el-icon {
@@ -598,18 +549,6 @@ onMounted(() => {
   overflow-y: auto;
 }
 
-:deep(.el-table__expanded-cell:hover) {
-  background-color: #e6e8eb !important;
-}
-
-:deep(.el-table__expanded-cell .process-detail) {
-  background-color: #e6e8eb;
-}
-
-:deep(.el-table__expanded-cell .process-detail:hover) {
-  background-color: #e6e8eb;
-}
-
 :deep(.process-table) {
   --el-table-border-color: #e4e7ed;
   margin: 0;
@@ -627,10 +566,6 @@ onMounted(() => {
 :deep(.process-table .el-table__cell) {
   border-bottom: 1px solid var(--el-table-border-color);
   background-color: #edf0f3;
-}
-
-:deep(.process-table .el-table__row:hover > td) {
-  background-color: #edf0f3 !important;
 }
 
 :deep(.process-table .el-table__body-wrapper) {

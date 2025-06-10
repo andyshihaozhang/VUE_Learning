@@ -54,6 +54,15 @@
     employeeStatus: ActiveStatus.ACTIVE,
   })
 
+  const resetForm = () => {
+    formEditModel.value = {
+      employeeId: 0,
+      employeeName: '',
+      employeePhone: 0,
+      employeeStatus: ActiveStatus.ACTIVE,
+    }
+  }
+
   const emit = defineEmits<{
     (e: 'formOver'): void
   }>()
@@ -67,11 +76,13 @@
       employeePhone: formEditModel.value.employeePhone,
       employeeStatus: formEditModel.value.employeeStatus as ActiveStatus
     })
+    resetForm()
     emit('formOver')
   }
   
   // 取消
   const handleCancel = () => {
+    resetForm()
     emit('formOver')
   }
   

@@ -53,6 +53,14 @@ const formAddModel = ref<EmployeeCreateParams>({
   employeeStatus: ActiveStatus.ACTIVE,
 })
 
+const resetForm = () => {
+  formAddModel.value = {
+    employeeName: '',
+    employeePhone: 0,
+    employeeStatus: ActiveStatus.ACTIVE,
+  }
+}
+
 const emit = defineEmits<{
   (e: 'formOver'): void
 }>()
@@ -64,11 +72,13 @@ const handleSave = async () => {
     employeePhone: formAddModel.value.employeePhone,
     employeeStatus: formAddModel.value.employeeStatus as ActiveStatus
   })
+  resetForm()
   emit('formOver')
 }
 
 // 取消
 const handleCancel = () => {
+  resetForm()
   emit('formOver')
 }
 
