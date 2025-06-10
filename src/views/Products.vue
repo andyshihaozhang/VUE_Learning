@@ -2,7 +2,10 @@
   <el-card class="products">
     <template #header>
       <div class="card-header">
-        <h2>产品管理</h2>
+        <div class="card-header-left">
+          <h2>产品管理</h2>
+          <HelperToolTip content="双击产品行，可以直接进入工序分配页面" />
+        </div>
         <el-button type="primary" @click="handleAddProduct">
           <el-icon><Plus /></el-icon>
           新增产品
@@ -14,80 +17,8 @@
     <el-table
       class="table-container"
       :loading="isLoadingProduct"
-      :data="productList">
-      <el-table-column type="expand">
-        <template #default="props">
-          <div class="process-detail">
-              <div class="process-title">
-                <el-icon><List /></el-icon>
-                <span>工序明细</span>
-              </div>
-            <el-table 
-              :data="props.row.processAllocations || []" 
-              border
-              class="process-table"
-              :header-cell-style="{
-                background: '#f5f7fa',
-                color: '#606266',
-                fontWeight: 'bold'
-              }">
-              <el-table-column label="工序ID" prop="processId" width="100" />
-              <el-table-column label="工序名称" prop="processName" width="150" />
-              <el-table-column label="工序描述" prop="processDescription" min-width="200" />
-              <el-table-column label="工序创建时间" prop="createTime" width="180" />
-              <el-table-column label="工序负责人" prop="employees" min-width="200">
-                <template #default="scope">
-                  <div class="responser-display">
-                    <el-tag
-                      v-for="employeeId in scope.row.employees"
-                      :key="employeeId"
-                      size="small"
-                      class="responser-tag">
-                      {{ getEmployeeName(employeeId) }}
-                    </el-tag>
-                    <span v-if="!scope.row.employees.length" class="empty-text">暂无负责人</span>
-                  </div>
-                </template>
-              </el-table-column>
-              <el-table-column label="工序参考单价" prop="referencePrice" width="120">
-                <template #default="scope">
-                  <span class="price">¥{{ scope.row.referencePrice.toFixed(2) }}</span>
-                </template>
-              </el-table-column>
-              <el-table-column label="操作" width="200" fixed="right">
-                <template #default="scope">
-                  <el-button 
-                    type="warning" 
-                    size="small" 
-                    class="process-action-btn"
-                    @click="handleEditProcess(scope.row)">
-                    <el-icon><Edit /></el-icon>
-                    修改
-                  </el-button>
-                  <el-button 
-                    type="danger" 
-                    size="small" 
-                    class="process-action-btn"
-                    @click="handleDeleteProcess(scope.row)">
-                    <el-icon><Delete /></el-icon>
-                    删除
-                  </el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-            <div class="process-footer">
-              <el-button 
-                type="success" 
-                class="add-process-btn"
-                @click="handleAddProcess(props.row.productId)"
-              >
-                <el-icon><Plus /></el-icon>
-                添加工序
-              </el-button>
-            </div>
-          </div>
-        </template>
-      </el-table-column>
+      :data="productList"
+      @row-dblclick="handleRowDblClick">
       <el-table-column label="产品名称" prop="productName" min-width="150" />
       <el-table-column label="产品编号" prop="productCode" width="120" />
       <el-table-column label="客户公司" prop="customerSource" min-width="200" />
@@ -122,20 +53,6 @@
       :page-size="pageSize"
     />
   
-    <!-- 新增工序对话框 -->
-    <ProcessDetailForm
-      ref="addProcessFormRef"
-      :is-edit="false"
-      @formOver="handleSaveAddProcess"
-    />
-    
-    <!-- 编辑工序对话框 -->
-    <ProcessDetailForm
-      ref="editProcessFormRef"
-      :is-edit="true"
-      @formOver="handleSaveEditProcess"
-    />
-
     <!-- 新增产品对话框 -->
     <ProductForm
       ref="addProductFormRef"
@@ -154,126 +71,43 @@
   
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Plus, Edit, Delete, List, Loading } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus, Edit, Delete } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
 import type { Product } from '@/types/business/product'
-import type { ProcessAllocation } from '@/types/business/process'
-import type { EmployeeDetail } from '@/types/business/employee'
-import { EmployeeApi } from '@/api/employeeApi'
 import ProgressStatusTag from "@/components/common/ProgressStatusTag.vue"
-import { useEmployeeStore } from '@/stores/employeeStore'
-import { useProductStore } from '@/stores/productStore'
-import { useProcessStore } from '@/stores/processStore'
+import { useProductStore } from '@/stores/business/productStore'
 import ProductForm from '@/components/product/ProductForm.vue'
-import ProcessDetailForm from '@/components/product/ProcessDetailForm.vue'
-
-// 扩展Product类型，增加工序明细及加载状态
-interface ProductWithProcess extends Product {
-  processAllocations?: ProcessAllocation[]
-  processLoading?: boolean
-}
+import { useRouter } from 'vue-router'
+import HelperToolTip from '@/components/common/HelperToolTip.vue'
+const router = useRouter()
 // 分页配置
 const currentPage = ref(1)
 const pageSize = ref(16)
 const total = ref(0)
 const isLoadingProduct = ref(true)
 // 实例配置
-const productList = ref<ProductWithProcess[]>([])
-const employeeOptions = ref<EmployeeDetail[]>([])
-const employeeStore = useEmployeeStore()
+const productList = ref<Product[]>([])
 const productStore = useProductStore()
-const processStore = useProcessStore()
 // 表单配置
-const addProcessFormRef = ref<InstanceType<typeof ProcessDetailForm>>()
-const editProcessFormRef = ref<InstanceType<typeof ProcessDetailForm>>()
 const addProductFormRef = ref<InstanceType<typeof ProductForm>>()
 const editProductFormRef = ref<InstanceType<typeof ProductForm>>()
 
 // 获取当前页的产品列表
 const loadProducts = async () => {
   try {
-    console.log("loadProducts")
+    isLoadingProduct.value = true
     await productStore.fetchProducts({
       page: currentPage.value,
       pageSize: pageSize.value,
     })
     
-    // 为每个产品添加工序明细相关属性
-    productList.value = productStore.productList.map(item => ({
-      ...item,
-      processAllocations: [],
-      processLoading: true
-    }))
+    productList.value = productStore.productList
     isLoadingProduct.value = false
-    // 为每个产品预加载工序明细
-    await loadProcessAllocations()
   } catch (error) {
     ElMessage.error('获取产品列表失败')
+    isLoadingProduct.value = false
   }
-}
-
-// 预加载当前页产品的工序明细
-const loadProcessAllocations = async () => {
-  try {
-    console.log("loadProcessAllocations")
-    // 收集所有工序中涉及的员工ID
-    const employeeIds = new Set<number>()
-    
-    await Promise.all(
-      productList.value.map(async (product) => {
-        try {
-          const res = await processStore.getProcessAllocationByProductId(product.productId)          
-          product.processAllocations = res || []
-        } catch (error) {
-          console.error(`加载产品 ${product.productId} 的工序明细失败:`, error)
-          product.processAllocations = []
-        } finally {
-          product.processLoading = false
-        }
-      })
-    )
-
-    // 预加载所有相关员工信息
-    if (employeeIds.size > 0) {
-      await employeeStore.fetchEmployees({
-        page: 1,
-        pageSize: employeeIds.size
-      })
-    }
-  } catch (error) {
-    console.error('预加载工序明细失败:', error)
-  }
-}
-
-// 预加载所有可分配的员工
-const loadEmployees = async () => {
-  try {
-    const res = await EmployeeApi.getEmployees({
-      page: 1,
-      pageSize: 100, // 假设员工不会太多，一次性加载
-    })
-    employeeOptions.value = res.data.data.items
-  } catch (error) {
-    ElMessage.error('获取员工列表失败')
-  }
-}
-
-const flushProcessesByProductId = async (productId: number) => {
-  // 找到所属产品并刷新其工序列表
-  const product = productList.value.find(p => 
-      p.productId === productId
-    )
-    if (product) {
-      // 标记为加载中
-      product.processLoading = true
-      try {
-        const res = await processStore.getProcessAllocationByProductId(product.productId)
-        product.processAllocations = res
-      } finally {
-        product.processLoading = false
-      }
-    }
 }
 
 // 打开新增产品表单
@@ -309,62 +143,6 @@ const handleDeleteProduct = async (row: Product) => {
   }
 }
 
-// 打开新增工序表单
-const handleAddProcess = (productId: number) => {
-  addProcessFormRef.value?.initForm(productId)
-  addProcessFormRef.value?.openForm()
-}
-
-// 处理保存新增工序
-const handleSaveAddProcess = async (productId: number) => {  
-  try {
-    console.log("handleSaveAddProcess")
-    addProcessFormRef.value?.closeForm()
-    flushProcessesByProductId(productId)
-    console.log(productList)
-  } catch (error) {
-    ElMessage.error('添加工序失败')
-  }
-}
-
-// 处理编辑工序
-const handleEditProcess = (row: ProcessAllocation) => {
-  editProcessFormRef.value?.initForm(row.productId, row)
-  editProcessFormRef.value?.openForm()
-}
-
-// 处理保存编辑工序
-const handleSaveEditProcess = async (productId: number) => {  
-  try {
-    ElMessage.success('工序信息已更新')
-    editProcessFormRef.value?.closeForm()
-    flushProcessesByProductId(productId)
-  } catch (error) {
-    ElMessage.error('更新工序信息失败' + error)
-  }
-}
-
-
-// 处理删除工序
-const handleDeleteProcess = (row: ProcessAllocation) => {
-  ElMessageBox.confirm(
-    `确定要删除工序"${row.processName}"吗？`,
-    '删除确认',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }
-  ).then(async () => {
-    await processStore.deleteProcessAllocation(row.processId)
-    ElMessage.success('工序已删除')
-    flushProcessesByProductId(row.productId)
-  }).catch(() => {
-    // 取消删除
-    ElMessage.info('取消删除')
-  })
-}
-
 // 处理页码变化
 const handleCurrentChange = (page: number) => {
   currentPage.value = page
@@ -378,22 +156,25 @@ const handleSizeChange = (size: number) => {
   loadProducts()
 }
 
-// 获取员工姓名的辅助函数
-const getEmployeeName = (employeeId: number) => {
-  const employee = employeeStore.employeeList.find((emp: EmployeeDetail) => emp.employeeId === employeeId)
-  return employee ? `${employee.employeeName}` : `未知员工(${employeeId})`
+const handleRowDblClick = (row: Product) => {
+  router.push({
+    path: '/allocations',
+    query: {
+      productId: row.productId
+    }
+  })
 }
 
 // 组件挂载时初始化相关信息
 onMounted(() => {
   loadProducts()
-  loadEmployees()
 })
 </script>
 
 <style scoped>
 .products {
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -437,6 +218,12 @@ onMounted(() => {
   align-items: center;
 }
 
+.card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .loading-container {
   display: flex;
   justify-content: center;
@@ -458,53 +245,6 @@ onMounted(() => {
   100% { transform: rotate(360deg); }
 }
 
-.process-detail {
-  margin-left: 20px;
-}
-
-.process-title {
-  display: flex;
-  align-items: center;
-  font-size: 16px;
-  font-weight: 500;
-  color: #606266;
-  margin-bottom: 16px;
-}
-
-.process-title .el-icon {
-  margin-right: 8px;
-  font-size: 18px;
-  color: #606266;
-}
-
-.process-table {
-  margin-bottom: 16px;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.process-footer {
-  display: flex;
-  justify-content: center;
-  margin-top: 16px;
-}
-
-.add-process-btn {
-  width: 100%;
-  height: 40px;
-  font-size: 14px;
-  border-radius: 4px;
-  background-color: #f0f9eb;
-  border-color: #e1f3d8;
-  color: #67c23a;
-}
-
-.add-process-btn:hover {
-  background-color: #e1f3d8;
-  border-color: #c2e7b0;
-  color: #67c23a;
-}
-
 .price {
   color: #f56c6c;
   font-weight: 500;
@@ -520,100 +260,6 @@ onMounted(() => {
   --el-button-border-color: #1a1f36;
   --el-button-hover-bg-color: #2d3748;
   --el-button-hover-border-color: #2d3748;
-}
-
-:deep(.process-action-btn) {
-  --el-button-hover-bg-color: var(--el-button-bg-color);
-  --el-button-hover-border-color: var(--el-button-border-color);
-  opacity: 0.9;
-}
-
-:deep(.process-action-btn:hover) {
-  opacity: 1;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-:deep(.el-table__expand-icon) {
-  color: #1a1f36;
-}
-
-:deep(.el-table__expand-icon--expanded) {
-  transform: rotate(90deg);
-}
-
-:deep(.el-table__expanded-cell) {
-  background-color: #e6e8eb !important;
-  padding: 10px 20px !important;
-  max-height: 500px;
-  overflow-y: auto;
-}
-
-:deep(.process-table) {
-  --el-table-border-color: #e4e7ed;
-  margin: 0;
-  border-radius: 4px;
-  overflow: hidden;
-  background-color: #edf0f3;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-  max-height: 400px;
-}
-
-:deep(.process-table .el-table__header) {
-  background-color: #f5f7fa;
-}
-
-:deep(.process-table .el-table__cell) {
-  border-bottom: 1px solid var(--el-table-border-color);
-  background-color: #edf0f3;
-}
-
-:deep(.process-table .el-table__body-wrapper) {
-  max-height: 350px;
-  overflow-y: auto;
-}
-
-:deep(.el-select) {
-  width: 100%;
-}
-
-:deep(.el-select .el-input__wrapper) {
-  background-color: #edf0f3;
-}
-
-:deep(.el-select:hover .el-input__wrapper) {
-  background-color: #e4e7ed;
-}
-
-:deep(.el-select-dropdown__item.selected) {
-  color: #409eff;
-  font-weight: bold;
-}
-
-:deep(.el-select-dropdown__item.selected::after) {
-  content: '✓';
-  position: absolute;
-  right: 20px;
-  color: #409eff;
-  font-weight: bold;
-}
-
-:deep(.responser-display) {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  align-items: center;
-}
-
-:deep(.responser-tag) {
-  background-color: #f0f2f5;
-  border-color: #e4e7ed;
-  color: #606266;
-}
-
-:deep(.empty-text) {
-  color: #909399;
-  font-size: 13px;
 }
 
 :deep(.el-dialog__body) {

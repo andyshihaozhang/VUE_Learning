@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import Main from '@/components/Main.vue'
-import { useLoginStore } from '@/stores/loginStore'
+import { useLoginStore } from '@/stores/global/loginStore'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -32,6 +32,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'products',
         name: 'Products',
         component: () => import('@/views/Products.vue')
+      },
+      {
+        path: 'allocations',
+        name: 'Allocations',
+        component: () => import('@/views/Allocations.vue')
       },
       {
         path: 'process',

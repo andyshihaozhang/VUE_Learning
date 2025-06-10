@@ -53,8 +53,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import BaseForm from '@/components/common/BaseForm.vue'
-import { useProcessStore } from '@/stores/processStore'
-import { useEmployeeStore } from '@/stores/employeeStore'
+import { useProcessStore } from '@/stores/business/processStore'
+import { useEmployeeStore } from '@/stores/business/employeeStore'
 
 import type { ProcessAllocation } from '@/types/business/process'
 import { ElMessage } from 'element-plus'

@@ -36,7 +36,7 @@ import BaseForm from '@/components/common/BaseForm.vue'
 import { ProgressStatus } from '@/types/business/common'
 import type { Product } from '@/types/business/product'
 import { ElMessage } from 'element-plus'
-import { useProductStore } from '@/stores/productStore'
+import { useProductStore } from '@/stores/business/productStore'
 import { progressStatusConverter, getEnumValues } from '@/utils/converter'
 // 属性
 const productStore = useProductStore()

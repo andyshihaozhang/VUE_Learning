@@ -2,13 +2,15 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { ProductApi } from '@/api/productApi'
 import type { Product } from '@/types/business/product'
+import { SetupStoreId } from '@/stores/storeEnums'
 import type {
   ProductQueryParams,
   ProductCreateParams,
   ProductUpdateParams,
 } from '@/types/business/product'
 
-export const useProductStore = defineStore('product', () => {
+
+export const useProductStore = defineStore(SetupStoreId.Product, () => {
   // 状态定义
   const productList = ref<Product[]>([])
   const currentProduct = ref<Product | null>(null)

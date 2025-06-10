@@ -2,13 +2,14 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { EmployeeApi } from '@/api/employeeApi'
 import type { EmployeeDetail } from '@/types/business/employee'
+import { SetupStoreId } from '@/stores/storeEnums'
 import type {
   EmployeeQueryParams,
   EmployeeCreateParams,
   EmployeeUpdateParams
 } from '@/types/business/employee'
 
-export const useEmployeeStore = defineStore('employee', () => {
+export const useEmployeeStore = defineStore(SetupStoreId.Employee, () => {
   // 状态定义
   const employeeList = ref<EmployeeDetail[]>([])
   const total = ref(0)

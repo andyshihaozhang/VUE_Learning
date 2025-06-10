@@ -1,13 +1,15 @@
 import { ProcessDetailApi } from '@/api/processApi'
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { SetupStoreId } from '@/stores/storeEnums'
 import type { 
     ProcessAllocation, 
     ProcessAllocationByEmployeeIdAndProductIdRequest, 
     ProcessAllocationCreateRequest, 
     ProcessAllocationUpdateRequest } from '@/types/business/process'
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
 
-export const useProcessStore = defineStore('process', () => {
+
+export const useProcessStore = defineStore(SetupStoreId.Process, () => {
   const processAllocationList = ref<ProcessAllocation[]>([])
   const total = ref(0)
 

@@ -161,10 +161,10 @@ import ProgressStatusTag from '@/components/common/ProgressStatusTag.vue'
 import ProcessPriceInput from '@/components/Process/ProcessPriceInput.vue'
 import type { Product } from '@/types/business/product'
 import type { Allocation } from '@/types/business/process'
-import { useProductStore } from '@/stores/productStore'
-import { useEmployeeStore } from '@/stores/employeeStore'
+import { useProductStore } from '@/stores/business/productStore'
+import { useEmployeeStore } from '@/stores/business/employeeStore'
 import type { EmployeeDetail } from '@/types/business/employee'
-import { useProcessStore } from '@/stores/processStore'
+import { useProcessStore } from '@/stores/business/processStore'
 import { ElMessage } from 'element-plus'
 const productStore = useProductStore()
 const employeeStore = useEmployeeStore()
@@ -250,16 +250,8 @@ const handleLeftSelected = async (row: any) => {
 .process-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-
-.process-container {
-  padding: 5px;
-}
-
-.search-header {
-  display: flex;
-  flex-direction: column;
+  height: 100%;
+  width: 100%;
   gap: 20px;
 }
 
@@ -272,7 +264,7 @@ const handleLeftSelected = async (row: any) => {
 .search-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .search-input {

@@ -106,7 +106,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { Iphone, Lock, User } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import { useLoginStore } from '@/stores/loginStore'
+import { useLoginStore } from '@/stores/global/loginStore'
 import { ElMessage } from 'element-plus'
 import type { LoginParams, RegisterParams } from '@/types/business/login'
 

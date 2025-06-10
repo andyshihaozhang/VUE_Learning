@@ -64,6 +64,7 @@ const handleChangePassword = () => {
   display: flex;
   gap: 20px;
   height: 100%;
+  width: 100%;
 }
 
 .message-card {

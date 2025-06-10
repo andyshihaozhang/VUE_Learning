@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
 import { ElMessage } from 'element-plus'
-import { useLoginStore } from '@/stores/loginStore'
+import { useLoginStore } from '@/stores/global/loginStore'
 import router from '@/router'
 
 // 创建 axios 实例

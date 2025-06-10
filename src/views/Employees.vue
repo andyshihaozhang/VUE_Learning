@@ -75,7 +75,7 @@ import type { EmployeeDetail } from '@/types/business/employee'
 import EmployeeStatusTag from '@/components/user/EmployeeStatusTag.vue'
 import EmployeeAddForm from '@/components/user/EmployeeAddForm.vue'
 import EmployeeEditForm from '@/components/user/EmployeeEditForm.vue'
-import { useEmployeeStore } from '@/stores/employeeStore'
+import { useEmployeeStore } from '@/stores/business/employeeStore'
 
 const employeeStore = useEmployeeStore()
 
@@ -163,6 +163,7 @@ onMounted(() => {
 <style scoped>
 .users {
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
