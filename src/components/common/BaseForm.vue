@@ -2,12 +2,11 @@
   <el-dialog 
     v-model="formVisible" 
     :title="props.title" 
-    :width="500" 
     :close-on-click-modal="false" 
     :show-close="false">
     <slot name="form-content"></slot>
     <template #footer>
-      <span class="form-footer">
+      <span slot="footer">
         <el-button @click="handleCancel">取消</el-button>
         <el-button type="primary" @click="handleSave">确定</el-button>
       </span>
@@ -43,11 +42,5 @@ defineExpose({
 
 </script>
 
-<style scoped>
-
-:deep(.dialog-footer) {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
+<style>
 </style>

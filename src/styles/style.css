@@ -24,6 +24,8 @@ body {
   font-size: 14px;
   line-height: 1.5;
   color: #333;
+  flex-shrink: 0;
+  height: 100%;
 }
 
 #app {
@@ -82,4 +84,76 @@ h1 {
   button {
     background-color: #f9f9f9;
   }
+}
+
+/* 隐藏所有滚动条 */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* elment-plus css*/
+
+/* el-button 通用配置*/
+.el-button .el-icon {
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+.el-button--primary {
+  --el-button-bg-color: #1a1f36;
+  --el-button-border-color: #1a1f36;
+  --el-button-hover-bg-color: #2d3748;
+  --el-button-hover-border-color: #2d3748;
+}
+
+/* el-card通用配置圆角 */
+.el-card {
+  flex-shrink: 0;
+  border-radius: 10px;
+}
+
+/* 分页器通用配置*/
+.el-pagination {
+  padding: 15px 0;
+  display: flex;
+  justify-content: center;
+  background-color: white;
+  border-top: 1px solid #f0f0f0;
+  z-index: 10;
+}
+
+.el-pagination.is-background .el-pager li:not(.is-disabled).is-active {
+  background-color: #1a1f36 !important;
+}
+
+/* 表单通用配置*/
+.el-dialog{
+  width: 30%;
+  padding: 20px;
+  border-radius: 10px;
+}
+.el-form-item__label {
+  font-weight: 500;
+}
+.el-dialog__header{
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  border-bottom: 1px solid #e0e0e0;
+  width: 100%;
+  gap: 20px;
+  padding: 10px;
+}
+
+.el-dialog__body {
+  padding: 20px 30px;
+}
+.el-dialog__footer > span{
+  display: flex;
+  flex: 1;
+  flex-direction: row-reverse;
+  border-top: 1px solid #e0e0e0;
+  width: 100%;
+  gap: 20px;
+  padding: 10px;
 }

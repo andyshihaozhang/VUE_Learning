@@ -39,10 +39,7 @@
           </el-table-column>
         </el-table>
         <!-- 分页配置 -->
-        <el-pagination
-          class="pagination"
-          background
-          layout="prev, pager, next, jumper, ->, total"
+        <FFPagination
           :total="employeeStore.total"
           @current-change="handleCurrentChange"
           @size-change="handleSizeChange"
@@ -76,7 +73,7 @@ import EmployeeStatusTag from '@/components/user/EmployeeStatusTag.vue'
 import EmployeeAddForm from '@/components/user/EmployeeAddForm.vue'
 import EmployeeEditForm from '@/components/user/EmployeeEditForm.vue'
 import { useEmployeeStore } from '@/stores/business/employeeStore'
-
+import FFPagination from '@/components/common/FFPagination.vue'
 const employeeStore = useEmployeeStore()
 
 // 表单
@@ -187,15 +184,6 @@ onMounted(() => {
   align-items: center;
 }
 
-.pagination {
-  padding: 15px 0;
-  display: flex;
-  justify-content: center;
-  background-color: white;
-  border-top: 1px solid #f0f0f0;
-  z-index: 10;
-}
-
 :deep(.el-card__body) {
   height: calc(100% - 60px);
   padding: 15px;
@@ -242,10 +230,6 @@ onMounted(() => {
   --el-button-border-color: #1a1f36;
   --el-button-hover-bg-color: #2d3748;
   --el-button-hover-border-color: #2d3748;
-}
-
-:deep(.el-pagination.is-background .el-pager li:not(.is-disabled).is-active) {
-  background-color: #1a1f36;
 }
 
 :deep(.el-button .el-icon) {

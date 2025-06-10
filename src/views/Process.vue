@@ -346,12 +346,6 @@ const handleLeftSelected = async (row: any) => {
   }
 }
 
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
 :deep(.price-input .el-input__wrapper) {
   padding-left: 8px;
 }

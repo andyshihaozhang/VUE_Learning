@@ -23,7 +23,7 @@
       <el-card class="process-card">
         <template #header>
             <h3>工序明细</h3>
-            <el-button type="primary" @click="handleAddProcess(selectedProductId)">
+            <el-button type="primary" @click="handleAddProcess">
             <el-icon><Plus /></el-icon>
             新增工序
           </el-button>
@@ -113,7 +113,7 @@ const productStore = useProductStore();
 const employeeStore = useEmployeeStore();
 const processStore = useProcessStore();
 
-const selectedProductId = ref(0);
+const selectedProductId = ref<number | null>(null);
 const processAllocations = ref<ProcessAllocation[]>([]);
 const addProcessFormRef = ref<InstanceType<typeof ProcessDetailForm>>();
 const editProcessFormRef = ref<InstanceType<typeof ProcessDetailForm>>();
@@ -128,6 +128,12 @@ const getEmployeeName = (employeeId: number) => {
 
 const getProductAllocations = async () => {
   try {
+    if (selectedProductId.value === null) {
+      processAllocations.value = [];
+      loadingData.value = false;
+      ElMessage.error("未选择产品")
+      return;
+    }
     loadingData.value = true
     const res = await processStore.getProcessAllocationByProductId(selectedProductId.value)          
     processAllocations.value = res || []

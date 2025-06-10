@@ -4,7 +4,7 @@
       <div class="card-header">
         <div class="card-header-left">
           <h2>产品管理</h2>
-          <HelperToolTip content="双击产品行，可以直接进入工序分配页面" />
+          <FFHelperToolTip content="双击产品行，可以直接进入工序分配页面" />
         </div>
         <el-button type="primary" @click="handleAddProduct">
           <el-icon><Plus /></el-icon>
@@ -42,10 +42,7 @@
       </el-table-column>
     </el-table>
     <!-- 分页配置 -->
-    <el-pagination
-      class="pagination"
-      background
-      layout="prev, pager, next, jumper, ->, total"
+    <FFPagination
       :total="total"
       @current-change="handleCurrentChange"
       @size-change="handleSizeChange"
@@ -79,7 +76,8 @@ import ProgressStatusTag from "@/components/common/ProgressStatusTag.vue"
 import { useProductStore } from '@/stores/business/productStore'
 import ProductForm from '@/components/product/ProductForm.vue'
 import { useRouter } from 'vue-router'
-import HelperToolTip from '@/components/common/HelperToolTip.vue'
+import FFHelperToolTip from '@/components/common/FFHelperToolTip.vue'
+import FFPagination from '@/components/common/FFPagination.vue'
 const router = useRouter()
 // 分页配置
 const currentPage = ref(1)
@@ -250,43 +248,8 @@ onMounted(() => {
   font-weight: 500;
 }
 
-:deep(.el-button .el-icon) {
-  margin-right: 4px;
-  vertical-align: middle;
-}
-
-:deep(.el-button--primary) {
-  --el-button-bg-color: #1a1f36;
-  --el-button-border-color: #1a1f36;
-  --el-button-hover-bg-color: #2d3748;
-  --el-button-hover-border-color: #2d3748;
-}
-
-:deep(.el-dialog__body) {
-  padding: 20px 30px;
-}
-
-:deep(.el-form-item__label) {
-  font-weight: 500;
-}
-
 :deep(.el-input-number) {
   width: 100%;
-}
-
-:deep(.dialog-footer) {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-.pagination {
-  padding: 15px 0;
-  display: flex;
-  justify-content: center;
-  background-color: white;
-  border-top: 1px solid #f0f0f0;
-  z-index: 10;
 }
 </style>
   
