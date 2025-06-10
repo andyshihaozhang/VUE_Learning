@@ -335,14 +335,14 @@ const handleLeftSelected = async (row: any) => {
   padding: 7px;
 
     .value {
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
 
     .link {
-  font-size: 12px;
-  color: #b4b4b4;
-}
+      font-size: 12px;
+      color: #b4b4b4;
+    }
   }
 }
 

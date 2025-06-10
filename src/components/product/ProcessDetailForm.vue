@@ -19,14 +19,13 @@
                     placeholder="请输入工序描述"
                 />
                 </el-form-item>
-                <el-form-item label="工序单价">
+                <el-form-item label="工序单价(¥)">
                 <el-input-number
                     v-model="formModel.referencePrice"
                     :precision="2"
                     :step="0.01"
                     :min="0"
-                    placeholder="请输入工序单价"
-                />
+                    placeholder="请输入工序单价"/>
                 </el-form-item>
                 <el-form-item label="工序负责人">
                 <el-select
