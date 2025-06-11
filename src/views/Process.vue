@@ -157,8 +157,8 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import ProgressStatusTag from '@/components/common/ProgressStatusTag.vue'
-import ProcessPriceInput from '@/components/Process/ProcessPriceInput.vue'
+import ProgressStatusTag from '@/components/global/ProgressStatusTag.vue'
+import ProcessPriceInput from '@/components/business/process/ProcessPriceInput.vue'
 import type { Product } from '@/types/business/product'
 import type { Allocation } from '@/types/business/process'
 import { useProductStore } from '@/stores/business/productStore'

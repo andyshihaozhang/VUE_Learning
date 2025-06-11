@@ -40,7 +40,7 @@
           <el-sub-menu index="product-management">
             <template #title>
               <el-icon><Scissor /></el-icon>
-              <span>产品管理</span>
+              <span>生产管理</span>
             </template>
             <el-menu-item index="/products">
               <el-icon><Paperclip /></el-icon>
@@ -55,6 +55,12 @@
               <span>生产记录</span>
             </el-menu-item>
           </el-sub-menu>
+          <el-menu-item index="/logistics">
+            <el-icon><Bicycle /></el-icon>
+            <template #title>
+              <span>物流管理</span>
+            </template>
+          </el-menu-item>
           <el-menu-item index="/data-center">
             <el-icon><DataLine /></el-icon>
             <template #title>
@@ -83,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { House, Cpu, User, Setting, Scissor, Calendar, DataLine, Paperclip, Postcard, Expand, Fold } from '@element-plus/icons-vue'
+import { House, Cpu, User, Setting, Scissor, Calendar, DataLine, Paperclip, Postcard, Expand, Fold, Bicycle } from '@element-plus/icons-vue'
 import { ref } from 'vue';
 
 const isCollapse = ref(false);

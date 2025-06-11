@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import BaseForm from '@/components/common/BaseForm.vue'
+import BaseForm from '@/components/global/BaseForm.vue'
 import { useProcessStore } from '@/stores/business/processStore'
 import { useEmployeeStore } from '@/stores/business/employeeStore'
 

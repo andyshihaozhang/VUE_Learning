@@ -41,7 +41,7 @@
 import { ref } from 'vue'
 import type { EmployeeCreateParams } from '@/types/business/employee'
 import { ActiveStatus } from '@/types/business/common'
-import BaseForm from '@/components/common/BaseForm.vue'
+import BaseForm from '@/components/global/BaseForm.vue'
 import { useEmployeeStore } from '@/stores/business/employeeStore'
 import { employeeStatusConverter, getEnumValues } from '@/utils/converter'
 

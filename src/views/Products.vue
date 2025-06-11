@@ -3,8 +3,8 @@
     <template #header>
       <div class="card-header">
         <div class="card-header-left">
-          <h2>产品管理</h2>
-          <FFHelperToolTip content="双击产品行，可以直接进入工序分配页面" />
+          <h2>产品信息</h2>
+          <FFHelperToolTip content="单击产品行，可以查看产品详情；双击产品行，可以直接进入工序分配页面" />
         </div>
         <el-button type="primary" @click="handleAddProduct">
           <el-icon><Plus /></el-icon>
@@ -18,6 +18,7 @@
       class="table-container"
       :loading="isLoadingProduct"
       :data="productList"
+      @click="handleRowClick"
       @row-dblclick="handleRowDblClick">
       <el-table-column label="产品名称" prop="productName" min-width="150" />
       <el-table-column label="产品编号" prop="productCode" width="120" />
@@ -47,22 +48,25 @@
       @current-change="handleCurrentChange"
       @size-change="handleSizeChange"
       :current-page="currentPage"
-      :page-size="pageSize"
-    />
+      :page-size="pageSize"/>
   
     <!-- 新增产品对话框 -->
     <ProductForm
       ref="addProductFormRef"
       :is-edit="false"
-      @formOver="handleAddProductOver"
-    />
+      @formOver="handleAddProductOver"/>
 
     <!-- 编辑产品对话框 -->
     <ProductForm
       ref="editProductFormRef"
       :is-edit="true"
-      @formOver="handleEditProductOver"
-  />
+      @formOver="handleEditProductOver"/>
+
+    <ProductDetailDrawer
+      :isVisible="isVisible"
+      :title="`产品明细`"
+      @close="handleCloseProductDetail"
+    />
   </el-card>
 </template>
   
@@ -70,14 +74,14 @@
 import { ref, onMounted } from 'vue'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-
-import type { Product } from '@/types/business/product'
-import ProgressStatusTag from "@/components/common/ProgressStatusTag.vue"
-import { useProductStore } from '@/stores/business/productStore'
-import ProductForm from '@/components/product/ProductForm.vue'
 import { useRouter } from 'vue-router'
-import FFHelperToolTip from '@/components/common/FFHelperToolTip.vue'
-import FFPagination from '@/components/common/FFPagination.vue'
+import type { Product } from '@/types/business/product'
+import { useProductStore } from '@/stores/business/productStore'
+import ProgressStatusTag from "@/components/global/ProgressStatusTag.vue"
+import ProductForm from '@/components/business/product/ProductForm.vue'
+import ProductDetailDrawer from '@/components/business/product/ProductDetailDrawer.vue'
+import FFHelperToolTip from '@/components/global/FFHelperToolTip.vue'
+import FFPagination from '@/components/global/FFPagination.vue'
 const router = useRouter()
 // 分页配置
 const currentPage = ref(1)
@@ -90,7 +94,8 @@ const productStore = useProductStore()
 // 表单配置
 const addProductFormRef = ref<InstanceType<typeof ProductForm>>()
 const editProductFormRef = ref<InstanceType<typeof ProductForm>>()
-
+// 产品详情抽屉配置
+const isVisible = ref(false)
 // 获取当前页的产品列表
 const loadProducts = async () => {
   try {
@@ -161,6 +166,14 @@ const handleRowDblClick = (row: Product) => {
       productId: row.productId
     }
   })
+}
+
+const handleRowClick = (row: Product) => {
+  isVisible.value = true
+}
+
+const handleCloseProductDetail = () => {
+  isVisible.value = false
 }
 
 // 组件挂载时初始化相关信息

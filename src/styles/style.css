@@ -163,3 +163,13 @@ h1 {
   gap: 20px;
   padding: 10px;
 }
+
+/* el-drawer通用配置*/
+.el-drawer__body {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+}
+
+

@@ -43,8 +43,8 @@
                 <el-tag
                   v-for="employeeId in scope.row.employees"
                   :key="employeeId"
-                  size="small"
-                  class="responser-tag">
+                  type="info"
+                  effect="light">
                   {{ getEmployeeName(employeeId) }}
                 </el-tag>
                 <span v-if="!scope.row.employees.length" class="empty-text">暂无负责人</span>
@@ -105,7 +105,7 @@ import type { EmployeeDetail } from '@/types/business/employee'
 import { useProductStore } from '@/stores/business/productStore';
 import { useEmployeeStore } from '@/stores/business/employeeStore';
 import { useProcessStore } from '@/stores/business/processStore';
-import ProcessDetailForm from '@/components/product/ProcessDetailForm.vue';
+import ProcessDetailForm from '@/components/business/product/ProcessDetailForm.vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
@@ -266,6 +266,14 @@ onMounted(() => {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+}
+
+.responser-display{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 5px;
 }
 
 :deep(.el-button--primary) {
