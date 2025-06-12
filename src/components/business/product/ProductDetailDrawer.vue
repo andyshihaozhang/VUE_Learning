@@ -1,52 +1,46 @@
 <template>
   <el-drawer 
     v-model="props.isVisible" 
-    :title="props.title"
-    size="60%">
-    <div class="product-container">
-        <div class="product-image-container">
-            <el-image 
-                :src="srcList[0]"
-                :preview-src-list="srcList"
-                fit="fill"
-                show-progress>
-                <template
-                    #toolbar="{ actions, prev, next, reset, activeIndex, setActiveItem }">
-                    <el-icon @click="prev">
-                        <Back />
-                    </el-icon>
-                    <el-icon @click="next">
-                        <Right />
-                    </el-icon>
-                    <el-icon @click="setActiveItem(srcList.length - 1)">
-                    <DArrowRight />
-                    </el-icon>
-                    <el-icon @click="actions('zoomOut')">
-                        <ZoomOut />
-                    </el-icon>
-                    <el-icon @click="actions('zoomIn', { enableTransition: false, zoomRate: 2 })">
-                        <ZoomIn />
-                    </el-icon>
-                    <el-icon @click="actions('clockwise', { rotateDeg: 180, enableTransition: false })">
-                        <RefreshRight />
-                    </el-icon>
-                    <el-icon @click="actions('anticlockwise')">
-                        <RefreshLeft />
-                    </el-icon>
-                    <el-icon @click="reset">
-                        <Refresh />
-                    </el-icon>
-                    <el-icon @click="download(activeIndex)">
-                        <Download />
-                    </el-icon>
-                </template>
-            </el-image>
-        </div>
-        <div class="product-info-container">
-
-        </div>
+    :title="props.title">
+    <div class="product-image-container">
+        <el-image 
+            :src="srcList[0]"
+            :preview-src-list="srcList"
+            fit="fill"
+            show-progress>
+            <template
+                #toolbar="{ actions, prev, next, reset, activeIndex, setActiveItem }">
+                <el-icon @click="prev">
+                    <Back />
+                </el-icon>
+                <el-icon @click="next">
+                    <Right />
+                </el-icon>
+                <el-icon @click="setActiveItem(srcList.length - 1)">
+                <DArrowRight />
+                </el-icon>
+                <el-icon @click="actions('zoomOut')">
+                    <ZoomOut />
+                </el-icon>
+                <el-icon @click="actions('zoomIn', { enableTransition: false, zoomRate: 2 })">
+                    <ZoomIn />
+                </el-icon>
+                <el-icon @click="actions('clockwise', { rotateDeg: 180, enableTransition: false })">
+                    <RefreshRight />
+                </el-icon>
+                <el-icon @click="actions('anticlockwise')">
+                    <RefreshLeft />
+                </el-icon>
+                <el-icon @click="reset">
+                    <Refresh />
+                </el-icon>
+                <el-icon @click="download(activeIndex)">
+                    <Download />
+                </el-icon>
+            </template>
+        </el-image>
     </div>
-    <div class="productDetail-info-container">
+    <div class="product-info-container">
 
     </div>
     <template #footer>
@@ -92,44 +86,23 @@ const download = (index: number) => {
 </script>
 
 <style scoped>
-.product-container {
-  position: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  height: 100%;
-  width: 50%;
-}
-
 .product-image-container {
     display: flex;
-    flex: 1;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    height: 50%;
+    height: 30%;
     width: 100%;
 }
 
 .product-info-container {
     display: flex;
     flex: 1;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    height: 50%;
+    height: 80%;
     width: 100%;
-}
-
-.productDetail-info-container {
-    position: flex;
-    flex: 1;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    height: 100%;
-    width: 50%;
 }
 
 .el-image {
@@ -138,6 +111,7 @@ const download = (index: number) => {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    border-radius: 10px;
 }
 </style>
 
