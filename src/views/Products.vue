@@ -4,7 +4,7 @@
       <div class="card-header">
         <div class="card-header-left">
           <h2>产品信息</h2>
-          <FFHelperToolTip content="单击产品行，可以查看产品详情；双击产品行，可以直接进入工序分配页面" />
+          <FFHelperToolTip content="双击产品行，查看产品详情" />
         </div>
         <el-button type="primary" @click="handleAddProduct">
           <el-icon><Plus /></el-icon>
@@ -18,7 +18,6 @@
       class="table-container"
       :loading="isLoadingProduct"
       :data="productList"
-      @click="handleRowClick"
       @row-dblclick="handleRowDblClick">
       <el-table-column label="产品名称" prop="productName" min-width="150" />
       <el-table-column label="产品编号" prop="productCode" width="120" />
@@ -159,16 +158,16 @@ const handleSizeChange = (size: number) => {
   loadProducts()
 }
 
-const handleRowDblClick = (row: Product) => {
-  router.push({
-    path: '/allocations',
-    query: {
-      productId: row.productId
-    }
-  })
-}
+// const handleRowDblClick = (row: Product) => {
+//   router.push({
+//     path: '/allocations',
+//     query: {
+//       productId: row.productId
+//     }
+//   })
+// }
 
-const handleRowClick = (row: Product) => {
+const handleRowDblClick = (row: Product) => {
   isVisible.value = true
 }
 

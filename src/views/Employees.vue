@@ -2,7 +2,7 @@
   <el-card class="employees">
     <template #header>
       <div class="card-header">
-        <h2>员工管理</h2>
+        <h2>员工信息</h2>
         <el-button type="primary" @click="handleAddEmployee">
           <el-icon><Plus /></el-icon>
           新增员工

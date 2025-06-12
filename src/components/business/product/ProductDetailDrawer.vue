@@ -41,7 +41,7 @@
         </el-image>
     </div>
     <div class="product-info-container">
-
+        
     </div>
     <template #footer>
         <el-button type="primary">保存</el-button>

@@ -1,7 +1,8 @@
+import type { App } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import Main from '@/components/Main.vue'
-import { useLoginStore } from '@/stores/global/loginStore'
+import { initRouterGuard } from '@/router/routerGuard'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -52,16 +53,14 @@ const routes: Array<RouteRecordRaw> = [
   }
 ]
 
-const router = createRouter({
+export const router = createRouter({
   history: createWebHistory(),
   routes
 })
 
-router.beforeEach(async (to, from) => {
-  const loginStore = useLoginStore()
-  if (!loginStore.isLoggedIn && to.name !== 'Login') {
-    return { name: 'Login' }
-  }
-})
-
-export default router 
+/** Setup Vue Router */
+export async function setupRouter(app: App) {
+  app.use(router);
+  initRouterGuard(router);
+  await router.isReady();
+}

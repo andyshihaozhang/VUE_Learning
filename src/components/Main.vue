@@ -34,7 +34,7 @@
           <el-menu-item index="/employees">
             <el-icon><User /></el-icon>
             <template #title>
-              <span>员工信息</span>
+              <span>员工管理</span>
             </template>
           </el-menu-item>
           <el-sub-menu index="product-management">
