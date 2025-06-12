@@ -1,27 +1,33 @@
 // 路由守卫
-
-import { useLoginStore } from "@/stores/global/loginStore"
 import type { Router } from "vue-router"
 import NProgress from 'nprogress' // 引入nprogress插件
 import 'nprogress/nprogress.css'  // 这个nprogress样式必须引入
 
 export function initRouterGuard(router: Router) {
     initBeforeRouter(router)
+
+    guardRouter(router);
+
     initAfterRouter(router)
 }
 
 function initBeforeRouter(router: Router) {
-    router.beforeEach(async (to, from) => {
-        // Start progress bar
+    router.beforeEach(async (_, __) => {
         NProgress.start();
-
-        const loginStore = useLoginStore()
-        if (!loginStore.isLoggedIn && to.name !== 'Login') {
-            return { name: 'Login' }
-        }
-        return true;
     });
 }
+
+function guardRouter(router: Router){
+    router.beforeEach(async (to, from) => {
+        // 登陆认证
+        const isLogin = Boolean(localStorage.getItem('token'));
+        if (!isLogin && to.name !== 'Login') {
+            return { name: 'Login' }
+        }
+        return true
+    });
+}
+
 
 function initAfterRouter(router: Router) {
     router.afterEach(() => {

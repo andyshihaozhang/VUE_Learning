@@ -15,8 +15,8 @@ export const useLoginStore = defineStore('login', () => {
             if (response?.data?.data) {
                 loginInfo.value = response.data.data
                 isLoggedIn.value = true
+                localStorage.setItem('token', loginInfo.value.token)
             }
-            console.log('loginInfo:', loginInfo.value)
             onSuccess()
         } catch (error) {
             console.error('请求异常', error)

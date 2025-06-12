@@ -9,19 +9,19 @@ import { getExpiresTime,
 
 
 export class CreateStorage {
-    /** Ä¬ÈÏÖµ£º localStorage*/
+    /** é»˜è®¤å€¼ï¼š localStorage*/
     private storage: Storage;
-    /** Ç°×º£¬»á×Ô¶¯¼Óµ½ key ÖµµÄÇ°Ãæ£¬Ä¬ÈÏÖµ£º'' */
+    /** å‰ç¼€ï¼Œä¼šè‡ªåŠ¨åŠ åˆ° key å€¼çš„å‰é¢ï¼Œé»˜è®¤å€¼ï¼š'' */
     private prefix: string;
-    /** ºó×º£¬»á×Ô¶¯¼Óµ½ key ÖµµÄºóÃæ,Ä¬ÈÏÖµ£º''*/
+    /** åç¼€ï¼Œä¼šè‡ªåŠ¨åŠ åˆ° key å€¼çš„åé¢,é»˜è®¤å€¼ï¼š''*/
     private suffix: string;
-    /** ÊÇ·ñ¿ªÆôÓĞĞ§ÆÚÉèÖÃ,Ä¬ÈÏÖµ£ºfalse */
+    /** æ˜¯å¦å¼€å¯æœ‰æ•ˆæœŸè®¾ç½®,é»˜è®¤å€¼ï¼šfalse */
     private isOpenExpires: boolean;
-    /** ÓĞĞ§ÆÚÉèÖÃ£¬ºÍisOpenExpiresÅä´îÊ¹ÓÃ£¬µ¥Î»£ºÌì, Ä¬ÈÏÖµ£º7 Ìì */
+    /** æœ‰æ•ˆæœŸè®¾ç½®ï¼Œå’ŒisOpenExpiresé…æ­ä½¿ç”¨ï¼Œå•ä½ï¼šå¤©, é»˜è®¤å€¼ï¼š7 å¤© */
     private day: number
-    /** ÊÇ·ñ¿ªÆôAES¼ÓÃÜºÍ½âÃÜÊı¾İ£¬ Ä¬ÈÏÖµ£ºfalse */
+    /** æ˜¯å¦å¼€å¯AESåŠ å¯†å’Œè§£å¯†æ•°æ®ï¼Œ é»˜è®¤å€¼ï¼šfalse */
     private encryption: boolean;
-    /** ¼ÓÃÜÊ±ĞèÒªµÄÃÜÔ¿£¬×Ô¶¯Éú³É£¬²»ĞèÒªÉèÖÃ */
+    /** åŠ å¯†æ—¶éœ€è¦çš„å¯†é’¥ï¼Œè‡ªåŠ¨ç”Ÿæˆï¼Œä¸éœ€è¦è®¾ç½® */
     private encryptionKey: string
     constructor(type: localStorageType = {}) {
         const { prefix = '', suffix = '', storage = localStorage, isOpenExpires = false, day = 7, encryption = false } = type
@@ -35,11 +35,11 @@ export class CreateStorage {
     }
 
     /**
-     * @description ÉèÖÃ»º´æ
-     * @param key »º´æ¼ü
-     * @param value »º´æÖµ
-     * @param expires µ½ÆÚÊ±¼ä
-     * @param isOpen ÊÇ·ñ¿ªÆôµ½ÆÚÊ±¼äµÄ¼ÆËã
+     * @description è®¾ç½®ç¼“å­˜
+     * @param key ç¼“å­˜é”®
+     * @param value ç¼“å­˜å€¼
+     * @param expires åˆ°æœŸæ—¶é—´
+     * @param isOpen æ˜¯å¦å¼€å¯åˆ°æœŸæ—¶é—´çš„è®¡ç®—
      */
     setItem(key: string, value: any, expires: number | null = this.day, isOpen: boolean | null = this.isOpenExpires) {
         const stringData = isOpen ? JSON.stringify({
@@ -50,27 +50,27 @@ export class CreateStorage {
     }
 
     /**
-     * @description ¶ÁÈ¡»º´æ
-     * @param {string} key »º´æ¼ü
-     * @param {any} def Ä¬ÈÏÖµ£¬²»´«µÄ»°Ä¬ÈÏÖµÎªnull
-     * @returns ·µ»Ø»º´æÖµ£¬Èç¹û³¬³öÓĞĞ§ÆÚ£¬Ôò·µ»Ønull»òÕßÓÃ»§×Ô¶¨ÒåµÄÄ¬ÈÏÖµ
+     * @description è¯»å–ç¼“å­˜
+     * @param {string} key ç¼“å­˜é”®
+     * @param {any} def é»˜è®¤å€¼ï¼Œä¸ä¼ çš„è¯é»˜è®¤å€¼ä¸ºnull
+     * @returns è¿”å›ç¼“å­˜å€¼ï¼Œå¦‚æœè¶…å‡ºæœ‰æ•ˆæœŸï¼Œåˆ™è¿”å›nullæˆ–è€…ç”¨æˆ·è‡ªå®šä¹‰çš„é»˜è®¤å€¼
      */
     getItem(key: string, def: any = null) {
         let item = this.storage.getItem(getKey(key, this.prefix, this.suffix));
         if (item) {
             try {
                 if (this.encryption) {
-                    // Èç¹ûÊÇ¼ÓÃÜ¹ıµÄ×Ö·û´®£¬ÏÈ½âÃÜ
+                    // å¦‚æœæ˜¯åŠ å¯†è¿‡çš„å­—ç¬¦ä¸²ï¼Œå…ˆè§£å¯†
                     item = handleDecryptData(this.encryptionKey, item) || ''
                 }
                 const data = JSON.parse(item as string);
                 const { value, expires } = data;
-                // ÔÚÓĞĞ§ÆÚÄÚ·µ»Ø
+                // åœ¨æœ‰æ•ˆæœŸå†…è¿”å›
                 if (expires) {
                     if (expires >= Date.now()) {
                         return value;
                     } else {
-                        // Èç¹û³¬¹ıµ½ÆÚÊ±¼äÁË£¬¾ÍÉ¾³ıµ±Ç°µÄÖµ
+                        // å¦‚æœè¶…è¿‡åˆ°æœŸæ—¶é—´äº†ï¼Œå°±åˆ é™¤å½“å‰çš„å€¼
                         this.removeItem(key);
                     }
 
@@ -79,7 +79,7 @@ export class CreateStorage {
                 }
 
             } catch (e) {
-                // µ±itemÄÃ²»µ½¼üÖµ¶ÔµÄÊ±ºò£¬Ö¤Ã÷Êı¾İÒì³££¬·µ»ØÄ¬ÈÏÖµ
+                // å½“itemæ‹¿ä¸åˆ°é”®å€¼å¯¹çš„æ—¶å€™ï¼Œè¯æ˜æ•°æ®å¼‚å¸¸ï¼Œè¿”å›é»˜è®¤å€¼
                 return def
             }
         }
@@ -87,15 +87,15 @@ export class CreateStorage {
     }
 
     /**
-     * @description ´Ó»º´æÉ¾³ıÄ³Ïî
-     * @param {string}  key  »º´æ¼ü
+     * @description ä»ç¼“å­˜åˆ é™¤æŸé¡¹
+     * @param {string}  key  ç¼“å­˜é”®
      */
     removeItem(key: string) {
         this.storage.removeItem(getKey(key, this.prefix, this.suffix));
     }
 
     /**
-     * @description Çå¿ÕËùÓĞ»º´æ
+     * @description æ¸…ç©ºæ‰€æœ‰ç¼“å­˜
      */
     clear() {
         this.storage.clear();
@@ -104,6 +104,5 @@ export class CreateStorage {
 
 }
 
-
-
 export default CreateStorage
+export const localStorage = new CreateStorage()

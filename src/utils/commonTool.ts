@@ -1,53 +1,53 @@
 import * as CryptoJS from "crypto-js"
 
 /**
- * Éî¿½±´
- * @param obj - ĞèÒªÉî¿½±´µÄ¶ÔÏó
- * @returns Éî¿½±´ºóµÄ¶ÔÏó
+ * æ·±æ‹·è´
+ * @param obj - éœ€è¦æ·±æ‹·è´çš„å¯¹è±¡
+ * @returns æ·±æ‹·è´åçš„å¯¹è±¡
  */
 export function jsonClone<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
 } 
 
 /**
- * ¼ÆËãÓĞĞ§ÆÚµÄÊ±¼ä£¬µ¥Î»£ºÃë
- * @param day ÓĞĞ§ÆÚµÄÌìÊı£¬µ¥Î»£ºÌì
- * @returns ÓĞĞ§ÆÚµÄºÁÃë¼¶Ê±¼ä´Á
+ * è®¡ç®—æœ‰æ•ˆæœŸçš„æ—¶é—´ï¼Œå•ä½ï¼šç§’
+ * @param day æœ‰æ•ˆæœŸçš„å¤©æ•°ï¼Œå•ä½ï¼šå¤©
+ * @returns æœ‰æ•ˆæœŸçš„æ¯«ç§’çº§æ—¶é—´æˆ³
  */
 export function getExpiresTime(day: number): number {
   return 60 * 60 * 24 * day * 1000
 }
 
 /**
-* Éú³É¼üÖµ
-* @param key ¼üÖµ
-* @param prefix Ç°×º
-* @param suffix ºó×º
-* @returns Êä³ö¼üÖµ£¬ÀıÈçÖ¸¶¨Ç°×º£ºLogin¡£ÄÇÃ´·µ»ØµÄÊÇ£ºLOGIN_KEY
+* ç”Ÿæˆé”®å€¼
+* @param key é”®å€¼
+* @param prefix å‰ç¼€
+* @param suffix åç¼€
+* @returns è¾“å‡ºé”®å€¼ï¼Œä¾‹å¦‚æŒ‡å®šå‰ç¼€ï¼šLoginã€‚é‚£ä¹ˆè¿”å›çš„æ˜¯ï¼šLOGIN_KEY
 */
 export function getKey(key: string, prefix = "", suffix = ""): string {
   return `${prefix}${prefix ? '_' : ''}${key}${suffix ? '_' : ''}${suffix}`;
 }
 
 /**
- * ¸ù¾İ¼ÓÃÜ½âÃÜµÄ²ÎÊı¾ö¶¨ÊÇ·ñ¶ÔÖµ½øĞĞ¼ÓÃÜ½âÃÜ
- * ½âÃÜ·½·¨
- * @param key ¼üÖµ
- * @param value Öµ
+ * æ ¹æ®åŠ å¯†è§£å¯†çš„å‚æ•°å†³å®šæ˜¯å¦å¯¹å€¼è¿›è¡ŒåŠ å¯†è§£å¯†
+ * è§£å¯†æ–¹æ³•
+ * @param key é”®å€¼
+ * @param value å€¼
  */
 export function handleDecryptData(key: string, value: string) {
-  // Í³Ò»ÓÃ¶ÔÏó±£´æ£¬boolean, array, object, string,numberµÈ»ù±¾ÀàĞÍµÄÖµ£¬Ò²·½±ãµ½Ê±ºò½âÃÜ
+  // ç»Ÿä¸€ç”¨å¯¹è±¡ä¿å­˜ï¼Œboolean, array, object, string,numberç­‰åŸºæœ¬ç±»å‹çš„å€¼ï¼Œä¹Ÿæ–¹ä¾¿åˆ°æ—¶å€™è§£å¯†
   const bytes = CryptoJS.AES.decrypt(value, key)
   return JSON.parse(bytes.toString(CryptoJS.enc.Utf8)).encryptValue;
 }
 
 /**
- * ¸ù¾İ¼ÓÃÜ½âÃÜµÄ²ÎÊı¾ö¶¨ÊÇ·ñ¶ÔÖµ½øĞĞ¼ÓÃÜ½âÃÜ
- * ¼ÓÃÜ·½·¨
+ * æ ¹æ®åŠ å¯†è§£å¯†çš„å‚æ•°å†³å®šæ˜¯å¦å¯¹å€¼è¿›è¡ŒåŠ å¯†è§£å¯†
+ * åŠ å¯†æ–¹æ³•
  * @param encryption 
  */
 export function handleEncryptData(key: string, value: any) {
-  // Í³Ò»ÓÃ¶ÔÏó±£´æ£¬boolean, array, object, string,numberµÈ»ù±¾ÀàĞÍµÄÖµ£¬Ò²·½±ãµ½Ê±ºò½âÃÜ
+  // ç»Ÿä¸€ç”¨å¯¹è±¡ä¿å­˜ï¼Œboolean, array, object, string,numberç­‰åŸºæœ¬ç±»å‹çš„å€¼ï¼Œä¹Ÿæ–¹ä¾¿åˆ°æ—¶å€™è§£å¯†
   const data = {
       encryptValue: value
   }
@@ -55,16 +55,16 @@ export function handleEncryptData(key: string, value: any) {
 }
 
 /**
- * Ëæ»úÉú³ÉÈÎÒâ³¤¶ÈµÄËæ»úÊı
- * @param size ĞèÒªÉú³ÉËæ»úÊı¾İµÄ³¤¶È
+ * éšæœºç”Ÿæˆä»»æ„é•¿åº¦çš„éšæœºæ•°
+ * @param size éœ€è¦ç”Ÿæˆéšæœºæ•°æ®çš„é•¿åº¦
  * @returns 
  */
 export const genRanHex = (size: number) => [...Array(size)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
 
 /**
- * ÉèÖÃAES¼ÓÃÜµÄÃÜÔ¿
- * @param encryption ÊÇ·ñ¿ªÆôAES¼ÓÃÜ
- * @returns ÃÜÔ¿×Ö·û´®
+ * è®¾ç½®AESåŠ å¯†çš„å¯†é’¥
+ * @param encryption æ˜¯å¦å¼€å¯AESåŠ å¯†
+ * @returns å¯†é’¥å­—ç¬¦ä¸²
  */
 export function setEncryptionKey(encryption: boolean): string {
     const radomHex = localStorage.getItem('uuid')

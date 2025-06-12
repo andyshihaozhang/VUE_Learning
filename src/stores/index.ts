@@ -1,7 +1,7 @@
 import { createPinia } from 'pinia';
 import type { App } from 'vue';
 import type { PiniaPluginContext } from 'pinia';
-import { jsonClone } from '@/utils/common';
+import { jsonClone } from '@/utils/commonTool';
 import { SetupStoreId } from './storeEnums';
 
 /**

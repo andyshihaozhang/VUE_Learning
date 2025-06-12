@@ -5,22 +5,22 @@ export interface CustomStorage {
 }
 
 export interface localStorageType {
-    // Ç°×º, Ä¬ÈÏÖµ£º ""
+    // å‰ç¼€, é»˜è®¤å€¼ï¼š ""
     prefix?: string;
-    // ºó×º Ä¬ÈÏÖµ£º ""
+    // åç¼€ é»˜è®¤å€¼ï¼š ""
     suffix?: string;
-    // Êı¾İ¿âÃû³Æ, Ä¬ÈÏÖµ£ºVue3PersistStorage
+    // æ•°æ®åº“åç§°, é»˜è®¤å€¼ï¼šVue3PersistStorage
     name?: string;
-    // Êı¾İ¿âÖĞ±íÃû£¬Ä¬ÈÏÖµ£ºDataShee
+    // æ•°æ®åº“ä¸­è¡¨åï¼Œé»˜è®¤å€¼ï¼šDataShee
     storeName?: string;
-    // µ÷ÊÔÄ£Ê½£¬»¹Ô­Ê§°Ü´òÓ¡±¨´í£¨¿ÉÑ¡£©
+    // è°ƒè¯•æ¨¡å¼ï¼Œè¿˜åŸå¤±è´¥æ‰“å°æŠ¥é”™ï¼ˆå¯é€‰ï¼‰
     debug?: boolean;
-    // ÊÇ·ñ¿ªÆô¼ÓÃÜ¹¦ÄÜ
+    // æ˜¯å¦å¼€å¯åŠ å¯†åŠŸèƒ½
     encryption?: boolean
-    // storageÀàĞÍ£¬ÓĞlocalStorage¡¢sessionStroage£¨¿ÉÑ¡£©
+    // storageç±»å‹ï¼Œæœ‰localStorageã€sessionStroageï¼ˆå¯é€‰ï¼‰
     storage?: Storage | CustomStorage;
-    // ÊÇ·ñ¿ªÆôÓĞĞ§ÆÚ, Ä¬ÈÏÖµ£ºfalse
+    // æ˜¯å¦å¼€å¯æœ‰æ•ˆæœŸ, é»˜è®¤å€¼ï¼šfalse
     isOpenExpires?: boolean;
-    // ÓĞĞ§ÆÚÄ¬ÈÏ¼¸Ìì, Ä¬ÈÏÖµ: 7Ìì
+    // æœ‰æ•ˆæœŸé»˜è®¤å‡ å¤©, é»˜è®¤å€¼: 7å¤©
     day?: number;
 }
