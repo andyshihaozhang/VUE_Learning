@@ -1,4 +1,4 @@
-import type { localStorageType } from '@/types/utils/localStorageType';
+import type { storage } from '@/types/utils/storage';
 import { getExpiresTime, 
     getKey, 
     handleDecryptData, 
@@ -23,7 +23,7 @@ export class CreateStorage {
     private encryption: boolean;
     /** 加密时需要的密钥，自动生成，不需要设置 */
     private encryptionKey: string
-    constructor(type: localStorageType = {}) {
+    constructor(type: storage = {}) {
         const { prefix = '', suffix = '', storage = localStorage, isOpenExpires = false, day = 7, encryption = false } = type
         this.storage = storage as Storage;
         this.prefix = prefix

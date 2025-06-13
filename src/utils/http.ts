@@ -1,9 +1,6 @@
 import axios from 'axios'
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
-import { ElMessage } from 'element-plus'
-import { useLoginStore } from '@/stores/global/loginStore'
-import { router } from '@/router'
-
+import { HttpStatusCode, getHttpStatusMessage } from '@/enums/httpEnums'
 // 创建 axios 实例
 const http: AxiosInstance = axios.create({
   timeout: 10000,
@@ -11,50 +8,45 @@ const http: AxiosInstance = axios.create({
     'Content-Type': 'application/json'
   }
 })
+// 请求处理
+const reqSuccess = (config: InternalAxiosRequestConfig) => {
+  console.log('Request:', config.method?.toUpperCase(), config.url)
+  // 获取token
+  var token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+}
+
+// 请求失败
+const reqFail = (error: any) => {
+  console.error('Request Error:', error)
+  return Promise.reject(error)
+}
+
+// 响应处理
+const resSuccess = (response: AxiosResponse) => {
+  console.log('Response:', response.status, response.config.url)
+  // 处理业务响应
+  var axiosResponse : ApiResponse<any> = response.data
+  if (axiosResponse.code === HttpStatusCode.OK) {
+    return axiosResponse.data // 返回响应数据
+  }
+}
+
+// 响应失败
+const resFail = (error: any) => {
+  // 处理 HTTP 错误
+  console.error('Response Error:', error)
+  var errorMessage = getHttpStatusMessage(error.response.status) + ' ' + error.response.data.message
+  return Promise.reject(errorMessage)
+}
 
 // 请求拦截器
-http.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    console.log('Request:', config.method?.toUpperCase(), config.url)
-    // 从 store 中获取 token
-    const loginStore = useLoginStore()
-    if (loginStore.loginInfo?.token) {
-      config.headers.Authorization = `Bearer ${loginStore.loginInfo.token}`
-    }
-    return config
-  },
-  (error) => Promise.reject(error)
-)
+http.interceptors.request.use(reqSuccess, reqFail)
 
 // 响应拦截器
-http.interceptors.response.use(
-  (response: AxiosResponse) => {
-    console.log('Response:', response.status, response.config.url)
-    const { data } = response
-    // 处理业务响应
-    if (data.code === 200) {
-      return response // 返回完整的 response 对象
-    }
-    // 处理业务错误
-    ElMessage.error(data.message || '请求失败')
-    return Promise.reject(new Error(data.message || '请求失败'))
-  },
-  (error) => {
-    // 处理 HTTP 错误
-    console.error('Request Error:', error)
-    if (error.response?.status === 401) {
-      // 如果是认证错误，跳转到登录页
-      ElMessage.error('请先登录')
-      const loginStore = useLoginStore()
-      loginStore.isLoggedIn = false
-      loginStore.loginInfo = null
-      localStorage.removeItem('token')
-      router.push({ name: 'Login' })
-    } else {
-      ElMessage.error(error.message || '网络错误')
-    }
-    return Promise.reject(error)
-  }
-)
+http.interceptors.response.use(resSuccess, resFail)
 
 export { http } 

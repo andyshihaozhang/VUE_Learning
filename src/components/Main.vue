@@ -17,7 +17,7 @@
           background-color="#1a1f36"
           text-color="#a3aed0"
           active-text-color="#fff"
-          router = "true"
+          :router = "true"
           :collapse="isCollapse">
           <el-menu-item index="/">
             <el-icon><House /></el-icon>

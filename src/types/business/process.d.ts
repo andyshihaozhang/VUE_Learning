@@ -1,4 +1,4 @@
-import { EmployeeDetail } from "./employee"
+import { Employee } from "./employee"
 
 // 简化的员工引用类型
 export interface EmployeeReference {

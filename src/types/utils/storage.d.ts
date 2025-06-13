@@ -1,10 +1,10 @@
 
-export interface CustomStorage {
+export interface CustomStorageTool {
     getItem<T>(key: string): Promise<T | null> | T;
     setItem<T>(key: string, value: T): Promise<T | null> | T;
 }
 
-export interface localStorageType {
+export interface storage {
     // 前缀, 默认值： ""
     prefix?: string;
     // 后缀 默认值： ""

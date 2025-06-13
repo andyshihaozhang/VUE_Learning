@@ -1,7 +1,13 @@
+/*
+* 工序管理全局状态管理
+* 缓存工序基本信息
+* 提供工序其他信息api调用接口
+*/
+
 import { ProcessDetailApi } from '@/api/processApi'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { SetupStoreId } from '@/stores/storeEnums'
+import { StoreId } from '@/enums/storeEnums'
 import type { 
     ProcessAllocation, 
     ProcessAllocationByEmployeeIdAndProductIdRequest, 
@@ -9,15 +15,14 @@ import type {
     ProcessAllocationUpdateRequest } from '@/types/business/process'
 
 
-export const useProcessStore = defineStore(SetupStoreId.Process, () => {
+export const useProcessStore = defineStore(StoreId.Process, () => {
   const processAllocationList = ref<ProcessAllocation[]>([])
   const total = ref(0)
 
   // 获取产品流程分配
   const getProcessAllocationByProductId = async (productId: number) => {
     const response = await ProcessDetailApi.getProcessAllocationByProductId(productId)
-    console.log("response", response)
-    processAllocationList.value = response.data.data.items || []
+    processAllocationList.value = response.data.items || []
     return processAllocationList.value
   }
 
@@ -38,10 +43,8 @@ export const useProcessStore = defineStore(SetupStoreId.Process, () => {
 
   // 根据员工ID和产品ID获取工序列表
   const getProcessAllocationByEmployeeIdAndProductId = async (data: ProcessAllocationByEmployeeIdAndProductIdRequest) => {
-    console.log("data", data)
     const response = await ProcessDetailApi.getProcessAllocationByEmployeeIdAndProductId(data)
-    console.log("response test", response)
-    return response.data.data.items || []
+    return response.data.items || []
   }
 
   return {

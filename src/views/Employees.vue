@@ -13,7 +13,7 @@
     <el-table 
       class="table-container"
       :data="employeeStore.employeeList" 
-      v-loading="employeeStore.loading">
+      v-loading="requestLoading">
       <el-table-column prop="employeeName" label="员工姓名" />
       <el-table-column prop="employeePhone" label="手机号" />
       <el-table-column prop="employeeStatus" label="状态">
@@ -62,13 +62,14 @@ import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 
-import type { EmployeeDetail } from '@/types/business/employee'
+import type { Employee } from '@/types/business/employee'
 import EmployeeStatusTag from '@/components/business/employee/EmployeeStatusTag.vue'
 import EmployeeAddForm from '@/components/business/employee/EmployeeAddForm.vue'
 import EmployeeEditForm from '@/components/business/employee/EmployeeEditForm.vue'
 import { useEmployeeStore } from '@/stores/business/employeeStore'
 import FFPagination from '@/components/global/FFPagination.vue'
 const employeeStore = useEmployeeStore()
+const requestLoading = ref(false)
 
 // 表单
 const addEmployeeFormRef = ref<InstanceType<typeof EmployeeAddForm>>()
@@ -79,13 +80,16 @@ const pageSize = ref(16)
 
 // 获取用户列表
 const getEmployees = async () => {
+  requestLoading.value = true
   try {
-    await employeeStore.fetchEmployees({
+    await employeeStore.getEmployees({
       page: currentPage.value,
       pageSize: pageSize.value
     })
-  } catch (error) {
-    ElMessage.error('获取员工列表失败')
+  } catch (error : any) {
+    ElMessage.error(error.message)
+  } finally {
+    requestLoading.value = false
   }
 }
 
@@ -99,8 +103,8 @@ const handleAddEmployeeOver = async () => {
   try {
     addEmployeeFormRef.value?.closeForm()
     getEmployees()
-  } catch (error) {
-    ElMessage.error('添加员工失败')
+  } catch (error : any) {
+    ElMessage.error(error.message)
   }
 }
 
@@ -111,8 +115,8 @@ const handleDeleteEmployee = async (id: number) => {
     await employeeStore.deleteEmployee(id)
     ElMessage.success('删除员工成功')
     getEmployees()
-  } catch (error) {
-    ElMessage.error('删除员工失败')
+  } catch (error : any) {
+    ElMessage.error(error.message)
   }
 }
 
@@ -121,13 +125,13 @@ const handleEditEmployeeOver = async () => {
   try {
     editEmployeeFormRef.value?.closeForm()
     getEmployees()
-  } catch (error) {
-    ElMessage.error('更新员工失败')
+  } catch (error : any) {
+      ElMessage.error(error.message)
   }
 }
 
 // 打开编辑模态框
-const openEditModal = (employee: EmployeeDetail) => {
+const openEditModal = (employee: Employee) => {
   editEmployeeFormRef.value?.initForm(employee)
   editEmployeeFormRef.value?.openForm()
 }

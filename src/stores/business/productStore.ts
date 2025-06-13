@@ -1,8 +1,14 @@
+/*
+* 产品管理全局状态管理
+* 缓存产品基本信息
+* 提供产品其他信息api调用接口
+*/
+
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { ProductApi } from '@/api/productApi'
 import type { Product } from '@/types/business/product'
-import { SetupStoreId } from '@/stores/storeEnums'
+import { StoreId } from '@/enums/storeEnums'
 import type {
   ProductQueryParams,
   ProductCreateParams,
@@ -10,7 +16,7 @@ import type {
 } from '@/types/business/product'
 
 
-export const useProductStore = defineStore(SetupStoreId.Product, () => {
+export const useProductStore = defineStore(StoreId.Product, () => {
   // 状态定义
   const productList = ref<Product[]>([])
   const currentProduct = ref<Product | null>(null)
@@ -23,9 +29,9 @@ export const useProductStore = defineStore(SetupStoreId.Product, () => {
     try {
       loading.value = true
       const response = await ProductApi.getProducts(params)
-      if (response?.data?.data) {
-        productList.value = response.data.data.items
-        total.value = response.data.data.total
+      if (response) {
+        productList.value = response.data.items
+        total.value = response.data.total
       } else {
         error.value = '获取产品列表失败，数据格式错误'
       }
@@ -59,7 +65,7 @@ export const useProductStore = defineStore(SetupStoreId.Product, () => {
       // 更新列表中的产品信息
       const index = productList.value.findIndex(p => p.productId === id)
       if (index !== -1) {
-        productList.value[index] = response.data.data
+        productList.value[index] = response.data
       }
       return response.data
     } catch (err) {

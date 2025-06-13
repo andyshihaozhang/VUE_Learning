@@ -1,5 +1,5 @@
-import { ProgressStatus } from "./common"
-import { ProcessAllocation } from "./process"
+import { ProgressStatus } from "@/enums/businessEnum"
+import { ProcessAllocation } from "@/types/business/process"
 
 // 产品基本信息
 export interface Product {

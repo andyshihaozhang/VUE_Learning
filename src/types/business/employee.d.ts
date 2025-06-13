@@ -1,7 +1,7 @@
-import { ActiveStatus } from './common';
+import { ActiveStatus } from '@/enums/businessEnum';
 
 // 用户基本信息接口
-export interface EmployeeBase {
+export interface Employee {
   employeeId: number;
   employeeName: string;
   employeePhone: number;
@@ -9,8 +9,11 @@ export interface EmployeeBase {
   employeeCreateTime: string;
 }
 
-// 用户详细信息接口
-export interface EmployeeDetail extends EmployeeBase {}
+// 全部用户响应接口
+export interface AllEmployeeListResponse {
+  items: Employee[];
+  total: number;
+}
 
 // 用户查询参数接口
 export interface EmployeeQueryParams {
@@ -37,7 +40,7 @@ export interface EmployeeUpdateParams {
 
 // 用户列表响应接口
 export interface EmployeeListResponse {
-  items: EmployeeDetail[];
+  items: Employee[];
   total: number;
   page: number;
   pageSize: number;
@@ -48,10 +51,10 @@ export interface EmployeeListResponse {
 export interface EmployeeOperationResult {
   success: boolean;
   message: string;
-  data?: EmployeeDetail;
+  data?: Employee;
 }
 
 export interface EmployeeListByProductResponse {
-  items: EmployeeDetail[]
+  items: Employee[]
   total: number
 }

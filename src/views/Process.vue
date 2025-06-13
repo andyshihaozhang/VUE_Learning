@@ -47,8 +47,8 @@
         </div>
         <div class="division-type">
           <el-radio-group v-model="divisionType" @change="handleDivisionTypeChange">
-            <el-radio-button label="employee">按负责人记录</el-radio-button>
-            <el-radio-button label="product">按产品记录</el-radio-button>
+            <el-radio-button value="employee">按负责人记录</el-radio-button>
+            <el-radio-button value="product">按产品记录</el-radio-button>
           </el-radio-group>
         </div>
       </div>
@@ -163,7 +163,7 @@ import type { Product } from '@/types/business/product'
 import type { Allocation } from '@/types/business/process'
 import { useProductStore } from '@/stores/business/productStore'
 import { useEmployeeStore } from '@/stores/business/employeeStore'
-import type { EmployeeDetail } from '@/types/business/employee'
+import type { Employee } from '@/types/business/employee'
 import { useProcessStore } from '@/stores/business/processStore'
 import { ElMessage } from 'element-plus'
 const productStore = useProductStore()
@@ -179,7 +179,7 @@ const currentLeftId = ref<number | null>(null)
 const currentProductList = ref<Product[]>([])
 
 // product对应数据源
-const currentEmployeeList = ref<EmployeeDetail[]>([])
+const currentEmployeeList = ref<Employee[]>([])
 
 // process工序分配对应数据源
 const currentAllocationList = ref<Allocation[]>([])
@@ -205,11 +205,11 @@ const handleDivisionTypeChange = () => {
 const handleTopSelected = async (topId: number) => {
   if (divisionType.value === 'employee') {
     // 根据员工选择的产品列表
-    currentProductList.value = (await employeeStore.getProductsByEmployeeId(topId)).data.items
+    currentProductList.value = (await employeeStore.getProductsByEmployeeId(topId)).items
     console.log("currentProductList", currentProductList.value)
   } else {
     // 根据产品选择的产品列表
-    currentEmployeeList.value = (await productStore.getEmployeesByProductId(topId)).data.items
+    currentEmployeeList.value = (await productStore.getEmployeesByProductId(topId)).items
     console.log("currentEmployeeList", currentEmployeeList.value)
   }
   // 清空右侧工序列表
@@ -234,7 +234,7 @@ const handleLeftSelected = async (row: any) => {
   }
   else {
     // 根据产品选择的产品列表
-    var selectedEmployee = row as EmployeeDetail
+    var selectedEmployee = row as Employee
     currentLeftId.value = selectedEmployee.employeeId
     // api获取当前产品工序列表
     currentAllocationList.value = (await processStore.getProcessAllocationByEmployeeIdAndProductId({

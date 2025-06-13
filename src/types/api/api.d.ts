@@ -1,4 +1,4 @@
-// API ÏìÓ¦ÀàĞÍ
+// API è¿”å›ç±»å‹
 declare interface ApiResponse<T = any> {
   code: number
   data: T

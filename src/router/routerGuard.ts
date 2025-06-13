@@ -24,7 +24,6 @@ function guardRouter(router: Router){
         if (!isLogin && to.name !== 'Login') {
             return { name: 'Login' }
         }
-        return true
     });
 }
 

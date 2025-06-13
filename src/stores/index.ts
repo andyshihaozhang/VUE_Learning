@@ -2,7 +2,7 @@ import { createPinia } from 'pinia';
 import type { App } from 'vue';
 import type { PiniaPluginContext } from 'pinia';
 import { jsonClone } from '@/utils/commonTool';
-import { SetupStoreId } from './storeEnums';
+import { StoreId } from '../enums/storeEnums';
 
 /**
  * The plugin reset the state of the store which is written by setup syntax
@@ -10,7 +10,7 @@ import { SetupStoreId } from './storeEnums';
  * @param context
  */
 function resetSetupStore(context: PiniaPluginContext) {
-  const setupSyntaxIds = Object.values(SetupStoreId) as string[];
+  const setupSyntaxIds = Object.values(StoreId) as string[];
 
   if (setupSyntaxIds.includes(context.store.$id)) {
     const { $state } = context.store;

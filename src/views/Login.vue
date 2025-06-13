@@ -106,16 +106,16 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { Iphone, Lock, User } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import { useLoginStore } from '@/stores/global/loginStore'
+import { useAuthStore } from '@/stores/global/authStore'
 import { ElMessage } from 'element-plus'
-import type { LoginParams, RegisterParams } from '@/types/business/login'
+import type { LoginParams, RegisterParams } from '@/types/global/auth'
 
 const router = useRouter()
 const loginFormRef = ref<FormInstance>()
 const registerFormRef = ref<FormInstance>()
 const loading = ref(false)
 const isLogin = ref(true)
-const loginStore = useLoginStore()
+const authStore = useAuthStore()
 
 // 登录表单数据
 const loginForm = reactive<LoginParams>({
@@ -166,7 +166,7 @@ const handleLogin = async () => {
     await loginFormRef.value.validate()
     loading.value = true
 
-    await loginStore.login(loginForm, () => {
+    await authStore.login(loginForm, () => {
       // 登录成功后，跳转到首页
       ElMessage.success('登录成功')
       router.push({ name: 'Home' })
@@ -187,7 +187,7 @@ const handleRegister = async () => {
     await registerFormRef.value.validate()
     loading.value = true
 
-    await loginStore.register(registerForm, () => {
+    await authStore.register(registerForm, () => {
       ElMessage.success('注册成功，请登录')
       isLogin.value = true
       // 清空注册表单

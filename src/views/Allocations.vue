@@ -101,7 +101,7 @@ import { ref, onMounted } from 'vue';
 import { Plus, Edit, Delete } from '@element-plus/icons-vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import type { ProcessAllocation } from '@/types/business/process'
-import type { EmployeeDetail } from '@/types/business/employee'
+import type { Employee } from '@/types/business/employee'
 import { useProductStore } from '@/stores/business/productStore';
 import { useEmployeeStore } from '@/stores/business/employeeStore';
 import { useProcessStore } from '@/stores/business/processStore';
@@ -122,7 +122,7 @@ const loadingData = ref(false);
 
 const getEmployeeName = (employeeId: number) => {
   // 获取员工名称
-  const employee = employeeStore.employeeList.find((emp: EmployeeDetail) => emp.employeeId === employeeId)
+  const employee = employeeStore.employeeList.find((emp: Employee) => emp.employeeId === employeeId)
   return employee ? `${employee.employeeName}` : `未知员工(${employeeId})`
 }
 

@@ -1,10 +1,10 @@
-export interface LoginInfo {
+export interface AuthInfo {
+    token: string
     userId: number
     username: string
     phone: string
     status: number
     role: string
-    token: string
 }
 
 export interface LoginParams {
@@ -13,12 +13,12 @@ export interface LoginParams {
 }
 
 export interface LoginResponse {
+    token: string
     userId: number
     username: string
     phone: string
     status: number
     role: string
-    token: string
 }
 
 export interface RegisterParams {
