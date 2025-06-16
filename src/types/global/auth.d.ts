@@ -1,10 +1,17 @@
+import { Token } from "typescript"
+
 export interface AuthInfo {
-    token: string
     userId: number
     username: string
     phone: string
     status: number
     role: string
+}
+
+export interface TokenInfo{
+    accessToken: string
+    refreshToken: string
+    expiresAt: string
 }
 
 export interface LoginParams {
@@ -13,12 +20,8 @@ export interface LoginParams {
 }
 
 export interface LoginResponse {
-    token: string
-    userId: number
-    username: string
-    phone: string
-    status: number
-    role: string
+    authInfo: AuthInfo
+    tokenInfo: TokenInfo
 }
 
 export interface RegisterParams {
@@ -30,4 +33,12 @@ export interface RegisterParams {
 export interface ChangePasswordParams {
     oldPassword: string
     newPassword: string
+}
+
+export interface RefreshJwtParams {
+    refreshToken: string
+}
+
+export interface RefreshJwtResponse {
+    tokenInfo: TokenInfo
 }

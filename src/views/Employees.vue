@@ -12,7 +12,7 @@
     
     <el-table 
       class="table-container"
-      :data="employeeStore.employeeList" 
+      :data="employees" 
       v-loading="requestLoading">
       <el-table-column prop="employeeName" label="员工姓名" />
       <el-table-column prop="employeePhone" label="手机号" />
@@ -36,7 +36,7 @@
     </el-table>
     <!-- 分页配置 -->
     <FFPagination
-      :total="employeeStore.total"
+      :total="total"
       @current-change="handleCurrentChange"
       @size-change="handleSizeChange"
       :current-page="currentPage"
@@ -62,12 +62,12 @@ import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 
-import type { Employee } from '@/types/business/employee'
 import EmployeeStatusTag from '@/components/business/employee/EmployeeStatusTag.vue'
 import EmployeeAddForm from '@/components/business/employee/EmployeeAddForm.vue'
 import EmployeeEditForm from '@/components/business/employee/EmployeeEditForm.vue'
 import { useEmployeeStore } from '@/stores/business/employeeStore'
 import FFPagination from '@/components/global/FFPagination.vue'
+import type { Employee } from '@/types/business/employee'
 const employeeStore = useEmployeeStore()
 const requestLoading = ref(false)
 
@@ -75,17 +75,23 @@ const requestLoading = ref(false)
 const addEmployeeFormRef = ref<InstanceType<typeof EmployeeAddForm>>()
 const editEmployeeFormRef = ref<InstanceType<typeof EmployeeEditForm>>()
 
-const currentPage = ref(1)
-const pageSize = ref(16)
+const employees = ref<Employee[]>()
+var currentPage = ref(1)
+var pageSize = ref(16)
+var total = ref(0)
 
 // 获取用户列表
 const getEmployees = async () => {
   requestLoading.value = true
   try {
-    await employeeStore.getEmployees({
+    var response = await employeeStore.getEmployees({
       page: currentPage.value,
       pageSize: pageSize.value
     })
+    employees.value = response.items
+    currentPage.value = response.page
+    pageSize.value = response.pageSize
+    total.value = response.total
   } catch (error : any) {
     ElMessage.error(error.message)
   } finally {

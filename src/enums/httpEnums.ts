@@ -1,74 +1,74 @@
 /**
- * HTTP ×´Ì¬ÂëÃ¶¾Ù
+ * HTTP çŠ¶æ€ç æžšä¸¾
  */
 export enum HttpStatusCode {
-  // 2xx ³É¹¦
-  OK = 200,                    // ÇëÇó³É¹¦
-  CREATED = 201,               // ´´½¨³É¹¦
-  ACCEPTED = 202,              // ÇëÇóÒÑ½ÓÊÜ
-  NO_CONTENT = 204,            // ÇëÇó³É¹¦µ«ÎÞ·µ»ØÄÚÈÝ
+  // 2xx æˆåŠŸ
+  OK = 200,                    // è¯·æ±‚æˆåŠŸ
+  CREATED = 201,               // åˆ›å»ºæˆåŠŸ
+  ACCEPTED = 202,              // è¯·æ±‚å·²æŽ¥å—
+  NO_CONTENT = 204,            // è¯·æ±‚æˆåŠŸä½†æ— è¿”å›žå†…å®¹
 
-  // 3xx ÖØ¶¨Ïò
-  MOVED_PERMANENTLY = 301,     // ÓÀ¾ÃÖØ¶¨Ïò
-  FOUND = 302,                 // ÁÙÊ±ÖØ¶¨Ïò
-  NOT_MODIFIED = 304,          // ×ÊÔ´Î´ÐÞ¸Ä
+  // 3xx é‡å®šå‘
+  MOVED_PERMANENTLY = 301,     // æ°¸ä¹…é‡å®šå‘
+  FOUND = 302,                 // ä¸´æ—¶é‡å®šå‘
+  NOT_MODIFIED = 304,          // èµ„æºæœªä¿®æ”¹
 
-  // 4xx ¿Í»§¶Ë´íÎó
-  BAD_REQUEST = 400,           // ÇëÇó²ÎÊý´íÎó
-  UNAUTHORIZED = 401,          // Î´ÊÚÈ¨£¨Î´µÇÂ¼£©
-  FORBIDDEN = 403,             // ½ûÖ¹·ÃÎÊ£¨ÎÞÈ¨ÏÞ£©
-  NOT_FOUND = 404,             // ×ÊÔ´²»´æÔÚ
-  METHOD_NOT_ALLOWED = 405,    // ÇëÇó·½·¨²»ÔÊÐí
-  REQUEST_TIMEOUT = 408,       // ÇëÇó³¬Ê±
-  CONFLICT = 409,              // ×ÊÔ´³åÍ»
-  GONE = 410,                  // ×ÊÔ´ÒÑÉ¾³ý
-  UNPROCESSABLE_ENTITY = 422,  // ²ÎÊýÑéÖ¤Ê§°Ü
-  TOO_MANY_REQUESTS = 429,     // ÇëÇó¹ýÓÚÆµ·±
+  // 4xx å®¢æˆ·ç«¯é”™è¯¯
+  BAD_REQUEST = 400,           // è¯·æ±‚å‚æ•°é”™è¯¯
+  UNAUTHORIZED = 401,          // æœªæŽˆæƒï¼ˆæœªç™»å½•ï¼‰
+  FORBIDDEN = 403,             // ç¦æ­¢è®¿é—®ï¼ˆæ— æƒé™ï¼‰
+  NOT_FOUND = 404,             // èµ„æºä¸å­˜åœ¨
+  METHOD_NOT_ALLOWED = 405,    // è¯·æ±‚æ–¹æ³•ä¸å…è®¸
+  REQUEST_TIMEOUT = 408,       // è¯·æ±‚è¶…æ—¶
+  CONFLICT = 409,              // èµ„æºå†²çª
+  GONE = 410,                  // èµ„æºå·²åˆ é™¤
+  UNPROCESSABLE_ENTITY = 422,  // å‚æ•°éªŒè¯å¤±è´¥
+  TOO_MANY_REQUESTS = 429,     // è¯·æ±‚è¿‡äºŽé¢‘ç¹
 
-  // 5xx ·þÎñÆ÷´íÎó
-  INTERNAL_SERVER_ERROR = 500, // ·þÎñÆ÷ÄÚ²¿´íÎó
-  NOT_IMPLEMENTED = 501,       // ¹¦ÄÜÎ´ÊµÏÖ
-  BAD_GATEWAY = 502,           // Íø¹Ø´íÎó
-  SERVICE_UNAVAILABLE = 503,   // ·þÎñ²»¿ÉÓÃ
-  GATEWAY_TIMEOUT = 504,       // Íø¹Ø³¬Ê±
+  // 5xx æœåŠ¡å™¨é”™è¯¯
+  INTERNAL_SERVER_ERROR = 500, // æœåŠ¡å™¨å†…éƒ¨é”™è¯¯
+  NOT_IMPLEMENTED = 501,       // åŠŸèƒ½æœªå®žçŽ°
+  BAD_GATEWAY = 502,           // ç½‘å…³é”™è¯¯
+  SERVICE_UNAVAILABLE = 503,   // æœåŠ¡ä¸å¯ç”¨
+  GATEWAY_TIMEOUT = 504,       // ç½‘å…³è¶…æ—¶
 }
 
 /**
- * HTTP ×´Ì¬Âë¶ÔÓ¦µÄ´íÎóÐÅÏ¢
+ * HTTP çŠ¶æ€ç å¯¹åº”çš„é”™è¯¯ä¿¡æ¯
  */
 export const HttpStatusMessage: Record<HttpStatusCode, string> = {
-  [HttpStatusCode.OK]: 'ÇëÇó³É¹¦',
-  [HttpStatusCode.CREATED]: '´´½¨³É¹¦',
-  [HttpStatusCode.ACCEPTED]: 'ÇëÇóÒÑ½ÓÊÜ',
-  [HttpStatusCode.NO_CONTENT]: 'ÇëÇó³É¹¦µ«ÎÞ·µ»ØÄÚÈÝ',
+  [HttpStatusCode.OK]: 'è¯·æ±‚æˆåŠŸ',
+  [HttpStatusCode.CREATED]: 'åˆ›å»ºæˆåŠŸ',
+  [HttpStatusCode.ACCEPTED]: 'è¯·æ±‚å·²æŽ¥å—',
+  [HttpStatusCode.NO_CONTENT]: 'è¯·æ±‚æˆåŠŸä½†æ— è¿”å›žå†…å®¹',
 
-  [HttpStatusCode.MOVED_PERMANENTLY]: '×ÊÔ´ÒÑÓÀ¾ÃÒÆ¶¯',
-  [HttpStatusCode.FOUND]: '×ÊÔ´ÒÑÁÙÊ±ÒÆ¶¯',
-  [HttpStatusCode.NOT_MODIFIED]: '×ÊÔ´Î´ÐÞ¸Ä',
+  [HttpStatusCode.MOVED_PERMANENTLY]: 'èµ„æºå·²æ°¸ä¹…ç§»åŠ¨',
+  [HttpStatusCode.FOUND]: 'èµ„æºå·²ä¸´æ—¶ç§»åŠ¨',
+  [HttpStatusCode.NOT_MODIFIED]: 'èµ„æºæœªä¿®æ”¹',
 
-  [HttpStatusCode.BAD_REQUEST]: 'ÇëÇó²ÎÊý´íÎó',
-  [HttpStatusCode.UNAUTHORIZED]: 'ÇëÏÈµÇÂ¼',
-  [HttpStatusCode.FORBIDDEN]: 'ÎÞÈ¨ÏÞ·ÃÎÊ',
-  [HttpStatusCode.NOT_FOUND]: 'ÇëÇóµÄ×ÊÔ´²»´æÔÚ',
-  [HttpStatusCode.METHOD_NOT_ALLOWED]: 'ÇëÇó·½·¨²»ÔÊÐí',
-  [HttpStatusCode.REQUEST_TIMEOUT]: 'ÇëÇó³¬Ê±',
-  [HttpStatusCode.CONFLICT]: '×ÊÔ´³åÍ»',
-  [HttpStatusCode.GONE]: '×ÊÔ´ÒÑÉ¾³ý',
-  [HttpStatusCode.UNPROCESSABLE_ENTITY]: '²ÎÊýÑéÖ¤Ê§°Ü',
-  [HttpStatusCode.TOO_MANY_REQUESTS]: 'ÇëÇó¹ýÓÚÆµ·±£¬ÇëÉÔºóÔÙÊÔ',
+  [HttpStatusCode.BAD_REQUEST]: 'è¯·æ±‚å‚æ•°é”™è¯¯',
+  [HttpStatusCode.UNAUTHORIZED]: 'è¯·å…ˆç™»å½•',
+  [HttpStatusCode.FORBIDDEN]: 'æ— æƒé™è®¿é—®',
+  [HttpStatusCode.NOT_FOUND]: 'è¯·æ±‚çš„èµ„æºä¸å­˜åœ¨',
+  [HttpStatusCode.METHOD_NOT_ALLOWED]: 'è¯·æ±‚æ–¹æ³•ä¸å…è®¸',
+  [HttpStatusCode.REQUEST_TIMEOUT]: 'è¯·æ±‚è¶…æ—¶',
+  [HttpStatusCode.CONFLICT]: 'èµ„æºå†²çª',
+  [HttpStatusCode.GONE]: 'èµ„æºå·²åˆ é™¤',
+  [HttpStatusCode.UNPROCESSABLE_ENTITY]: 'å‚æ•°éªŒè¯å¤±è´¥',
+  [HttpStatusCode.TOO_MANY_REQUESTS]: 'è¯·æ±‚è¿‡äºŽé¢‘ç¹ï¼Œè¯·ç¨åŽå†è¯•',
 
-  [HttpStatusCode.INTERNAL_SERVER_ERROR]: '·þÎñÆ÷ÄÚ²¿´íÎó',
-  [HttpStatusCode.NOT_IMPLEMENTED]: '¹¦ÄÜÎ´ÊµÏÖ',
-  [HttpStatusCode.BAD_GATEWAY]: 'Íø¹Ø´íÎó',
-  [HttpStatusCode.SERVICE_UNAVAILABLE]: '·þÎñÔÝÊ±²»¿ÉÓÃ',
-  [HttpStatusCode.GATEWAY_TIMEOUT]: 'Íø¹Ø³¬Ê±',
+  [HttpStatusCode.INTERNAL_SERVER_ERROR]: 'æœåŠ¡å™¨å†…éƒ¨é”™è¯¯',
+  [HttpStatusCode.NOT_IMPLEMENTED]: 'åŠŸèƒ½æœªå®žçŽ°',
+  [HttpStatusCode.BAD_GATEWAY]: 'ç½‘å…³é”™è¯¯',
+  [HttpStatusCode.SERVICE_UNAVAILABLE]: 'æœåŠ¡æš‚æ—¶ä¸å¯ç”¨',
+  [HttpStatusCode.GATEWAY_TIMEOUT]: 'ç½‘å…³è¶…æ—¶',
 }
 
 /**
- * »ñÈ¡×´Ì¬Âë¶ÔÓ¦µÄ´íÎóÐÅÏ¢
- * @param status HTTP×´Ì¬Âë
- * @returns ¶ÔÓ¦µÄ´íÎóÐÅÏ¢
+ * èŽ·å–çŠ¶æ€ç å¯¹åº”çš„é”™è¯¯ä¿¡æ¯
+ * @param status HTTPçŠ¶æ€ç 
+ * @returns å¯¹åº”çš„é”™è¯¯ä¿¡æ¯
  */
 export function getHttpStatusMessage(status: HttpStatusCode): string {
-  return HttpStatusMessage[status] || 'Î´Öª´íÎó'
+  return HttpStatusMessage[status] || 'æœªçŸ¥é”™è¯¯'
 }

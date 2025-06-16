@@ -40,7 +40,7 @@
   <script setup lang="ts">
   import { ref } from 'vue'
   import type { EmployeeUpdateParams } from '@/types/business/employee'
-  import { ActiveStatus } from '@/types/business/common'
+  import { ActiveStatus } from '@/enums/businessEnum'
   import BaseForm from '@/components/global/BaseForm.vue'
   import { useEmployeeStore } from '@/stores/business/employeeStore'
   import { employeeStatusConverter, getEnumValues } from '@/utils/converter'

@@ -1,5 +1,5 @@
 import type { EmployeeDetail } from '@/types/business/employee'
-import { ActiveStatus } from '@/types/business/common'
+import { ActiveStatus } from '@/enums/businessEnum'
 
 // 模拟用户列表数据
 export const mockUsers: EmployeeDetail[] = [

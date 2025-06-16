@@ -7,28 +7,13 @@
 import { defineStore } from 'pinia'
 import { EmployeeApi } from '@/api/employeeApi'
 import { StoreId } from '@/enums/storeEnums'
-import { Cache } from '@/utils/cache'
 import type {
   EmployeeQueryParams,
   EmployeeCreateParams,
   EmployeeUpdateParams,
-  Employee
 } from '@/types/business/employee'
 
 export const useEmployeeStore = defineStore(StoreId.Employee, () => {
-  // 员工基本信息缓存
-  const employeeCache = new Cache<Employee[]>()
-
-  // 获取所有员工列表
-  const getAllEmployees = async () => {
-    try {
-      const response = await EmployeeApi.getAllEmployees()
-      employeeCache.setCashData(response.data.items)
-    } catch (errMsg) {
-      throw errMsg
-    }
-  }
-
   // 获取员工列表
   const getEmployees = async (params: EmployeeQueryParams) => {
     try {
@@ -42,8 +27,9 @@ export const useEmployeeStore = defineStore(StoreId.Employee, () => {
   // 创建员工
   const createEmployee = async (data: EmployeeCreateParams) => {
     try {
-      const response = await EmployeeApi.createEmployee(data)
-      return response.data
+      await EmployeeApi.createEmployee(data)
+      // 操作成功更新缓存
+
     } catch (errMsg) {
       throw errMsg
     }
@@ -52,8 +38,8 @@ export const useEmployeeStore = defineStore(StoreId.Employee, () => {
   // 更新员工
   const updateEmployee = async (id: number, data: EmployeeUpdateParams) => {
     try {
-      const response = await EmployeeApi.updateEmployee(id, data)
-      return response.data
+      await EmployeeApi.updateEmployee(id, data)
+      // 操作成功更新缓存
     } catch (errMsg) {
       throw errMsg
     }
@@ -89,8 +75,6 @@ export const useEmployeeStore = defineStore(StoreId.Employee, () => {
   }
 
   return {
-    // 状态
-    employeeCache,
     // 方法
     getEmployees,
     createEmployee,

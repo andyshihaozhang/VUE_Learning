@@ -1,6 +1,6 @@
 // 后台数据余前台显示转换中间层
 
-import { ProgressStatus, ActiveStatus } from "@/types/business/common"
+import { ProgressStatus, ActiveStatus } from "@/enums/businessEnum"
 
 // 获取枚举正向映射数据集
 export const getEnumValues = (enumObj: any) => {

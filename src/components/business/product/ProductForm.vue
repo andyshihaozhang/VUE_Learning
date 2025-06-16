@@ -33,7 +33,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import BaseForm from '@/components/global/BaseForm.vue'
-import { ProgressStatus } from '@/types/business/common'
+import { ProgressStatus } from '@/enums/businessEnum'
 import type { Product } from '@/types/business/product'
 import { ElMessage } from 'element-plus'
 import { useProductStore } from '@/stores/business/productStore'

@@ -1,6 +1,10 @@
 import axios from 'axios'
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
 import { HttpStatusCode, getHttpStatusMessage } from '@/enums/httpEnums'
+import { useAuthStore } from '@/stores/global/authStore'
+
+const authStore = useAuthStore()
+
 // 创建 axios 实例
 const http: AxiosInstance = axios.create({
   timeout: 10000,
@@ -12,7 +16,7 @@ const http: AxiosInstance = axios.create({
 const reqSuccess = (config: InternalAxiosRequestConfig) => {
   console.log('Request:', config.method?.toUpperCase(), config.url)
   // 获取token
-  var token = localStorage.getItem('token')
+  var token = authStore.getAccessToken()
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -36,10 +40,17 @@ const resSuccess = (response: AxiosResponse) => {
 }
 
 // 响应失败
-const resFail = (error: any) => {
+const resFail = async (error: any) => {
   // 处理 HTTP 错误
-  console.error('Response Error:', error)
   var errorMessage = getHttpStatusMessage(error.response.status) + ' ' + error.response.data.message
+  switch (error.response?.status){
+    case HttpStatusCode.UNAUTHORIZED:
+      await authStore.refreshJwt()
+      
+      break
+    default:
+      console.error('Response Error:', error, errorMessage)
+  }
   return Promise.reject(errorMessage)
 }
 

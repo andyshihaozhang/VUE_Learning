@@ -18,7 +18,7 @@ function initBeforeRouter(router: Router) {
 }
 
 function guardRouter(router: Router){
-    router.beforeEach(async (to, from) => {
+    router.beforeEach(async (to, _) => {
         // 登陆认证
         const isLogin = Boolean(localStorage.getItem('token'));
         if (!isLogin && to.name !== 'Login') {

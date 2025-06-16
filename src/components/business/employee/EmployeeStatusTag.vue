@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { ActiveStatus } from '@/types/business/common'
+import { ActiveStatus } from '@/enums/businessEnum'
 import { employeeStatusConverter, employeeStatusColorConverter } from '@/utils/converter'
 defineProps<{
   status: ActiveStatus

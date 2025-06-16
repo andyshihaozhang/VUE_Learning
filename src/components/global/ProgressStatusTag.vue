@@ -5,7 +5,7 @@
   </template>
 
 <script setup lang="ts">
-import { ProgressStatus } from '@/types/business/common'
+import { ProgressStatus } from '@/enums/businessEnum'
 import { progressStatusConverter, progressStatusColorConverter } from '@/utils/converter'
 defineProps<{
     status: ProgressStatus
