@@ -1,9 +1,8 @@
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
 import { HttpStatusCode, getHttpStatusMessage } from '@/enums/httpEnums'
 import { useAuthStore } from '@/stores/global/authStore'
-
-const authStore = useAuthStore()
 
 // 创建 axios 实例
 const http: AxiosInstance = axios.create({
@@ -15,6 +14,8 @@ const http: AxiosInstance = axios.create({
 // 请求处理
 const reqSuccess = (config: InternalAxiosRequestConfig) => {
   console.log('Request:', config.method?.toUpperCase(), config.url)
+  const authStore = useAuthStore()
+
   // 获取token
   var token = authStore.getAccessToken()
   if (token) {
@@ -33,9 +34,9 @@ const reqFail = (error: any) => {
 const resSuccess = (response: AxiosResponse) => {
   console.log('Response:', response.status, response.config.url)
   // 处理业务响应
-  var axiosResponse : ApiResponse<any> = response.data
-  if (axiosResponse.code === HttpStatusCode.OK) {
-    return axiosResponse.data // 返回响应数据
+  var apiResponse : ApiResponse = response.data
+  if (apiResponse.code === HttpStatusCode.OK) {
+    return apiResponse.data // 返回响应数据
   }
 }
 
@@ -43,10 +44,15 @@ const resSuccess = (response: AxiosResponse) => {
 const resFail = async (error: any) => {
   // 处理 HTTP 错误
   var errorMessage = getHttpStatusMessage(error.response.status) + ' ' + error.response.data.message
+  const authStore = useAuthStore()
+  const router = useRouter()
   switch (error.response?.status){
     case HttpStatusCode.UNAUTHORIZED:
+      if(authStore.isRefreshAuth == true){
+        await authStore.clearJwt()
+        router.push({name : 'Login'})
+      }
       await authStore.refreshJwt()
-      
       break
     default:
       console.error('Response Error:', error, errorMessage)

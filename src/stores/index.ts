@@ -2,7 +2,7 @@ import { createPinia } from 'pinia';
 import type { App } from 'vue';
 import type { PiniaPluginContext } from 'pinia';
 import { jsonClone } from '@/utils/commonTool';
-import { StoreId } from '../enums/storeEnums';
+import { StoreId } from '@/enums/storeEnums';
 
 /**
  * The plugin reset the state of the store which is written by setup syntax

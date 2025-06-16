@@ -13,19 +13,20 @@ import type {
     ChangePasswordParams, 
     TokenInfo
 } from '@/types/global/auth'
-import { AuthApi } from '@/api/loginApi'
+import { AuthApi } from '@/api/authApi'
 import { StoreId } from '@/enums/storeEnums'
 
 export const useAuthStore = defineStore(StoreId.Auth, function() {
     const authInfo = ref<AuthInfo | null>(null)
     const isLoggedIn = ref(false)
+    var isRefreshAuth = false
     
     // 登陆
     async function login(loginParams: LoginParams, onSuccess: () => void) {
         try {
             const response = await AuthApi.login(loginParams)
             if (response) {
-                authInfo.value = response.data.authInfo
+                authInfo.value = response
                 await setJwtToLocal(response.data.tokenInfo)
                 isLoggedIn.value = true
             }
@@ -66,6 +67,10 @@ export const useAuthStore = defineStore(StoreId.Auth, function() {
         }   
     }
 
+    async function logout(){
+        clearJwt()
+    }
+
     // JWT持久化
     async function setJwtToLocal(tokenInfo: TokenInfo) {
         localStorage.setItem('access_token', tokenInfo.accessToken)
@@ -73,13 +78,16 @@ export const useAuthStore = defineStore(StoreId.Auth, function() {
         localStorage.setItem('expires_time', tokenInfo.expiresAt)
     }
 
+    // 刷新JWT
     async function refreshJwt(){
+        isRefreshAuth = true
         const refreshToken = localStorage.getItem('refresh_token')
         if (!refreshToken) {
             throw new Error('No refresh token found')
         }
         const response = await AuthApi.refreshJwt({refreshToken})
         await setJwtToLocal(response.data.tokenInfo)
+        isRefreshAuth = false
     }
 
     // 获取有效JWT认证
@@ -113,14 +121,24 @@ export const useAuthStore = defineStore(StoreId.Auth, function() {
         return localStorage.getItem('access_token')
     }
 
+    // 清空JWT认证
+    async function clearJwt() {
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        localStorage.removeItem('expires_time')
+    }
+
     return { 
+        isRefreshAuth,
         authInfo,
         isLoggedIn, 
         login, 
         register, 
         changePassword,
+        logout,
         getAccessToken,
-        refreshJwt
+        refreshJwt,
+        clearJwt
     }
 })
 

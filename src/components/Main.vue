@@ -2,11 +2,23 @@
   <el-container>
     <!-- 顶部标题栏 -->
     <el-header>
-      <el-button link class="collapse-button" @click="CollapseClick">
-        <el-icon v-if="isCollapse"><Expand /></el-icon>
-        <el-icon v-else><Fold /></el-icon>
-      </el-button>
-      <h1>FEIFAN-SYSTEM</h1>
+      <div class="header-left">
+        <el-button link class="collapse-button" @click="CollapseClick">
+          <el-icon v-if="isCollapse"><Expand /></el-icon>
+          <el-icon v-else><Fold /></el-icon>
+        </el-button>
+        <h1>FEIFAN-SYSTEM</h1>
+      </div>
+      <div class="header-right">
+        <el-menu
+            :default-active="optionIndex"
+            class="el-menu-demo"
+            mode="horizontal"
+            :ellipsis="false"
+            @select="handleOption">
+            <el-menu-item index="0">退出</el-menu-item>
+        </el-menu>
+      </div>
     </el-header>
     
     <el-container>
@@ -91,11 +103,19 @@
 <script setup lang="ts">
 import { House, Cpu, User, Setting, Scissor, Calendar, DataLine, Paperclip, Postcard, Expand, Fold, Bicycle } from '@element-plus/icons-vue'
 import { ref } from 'vue';
+import { useRouter } from 'vue-router'
+import { useAuthStore } from "@/stores/global/authStore"
 
+const router = useRouter()
+const authStore = useAuthStore()
 const isCollapse = ref(false);
-
+const optionIndex = ref('')
 const CollapseClick = () => {
   isCollapse.value = !isCollapse.value;
+}
+const handleOption = () =>{
+  authStore.logout()
+  router.push({ name: 'Login' })
 }
 </script>
 
