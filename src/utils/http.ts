@@ -1,9 +1,8 @@
 import axios from 'axios'
-import { useRouter } from 'vue-router'
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
 import { HttpStatusCode, getHttpStatusMessage } from '@/enums/httpEnums'
 import { useAuthStore } from '@/stores/global/authStore'
-
+import { router } from '@/router'
 // 创建 axios 实例
 const http: AxiosInstance = axios.create({
   timeout: 10000,
@@ -32,11 +31,11 @@ const reqFail = (error: any) => {
 
 // 响应处理
 const resSuccess = (response: AxiosResponse) => {
-  console.log('Response:', response.status, response.config.url)
+  console.log('Response:', response)
+  console.log('Response Data: ', response.data)
   // 处理业务响应
-  var apiResponse : ApiResponse = response.data
-  if (apiResponse.code === HttpStatusCode.OK) {
-    return apiResponse.data // 返回响应数据
+  if (response.status === HttpStatusCode.OK) {
+    return response.data // 返回响应数据
   }
 }
 
@@ -45,7 +44,6 @@ const resFail = async (error: any) => {
   // 处理 HTTP 错误
   var errorMessage = getHttpStatusMessage(error.response.status) + ' ' + error.response.data.message
   const authStore = useAuthStore()
-  const router = useRouter()
   switch (error.response?.status){
     case HttpStatusCode.UNAUTHORIZED:
       if(authStore.isRefreshAuth == true){

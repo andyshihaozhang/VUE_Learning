@@ -25,8 +25,9 @@ export const useAuthStore = defineStore(StoreId.Auth, function() {
     async function login(loginParams: LoginParams, onSuccess: () => void) {
         try {
             const response = await AuthApi.login(loginParams)
+            console.log('debug response :',response)
             if (response) {
-                authInfo.value = response
+                authInfo.value = response.data.authInfo
                 await setJwtToLocal(response.data.tokenInfo)
                 isLoggedIn.value = true
             }

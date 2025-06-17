@@ -103,14 +103,13 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
 import { Iphone, Lock, User } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { useAuthStore } from '@/stores/global/authStore'
 import { ElMessage } from 'element-plus'
 import type { LoginParams, RegisterParams } from '@/types/global/auth'
+import { router } from '@/router'
 
-const router = useRouter()
 const loginFormRef = ref<FormInstance>()
 const registerFormRef = ref<FormInstance>()
 const loading = ref(false)
